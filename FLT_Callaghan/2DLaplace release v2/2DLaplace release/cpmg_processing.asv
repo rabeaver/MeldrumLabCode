@@ -1,0 +1,54 @@
+%  Application M-file for plotting cpmg-data-files immidiately after the
+%  measurements. It makes:
+%      1. plotting thecpmg decay
+%      2. save *.jpg of decays in the same directory and '.fig' if the
+%         following edition is necassery 
+%      3. creates 2 diffeent files withexpansion '_time.dat' & '_amp.dat'
+%      for the Callaghan program
+%      4. save data file - '_data.mat' 
+%      developed by Elena Talnishnikh
+
+clear;
+
+R='F:\Tobias_3cm\s48\Data\cpmg48II.txt';
+RR='F:\Tobias_3cm\s48\Data\s48';
+ReadFile=strcat(R);
+
+original_data=load (ReadFile);
+[l,c]=size(original_data);
+
+number_echoe=l;
+
+for i=1:l;
+t(i,1)=0.001*original_data(i,1);
+m(i,1)=original_data(i,2);
+end;
+
+figure;
+axes('FontSize',20);
+axis([t(1), t(l), min(m), max(m)]);
+plot(t, m, 'b', 'linewidth', 1.5)
+xlabel('time [s]','FontSize', 20);
+ylabel('P [a.u.]','FontSize', 20);
+
+savefile=[RR,'_cpmg.fig'];
+saveas(gcf,savefile);
+clear savefile;
+
+savefile=[RR,'_cpmg.jpg'];
+saveas(gcf, savefile);
+clear savefile;
+
+SaveFile=strcat(RR,'_time.dat');
+save ( SaveFile, 't','-ASCII');
+clear SaveFile;
+
+SaveFile=strcat(RR,'_amp.dat');
+save ( SaveFile, 'm','-ASCII');
+clear SaveFile;
+
+clear R c i l;
+
+SaveFile=strcat(RR,'_data.mat');
+save (SaveFile);
+clear SaveFile;

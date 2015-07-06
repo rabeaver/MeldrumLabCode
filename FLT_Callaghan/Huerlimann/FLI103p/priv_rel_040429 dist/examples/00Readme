@@ -1,0 +1,24 @@
+examples/Readme
+
+Files in
+
+examples:
+	example1.mat		- input data from an inversion-recovery-cpmg experiment
+	example1.matRe.mat	- result for one alpha
+	example1.matReFull.mat	- result for a full range of alpha
+
+
+	ircpmg.mat			- input data from an ir-cpmg experiment.
+
+
+To analyse the two above data, choose inversion recovery for K_1, 
+and exponential for K_2.
+
+
+
+
+	expexp.mat			- input data, exponential decay for both dimensions. 
+
+To analyse this data, use exponential for K_1 and K_2.
+
+

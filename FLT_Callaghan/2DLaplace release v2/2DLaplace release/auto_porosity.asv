@@ -1,0 +1,32 @@
+%calculations of porosity and data analysis for  'auto_porosity_halbach'
+
+
+	R = input('Please provide the input data file name:','s');
+	
+	
+	clear('R');
+
+
+
+%R='F:\Porosity_auto\long_data\long28\long28.txt';
+
+M_h2o=82.7;
+RG_h2o=55;
+echoes=2500;
+
+ReadFile=strcat(R);
+Data=load (ReadFile,'-ASCII');
+clear ReadFile;
+[n,p]=size(Data);
+
+steps=n/echoes;
+
+for i=1:n;
+    A(i,1)=Data(i,2);
+    t(i,1)=Data(i,1);
+end;
+
+for i=1:steps;
+    echo3d(i,1)=A(3+(i-1)*echoes),1);
+    t3d(i,1)=t(3+(i-1)*echoes),1);
+end;

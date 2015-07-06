@@ -1,0 +1,51 @@
+% for t1- t2 with saturation recovery, t1 changes in log10 scale
+% M=Mo*(1-exp{-tau1/T1})*exp{-kte/T2} + noise
+clear;
+tau1_st=0.1;                  % recovery start
+tau1_end=3.0;                 % recovery end
+Mo=100;                       % amplitude
+te=0.0002;                    % echo time
+
+n_T1=100;                     % number of T1
+n_echo=3500;                  % number of T2
+
+T1=0.5;                       % T1 
+T2=0.1;                       % T2 
+
+power_incr=log10(tau1_end)-log10(tau1_st);
+power_incr=power_incr/n_T1;
+incr=10^power_incr;
+level_noise=5;           % noise level
+noise=rand(n_T1,n_echo); % generate random numbers from 0 till 1
+noise=noise*level_noise;
+
+for i=1:n_T1;
+    tau1(i,1)=tau1_st*incr^(i-1);
+    for j=1:n_echo;
+        kte(j,1)=te*j;
+        M(i,j)=Mo*(1-exp(-tau1(i)/T1))*exp(-te*j/T2); % drawimg as saturation
+        M_noise(i,j)=M(i,j)+noise(i,j);
+        M_tr(j,i)=M(i,j);
+        M_tr_noise(j,i)=M_noise(i,j);
+    end;
+end;
+ 
+plot(tau1,M);figure(gcf)
+figure1 = figure('PaperPosition',[0.6345 6.345 20.3 15.23],'PaperSize',[20.98 29.68]);
+plot(tau1,M_noise);figure(gcf)
+%plot(M);figure(gcf)
+figure1 = figure('PaperPosition',[0.6345 6.345 20.3 15.23],'PaperSize',[20.98 29.68]);
+
+plot(kte,M_tr);figure(gcf)
+figure1 = figure('PaperPosition',[0.6345 6.345 20.3 15.23],'PaperSize',[20.98 29.68]);
+plot(kte,M_tr_noise);figure(gcf)
+
+clear i;
+clear j;
+clear power_incr;
+clear figure1;
+
+%plot(Tau_2, Data_help);figure(gcf)
+%figure1 = figure('PaperPosition',[0.6345 6.345 20.3 15.23],'PaperSize',[20.98 29.68]);
+%plot(Tau_1,Data_tr_plot);figure(gcf)
+
