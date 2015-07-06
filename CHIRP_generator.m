@@ -7,19 +7,21 @@ close all
 
 %%%%%%% User-defined parameters %%%%%%%
 
-dt = 500e-9 ; %time per point in waveform (s) [Scout limit is 20ns]
-tau = 15e-3; %pulse length (s)
-sliceheight = 0.020; %mm
+% dt = 500e-9 ; %time per point in waveform (s) [Scout limit is 20ns]
+N = 20000; %points to define the waveform
+tau = 20e-3; %pulse length (s)
+sliceheight = 0.030; %mm
 G = 6.59; %T m-1, B0 field gradient
 offset = 0; %mm, frequency offset (if applicable)
-amplitude = 15; %dB, for Tecmag
+amplitude = 6; %dB, for Tecmag
 % NOTE: positive offset moves to the left in the FT spectrum (negative
 % position)
 
 %%%%%%% END User-defined parameters %%%%%%%
 
 
-N = round(tau/dt); %number of points per pulse waveform
+% N = round(tau/dt); %number of points per pulse waveform
+dt = (tau/N); %time per point in waveform (s) [Scout limit is 20 ns]
 gamma = 42.576; %MHz T-1
 SW = sliceheight*G*gamma*1000; %Hz
 offsetHz = offset*1000*G*gamma; %Hz
@@ -36,18 +38,25 @@ for i = 1:N-1
 end
 
 phase = mod((phase*360/2/pi),360);
-% dlmwrite('CHIRP_Phase.dat',phase);
+dlmwrite('CHIRP_Phase.dat',phase);
 
 
 
 figure(1)
 hold on
-t = dt:dt:N*dt;
+t = linspace(0,tau,N);
 plot(t,phase,'-k')
+xlabel('time [s]')
+ylabel('phase [deg]')
+ylim([0 360])
 
-
-amp = amplitude*(1-(cos(pi*t/tau)).^40);
-% dlmwrite('CHIRP_Amp.dat',amp);
+tamp = linspace(0,tau,N);
+amp = amplitude*(1-(cos(pi*tamp/tau)).^40);
+dlmwrite('CHIRP_Amp.dat',amp');
 
 figure(2)
-plot(t,amp,'-k')
+plot(tamp,amp,'-k')
+xlabel('time [s]')
+ylabel('amplitude [dB]')
+ylim([0 amplitude+1])
+
