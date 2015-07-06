@@ -17,7 +17,7 @@ close all
 i = 1; %echo number for plotting
 reduction = 1; %reduce sampling rate by this factor to decrease bandwidth 
 lb = 25; %line broadening
-zerofilling = 2; %factor for ZF (0 = no ZF, 1 = double the length, 2 = 4x the length, etc...)
+zerofilling = 1; %factor for ZF (0 = no ZF, 1 = double the length, 2 = 4x the length, etc...)
 sample_window = 50; %window for saving samples in um
 
 real_data = load('Re_echoData.dat');
@@ -117,10 +117,10 @@ ylabel('time (\mus)')
 zlabel('signal intensity (arb)')
 
 %% Do ILT
-alpha = 1e6;
+alpha = 1e7;
 lowLim = min(echoVector)/1000;
 hiLim = max(echoVector)/10;
-nrILTSteps = length(echoVector);
+nrILTSteps = length(echoVector); % May want to change yourself
 clear('spectrum','tau','chisq')
 spectrum = zeros(nrILTSteps,length(real_space));
 tau = spectrum;

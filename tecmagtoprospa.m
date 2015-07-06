@@ -4,14 +4,12 @@ clear
 
 %% Load data
 if ispc == 1;
-    filedir = 'C:\Users\tkmeldrum\Desktop\'; 
-    filename = 'C:\Users\tkmeldrum\Desktop\0P2_T2D_TecMag_2.tnt';
+    filedir = 'C:\Users\jnking01\Desktop\'; 
+    filename = 'C:\Users\jnking01\Desktop\MilkT2D_2.tnt';
 elseif ismac == 1;
-    filedir = '/Users/tyler/Dropbox/Data/Mortar/T1T2/';
-    filename = '/Users/tyler/Dropbox/Data/Mortar/T1T2/Jamestown_17Nov2014_T1T2.tnt';
+    filedir = '/Users/tyler/Dropbox/Data/T2D_Water_T2D/';
+    filename = '/Users/tyler/Dropbox/Data/T2D_Water_T2D/H2O_T2D_test3_10Oct2014.tnt';
 end
-
-filenameout = '0P2_T2D_TecMag_2.out';
 
 cd(filedir)
 
@@ -20,18 +18,15 @@ cd(filedir)
 n1D = aq.td(1);
 n2D = aq.td(2);
 nPts = aq.ctd;
-nEchoes = 790;
+nEchoes = 1024;
 tEcho = 150e-6;     % echo time
 tD = 1e-6;
 ptsPer_tE = (tEcho/tD);
-ptsPerEcho = 64;
-singleAcqPeriod = 1;
-omitEchoes = 0;
+ptsPerEcho = 69;
 
-
-dMin = 60e-6; %minimum delta time in s
+dMin = 45e-6; %minimum delta time in s
 DELTA = 1e-3; %DELTA in s
-dStep = 20e-6; %step size between deltas in s
+dStep = 27e-6; %step size between deltas in s
 
 G = 6.5998;         % T/m (Smallest gradient amplitude) (6.5998 PM25; 23.8626 PM5)
 
@@ -39,58 +34,26 @@ G = 6.5998;         % T/m (Smallest gradient amplitude) (6.5998 PM25; 23.8626 PM
 tauVecA = dMin:dStep:dMin+(dStep*(n2D-1));
 tauVec = tauVecA;
 
-if singleAcqPeriod == 1;
-    spec2 = [spec2,zeros(n2D,int32(nEchoes*ptsPer_tE-size(spec2,2)))];
-    spec3 = reshape(spec2',int32(ptsPer_tE),nEchoes,n2D);
-    spec3 = spec3(1:ptsPerEcho,omitEchoes+1:end,:);
-    
-    dataInt = reshape(sum(spec3,1),(nEchoes-omitEchoes)*n2D,1);
-    dataIntSurf = reshape(sum(spec3,1),(nEchoes-omitEchoes),n2D);
-    
-    dISRe = real(dataIntSurf);
-    dISIm = imag(dataIntSurf);
-    
-    dISRe2 = reshape(dISRe,size(dISRe,1)*size(dISRe,2),1);
-    dISIm2 = reshape(dISIm,size(dISIm,1)*size(dISIm,2),1);
-    
-    dIS = [dISRe2';dISIm2'];
-    
-    dISnew = reshape(dIS,2*(nEchoes-omitEchoes),n2D);
-    dISnew = dISnew';
-    save(filenameout,'dISnew','-ascii','-tabs');
+spec2 = [spec2,zeros(n2D,int32(nEchoes*ptsPer_tE-size(spec2,2)))];
+spec3 = reshape(spec2',int32(ptsPer_tE),nEchoes,n2D);
+spec3 = spec3(1:ptsPerEcho,:,:);
 
-elseif singleAcqPeriod ==0;
-    data = reshape(spec2',nPts,nEchoes,n2D);
-    data = data(1:ptsPerEcho,:,:);
-    dataInt = sum(data,1);
-    dataInt = reshape(dataInt,nEchoes,n2D);
-    
-    dRe = real(dataInt);
-    dIm = imag(dataInt);
-    
-    dISRe2 = reshape(dRe,size(dRe,1)*size(dRe,2),1);
-    dISIm2 = reshape(dIm,size(dIm,1)*size(dIm,2),1);
-    
-    dIS = [dISRe2';dISIm2'];
-    
-    dISnew = reshape(dIS,2*nEchoes,n2D);
-    dISnew = dISnew';
-    
-    save(filenameout,'dISnew','-ascii','-tabs');
-end
+dataInt = reshape(sum(spec3,1),nEchoes*n2D,1);
+dataIntSurf = reshape(sum(spec3,1),nEchoes,n2D);
 
-%% T1 fit
+dISRe = real(dataIntSurf);
+dISIm = imag(dataIntSurf);
 
-dT1 = real(sum(dISnew,2));
-dT1 = dT1./max(dT1);
+dISRe2 = reshape(dISRe,size(dISRe,1)*size(dISRe,2),1);
+dISIm2 = reshape(dISIm,size(dISIm,1)*size(dISIm,2),1);
 
-T1times = load('JamestownT1T2_11Nov2014_5_log_T1times.txt');
-T1times = T1times/1e6;
+dIS = [dISRe2';dISIm2'];
 
-scatter(T1times,dT1)
-%%
+dISnew = reshape(dIS,2*nEchoes,n2D);
+dISnew = dISnew';
 
 
+save('dataIntSurf7.dat','dISnew','-ascii','-tabs');
 fitData = real(dataInt)./max(real(dataInt));
 % fitData = real(dataIntSurf(:,1))./max(real(dataIntSurf(:,1)));
 

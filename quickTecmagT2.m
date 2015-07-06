@@ -3,19 +3,16 @@ clc
 close all
 
 %%
-filename = 'Rubberstopper_T2_01_17Mar.tnt';
+filename = 'Glycerol_CPMG_1.tnt';
 filedir = 'C:\Users\tkmeldrum\Desktop\';
 
 fileloc = strcat(filedir,filename);
 
-%%%%%%%%
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 150; %us
-nEchoes = 128;
+nEchoes = 512;
 nPts = 69;
 nPtsBlank = 5;
-%%%%%%%%
-
 
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 
@@ -31,6 +28,6 @@ ypred = t2monofit_simple(beta,echoVector);
 
 figure(1)
 hold on
-scatter(echoVector,dataIntRe,'ok');
-scatter(echoVector,dataIntIm,'or');
+plot(echoVector,dataIntRe);
+plot(echoVector,dataIntIm);
 plot(echoVector,ypred,'-r');

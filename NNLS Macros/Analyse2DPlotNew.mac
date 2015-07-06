@@ -1,0 +1,2865 @@
+#######################################################
+# Provides an interface to the 2D NNLS Inverse Laplace
+# code (FISTA, L&H and Maximum entropy methods)
+# for analysing 2D:
+#    T1T2, T2T2, DT2, T1IRT2, T1SRT2,
+# and  multirow 1D data sets:
+#    Multirow-T2, Multirow-T1, Multirow_T1IR 
+#    Multirow-PGSE-ST, Multirow-PGSE-G
+#    Multirow-PGSE-D, Multirow-PGSE-d 
+#
+# Author: C Eccles
+# Copyright (c) Magritek Ltd 2013-14
+#
+
+# V1.3 Changes (29 Oct 13)
+#  1. Modified to allow log binning on both axes
+#  2. Log or linear axes inferred from input plot
+#  3. All axes log/lin combinations now supported
+#  4. Added knee calculation in smoothing loop
+# V1.4 Changes (3 Dec 13)
+#  1. Added bin weighting option for LH
+#  2. Added new option to perform 1D LH on multiple rows
+#  3. Added critical slope smoothing parameter
+# V1.5 Changes (26 May 14)
+#  1. Added FISTA algorithm
+#  2. Added no. of iterations and start guess fields
+# V1.6 Changes (30 Sept 14)
+# 1. Fixed axes display in residuals plot
+# 2. Removed start-value for FISTA algorithm
+# 3. T2T2 option added
+# V1.7 Changes (3 Nov 14)
+# 1. Added DT2 (SGSTE-CPMG) experiment.
+# 2. Changed time units to a text menu and added us.
+# 3. Added Max gradient to possible diffusion parameters.
+#
+########################################################
+
+procedure(Analyse2DPlot)
+
+   plt2 = curplot("2d")
+   plt1 = curplot("1d")
+   n = :windowdefinition()
+   curplot(plt2)
+   :panelize(n)
+   cd(getmacropath())
+   cachemacro("Analyse2DPlot.mac","window")
+   cacheproc("true")
+   assignctrls(n)
+   plotCtrl->subplot(1,1)->margins(70,45,30,55)
+   plotCtrl1->subplot(1,1)->margins(70,45,30,55)
+   plotCtrl2->subplot(1,1)->margins(70,45,30,55)
+   wvDataDir = ""
+   wvDataName = ""
+   wvCurPlot = plt2
+   wvWinNr = n
+   wvAlpha = 0
+   :loadPar()
+   wvInversion = null
+   :enableDisplayCtrls()
+   :updateAlgorithmCtrls()
+   :updateExptCtrls()
+   curplot(plt2)
+   :updateCurrentData()
+   setwindowpar(n,"exit_procedure",":exitProc")
+   setwindowpar(n,"sizelimits",[700,-1,313,-1])
+   setwindowpar(n,"statusbox",113)
+   setwindowpar(n,"menubar",[123:127])
+   setwindowpar(n,"titleupdate","false")
+   setwindowpar(n,"focus",110)
+   setwindowpar(n,"show_menu","false")
+   showwindow(n)
+   curplot(plt1)
+   curplot(plt2)
+
+endproc()
+
+###################################################
+# User interface definition
+###################################################
+
+procedure(windowdefinition)
+
+   # Automatically generated window definition procedure.
+   # Any code added manually will be removed if layout modified interactively
+   n = window("Analyse2DPlot (2D non-negative least squares inversion)", -1, -1, 865, 550, "resizable")
+
+      # Define all controls with basic parameters
+      windowvar(wvMLoc,wvAlpha,wvDataDir,wvDataName,wvInversion,wvWinNr,
+                wvCurPlot,xAxisSpacing,yAxisSpacing,wvYLabelTxt,wvYRange)
+      getmessage(0,
+        :processMessage();)
+      checkbox(1, 155, 64, "no,yes", "no",
+           :setDataSource();)
+      textmenu(2, 208, 140, 110, 200,
+         :updateExptCtrls();)
+
+      statictext(3, 275, 300, "right", "Big DELTA (ms)")
+      textbox(4, 281, 296, 40)
+      statictext(5, 274, 269, "right", "Little delta (ms)")
+      textbox(6, 280, 265, 40)
+      statictext(7, 166, 243, "right", "Log binning parameters")
+      button(8, 307, 25, 27, 21, "...",
+         :loadData("select");)
+      statictext(9, 98, 422, "center", "T2 (s)")
+      statictext(10, 156, 422, "center", "D (m^2/s)")
+      statictext(11, 71, 444, "right", "Minimum")
+      statictext(12, 71, 472, "right", "Maximum")
+      statictext(13, 71, 499, "right", "Steps")
+      textbox(14, 78, 439, 43)
+      textbox(15, 136, 439, 43)
+      textbox(16, 78, 468, 43)
+      textbox(17, 136, 468, 43)
+      textbox(18, 78, 495, 43)
+      textbox(19, 136, 495, 43)
+      statictext(20, 71, 395, "right", "Smoothing")
+      textbox(21, 78, 390, 43)
+      statictext(22, 275, 331, "right", "Ramp time (ms)")
+      button(23, 266, 495, 57, 26, "Close",
+         :exitProc();)
+      button(24, 267, 457, 57, 26, "Save",
+         :saveSpectrum();)
+      progressbar(25, 202, 426, 16, 86, "vertical")
+      statictext(26, 230, 403, "right", "Progress")
+      textbox(27, 134, 279, 34)
+      checkbox(28, 80, 283, "no,yes", "no")
+      statictext(29, 57, 277, 37, 27, "center", "log-bin x axis")
+      statictext(30, 128, 282, "right", "Bins:")
+      textbox(31, 134, 314, 34)
+      checkbox(32, 80, 317, "no,yes", "no")
+      statictext(33, 57, 310, 34, 27, "center", "log-bin y axis")
+      statictext(34, 129, 317, "right", "Bins:")
+      statictext(35, 122, 119, "center", "Inversion details")
+      groupbox(36, "Input parameters", 11, 94, 331, 267)
+      groupbox(37, "Output parameters", 11, 364, 230, 167)
+      statictext(38, 263, 174, "center", "Time units")
+     # radiobuttons(39, 265, 193, 20, "vertical", "s,ms", "ms")
+      textmenu(39, 208, 193, 110, 200)
+      menu(40, "&Edit", "Copy plot\tCtrl+C", func2d("copy plot"))
+      statictext(41, 275, 269, "right", "Max gradient(T/m)")
+      textbox(42, 281, 265, 40)
+      groupbox(43, "Plot file to invert", 10, 4, 331, 87)
+      textbox(44, 31, 24, 270)
+      groupbox(45, "Display", 10, 684, 331, 177)
+      checkbox(46, 116, 709, "no,yes", "no",
+           :intensityPlotCallBack();
+           :plotResult();)
+      checkbox(47, 204, 709, "no,yes", "no",
+           :contourPlotCallBack();
+           :plotResult();)
+      statictext(48, 108, 708, "right", "Intensity plot")
+      statictext(49, 195, 708, "right", "Contour plot")
+      textbox(50, 281, 327, 40)
+      textmenu(51, 136, 740, 90, 200,
+         :plotResult();)
+      textmenu(52, 221, 780, 90, 200,
+         :plotResult();)
+      statictext(53, 216, 783, "right", "Contour color")
+      checkbox(54, 115, 784, "no,yes", "no",
+           :useColorScaleCallBack();
+           :plotResult();)
+      statictext(55, 76, 776, 64, 28, "center", "Use single contour color")
+      button(56, 266, 381, 57, 26, "Calculate",
+         :CalculateIL();)
+      button(57, 267, 419, 57, 26, "Load",
+         :loadSpectrum();)
+      groupbox(58, "", 250, 364, 91, 167)
+      statictext(59, 131, 743, "right", "Background color")
+      statictext(60, 108, 823, "right", "Contour array")
+      textbox(61, 116, 819, 194,
+        :plotResult();)
+      button(62, 180, 58, 41, 24, "Show",
+         :showCurrentPlot();)
+      button(63, 230, 58, 41, 24, "Update",
+         :updateCurrentPlot();)
+      statictext(64, 101, 203, "right", "Start guess")
+      statictext(65, 98, 568, "center", "Smoothing")
+      statictext(66, 145, 63, "right", "Use current 2D plot data")
+      statictext(67, 71, 590, "right", "Minimum")
+      statictext(68, 71, 618, "right", "Maximum")
+      statictext(69, 71, 645, "right", "Steps")
+      textbox(70, 77, 585, 43)
+      textmenu(71, 110, 140, 54, 200,
+         :updateAlgorithmCtrls();)
+      textbox(72, 77, 614, 43)
+      statictext(73, 100, 144, "right", "Algorithm")
+      textbox(74, 77, 641, 43)
+      statictext(75, 263, 119, "center", "Experiment")
+      statictext(77, 101, 172, "right", "Iterations")
+      textbox(78, 111, 169, 40)
+      button(79, 267, 635, 57, 26, "Save",
+         :saveSmoothingCurve();)
+      statictext(80, 315, 243, "right", "Diffusion parameters")
+      textbox(81, 78, 390, 43)
+      textbox(82, 136, 439, 43)
+      textbox(83, 136, 468, 43)
+      textbox(84, 77, 585, 43)
+      textbox(85, 77, 614, 43)
+      textbox(86, 111, 200, 40)
+      progressbar(87, 202, 581, 16, 86, "vertical")
+      statictext(88, 230, 558, "right", "Progress")
+      groupbox(89, "Smoothing determination", 10, 534, 231, 147)
+      textbox(90, 140, 614, 42)
+      statictext(91, 161, 600, "center", "Slope")
+      button(92, 266, 559, 57, 26, "Calculate",
+         :smoothingLoop();)
+      button(93, 267, 597, 57, 26, "Load",
+         :loadSmoothingCurve();)
+      groupbox(94, "", 250, 534, 91, 147)
+      textbox(95, 78, 390, 43)
+      textbox(96, 77, 585, 43)
+      textbox(97, 77, 614, 43)
+
+      plot2d(110, 395, 35, "ww-410", "wh-72")
+      plot1d(111, 395, 35, "ww-410", "wh-72")
+      tab(112, 390, 10, "ww-400", "wh-42")
+      statusbox(113)
+      plot2d(114, 395, 35, "ww-410", "wh-72")
+
+
+      menu(120, "bkgMenu", "Select colormap", selectColourScale(),
+                "Copy plot", :copyPlot())
+      menu(121, "Scale", "Enlarge vertical\tShift+up", func2d("enlarge vertical"),
+                "Reduce vertical\tShift+down", func2d("reduce vertical"),
+                "Enlarge horizontal\tShift+right", func2d("enlarge horizontal"),
+                "Reduce horizontal\tShift+left", func2d("reduce horizontal"))
+      menu(122, "Move", "Move up\tCtrl+up", func2d("move up"),
+                "Move down\tCtrl+down", func2d("move down"),
+                "Move right\tCtrl+right", func2d("move right"),
+                "Move left\tCtrl+left", func2d("move left"))
+      menu(123, "&File", "Open data to invert ... \tCtrl+O", :loadData("select"),
+                "Open inverted data ... \tCtrl+Shift+O", :loadSpectrum(),
+                "Save inverted data ...\tCtrl+S", :saveSpectrum(),
+                "Close window ...\tCtrl+X", :savePar(); closewindow(0);)
+      menu(124, "&Edit", "Copy plot ... \tCtrl+C", :copyPlot(),
+                "Select colormap ...\tCtrl+K", selectColourScale())
+      menu(125, "&View", "Show &data under cursor\tCtrl+D", func2d("display data"),
+                "&Select a rectangular region\tCtrl+R", func2d("select region"),
+                "&Move plot\tCtrl+M", func2d("drag plot"),
+                "Separator", ,
+                "Display a row ... \tCtrl+Shift+R", func2d("select row"),
+                "Display a column ... \tCtrl+Shift+C", func2d("select column"),
+                "Separator", ,
+                "&Zoom a region\tCtrl+Z", func2d("zoom region"),
+                "Show &last region\tCtrl+L", func2d("last region"),
+                "Display &all data\tCtrl+A", func2d("full region"),
+                "Separator", ,
+                "Pull_right", 121,
+                "Pull_right", 122)
+      menu(126, "&Calculate", "Invert ... \tCtrl+I", :CalculateIL(),
+                "Peak integral ... \tCtrl+P", :integrateRegion())
+      menu(127, "Help", "About Analyse2DPlot", help("Macros\\NNLS","Analyse2Dplot.htm"))
+      menu(128, "bkgMenu", "Copy plot", :copyPlot())
+
+      menu(129, "&View", "Show &data under cursor\tCtrl+D", func1d("display data"),
+                "&Select a rectangular region\tCtrl+R", func1d("select region"),
+                "&Move plot\tCtrl+M", func1d("drag plot"),
+                "Separator", ,
+                "&Zoom a region\tCtrl+Z", func1d("zoom region"),
+                "Show &last region\tCtrl+L", func1d("last region"),
+                "Display &all data\tCtrl+A", func1d("full region"),
+                "Separator", ,
+                "Pull_right", 121,
+                "Pull_right", 122)
+
+     # Set other control parameters
+      setpar(n,1,"objID","usePlotDataCtrl",
+                  "valueID","usePlotData",
+                  "tab_number",3)
+      setpar(n,2,"objID","exptModeCtrl",
+                  "valueID","exptMode",
+                  "readonly","true",
+                  "tab_number",9,
+                  "menu",["T2T2","T1T2","T1IRT2","T1SRT2",
+                          "Multirow-T2","Multirow-T1","Multirow-T1IR",
+                          "DT2 (PGSE-CPMG)","DT2 (SGSTE-CPMG)",
+                          "Multirow-PGSE-ST","Multirow-PGSE-G","Multirow-PGSE-D","Multirow-PGSE-d"])
+      setpar(n,4,"valueID","bDelta",
+                  "tab_number",14)
+      setpar(n,6,"valueID","lDelta",
+                  "tab_number",13)
+      setpar(n,8,"tab_number",2)
+      setpar(n,14,"valueID","x_minimum",
+                  "tab_number",17)
+      setpar(n,15,"objID","t1MinimumCtrl",
+                  "valueID","t1Minimum")
+      setpar(n,16,"valueID","x_maximum",
+                  "tab_number",18)
+      setpar(n,17,"objID","t1MaximumCtrl",
+                  "valueID","t1Maximum")
+      setpar(n,18,"valueID","x_steps",
+                  "tab_number",19)
+      setpar(n,19,"valueID","y_steps",
+                  "tab_number",22)
+      setpar(n,21,"objID","alphaMECtrl",
+                  "valueID","alphaME",
+                  "tab_number",16)
+      setpar(n,23,"tab_number",26)
+      setpar(n,24,"tab_number",25)
+      setpar(n,25,"objID","convergObj")
+      setpar(n,27,"objID","xBinsCtrl",
+                  "valueID","xBins",
+                  "tab_number",11)
+      setpar(n,28,"objID","binXCtrl",
+                  "valueID","binX")
+      setpar(n,31,"objID","yBinsCtrl",
+                  "valueID","yBins",
+                  "tab_number",12)
+      setpar(n,32,"objID","binYCtrl",
+                  "valueID","binY")
+      setpar(n,39,"objID","timeUnitsCtrl",
+                  "valueID","timeUnits",
+                  "readonly","true",
+                  "menu",["seconds","milliseconds","microseconds"],
+                  "tab_number",10)
+      setpar(n,42,"valueID","maxGrad",
+                  "tab_number",14)
+      setpar(n,44,"objID","fileCtrl",
+                  "valueID","file",
+                  "tab_number",1)
+      setpar(n,46,"objID","intensityPlotCtrl",
+                  "valueID","intensityPlot",
+                  "tab_number",34)
+      setpar(n,47,"objID","contourPlotCtrl",
+                  "valueID","contourPlot",
+                  "tab_number",35)
+      setpar(n,50,"valueID","gradRamp",
+                  "tab_number",15)
+      setpar(n,51,"valueID","bkgColor",
+                  "tab_number",36,
+                  "menu",["white","gray","black"])
+      setpar(n,52,"valueID","contourColor",
+                  "tab_number",38,
+                  "menu",["gray","red","orange","yellow","green","cyan","blue","magenta","dred","dgreen","dblue"])
+      setpar(n,54,"valueID","useSingleColor",
+                  "tab_number",37)
+      setpar(n,56,"tab_number",23)
+      setpar(n,57,"tab_number",24)
+      setpar(n,61,"objID","contArrayCtrl",
+                  "valueID","contArray",
+                  "tab_number",39)
+      setpar(n,62,"tab_number",4)
+      setpar(n,63,"tab_number",5)
+      setpar(n,64,"objID","startValueTxtCtrl")
+
+      setpar(n,70,"objID","alphaMEMinCtrl",
+                  "valueID","alphaMEMin",
+                  "tab_number",27)
+      setpar(n,71,"objID","inversionMethodCtrl",
+                  "valueID","inversionMethod",
+                  "readonly","true",
+                  "tooltip","FISTA: Fast Iterative Shrinkage-threasholding algorithm\r,ME: Maximum entropy\rLH: Lawson and Hanson inversion",
+                  "tab_number",6,
+                  "menu",["FISTA","ME","LH"])
+      setpar(n,72,"objID","alphaMEMaxCtrl",
+                  "valueID","alphaMEMax",
+                  "tab_number",28)
+      setpar(n,74,"valueID","smoothSteps",
+                  "tab_number",29)
+      setpar(n,77,"objID","nrIterationsTxtCtrl")
+
+      setpar(n,78,"valueID","nrIterations",
+                  "objID","nrIterationsCtrl",
+                  "type","integer",
+                  "range",[1,50000],
+                  "tab_number",7)
+      setpar(n,79,"tab_number",33)
+      setpar(n,81,"objID","alphaLHCtrl",
+                  "valueID","alphaLH")
+      setpar(n,82,"objID","dMinimumCtrl",
+                  "valueID","dMinimum",
+                  "tab_number",20)
+      setpar(n,83,"objID","dMaximumCtrl",
+                  "valueID","dMaximum",
+                  "tab_number",21)
+      setpar(n,84,"objID","alphaLHMinCtrl",
+                  "valueID","alphaLHMin")
+      setpar(n,85,"objID","alphaLHMaxCtrl",
+                  "valueID","alphaLHMax")
+      setpar(n,86,"valueID","startValue",
+                  "objID","startValueCtrl",
+                  "type","float",
+                  "range",[0.001,1000],
+                  "tab_number",8)
+      setpar(n,87,"objID","smoothProgCtrl",
+                  "type","float",
+                  "range",[0,100])
+      setpar(n,90,"objID","alphaSlopeCtrl",
+                  "valueID","alphaSlope",
+                  "type","float",
+                  "range",[0.01,0.9],
+                  "tab_number",30)
+      setpar(n,92,"tab_number",31)
+      setpar(n,93,"tab_number",32)
+      setpar(n,95,"objID","alphaFISTACtrl",
+                  "valueID","alphaFISTA")
+      setpar(n,96,"objID","alphaFISTAMinCtrl",
+                  "valueID","alphaFISTAMin")
+      setpar(n,97,"objID","alphaFISTAMaxCtrl",
+                  "valueID","alphaFISTAMax")
+      setpar(n,110,"objID","plotCtrl",
+                  "statusbox",113,
+                  "tabparent",[112,0],
+                  "menubar",[123,124,125,126,127])
+      setpar(n,111,"objID","plotCtrl1",
+                  "statusbox",113,
+                  "tabparent",[112,2],
+                  "menubar",[123,124,129,126,127])
+      setpar(n,112,"objID","tabCtrl",
+                  "tab_number",40,
+                  "inittabs",["Inversion","Deviation","Smoothing"])
+      setpar(n,113,"objID","statusCtrl")
+      setpar(n,114,"objID","plotCtrl2",
+                  "statusbox",113,
+                  "tabparent",[112,1],
+                  "menubar",[123,124,125,126,127])
+
+endproc(n)
+
+###########################################################
+# Add controls to the panel
+###########################################################
+
+procedure(panelize,n)
+
+   panel(100,10,10,374,"wh-40")
+   for(k = 1 to 97)
+      try
+         setpar(n,k,"panelparent",100)
+      catch
+      endtry
+   next(k)
+   setpar(n,100,"panelupdate","")
+
+# Color some controls
+   lst = [35,75,7,80,38,9,10,26,65,88]
+   for(k = 0 to size(lst)-1)
+     setpar(0,lst[k],"color",[128,0,0])
+   next(k)
+
+endproc()
+
+###################################################
+# Come here when closing the window
+###################################################
+
+procedure(exitProc)
+
+   :savePar()
+   closewindow(0)
+
+endproc()
+
+###################################################
+# Select and load the 2D data set to invert
+###################################################
+
+procedure(loadData,mode)
+
+   if(mode == "select")
+      if(isdir(wvDataDir))
+         cd(wvDataDir)
+      endif
+      name = getfilename("Open","Load 2D data set to analyze","2D Plots","pt2")
+      if(name == "cancel")
+         return
+      endif
+      plotCtrl->load(name)
+      fileCtrl->text("$getcwd()$\\$name$")
+   else # use current file
+      name = fileCtrl->text
+      file = getbasedir(name)
+      dir = getbasepath(name)
+      cd(dir)
+      if(isfile(file))
+         plotCtrl->load(name) 
+      else
+         return
+      endif
+   endif
+   wvDataDir = getcwd()
+   wvDataName = name
+   plotCtrl->draw("false")
+   plotCtrl->subplot(1,1)->showcmap("true")
+   plotCtrl->subplot(1,1)->margins(70,45,30,55)
+   xAxisSpacing  = plotCtrl->subplot(1,1)->axes->xmapping() 
+   yAxisSpacing  = plotCtrl->subplot(1,1)->axes->ymapping() 
+   plotCtrl->draw("true")
+   :enableDisplayCtrls()
+
+endproc()
+
+##############################################
+# Save the window GUI parameters
+##############################################
+
+procedure(savePar)
+
+   lst = getctrlvalues(0)
+   dir = "$prefdir$\\Other Macros\\NNLS"
+   mkdir(dir)
+   if(isdir(dir))
+      cd(dir)
+      if(isvar("wvDataDir"))
+        lst = lst + ["dataDir = \"$wvDataDir$\""]
+      endif
+      if(isvar("wvDataName"))
+        lst = lst + ["dataName = \"$wvDataName$\""]
+      endif
+      save("Analyse2DPlot.par",sortlist(lst))
+   endif
+
+endproc()
+
+##############################################
+# Load the window GUI parameters and 
+# initialise them if this is the first time
+##############################################
+
+procedure(loadPar)
+
+   lst = list(0)
+   dir = "$prefdir$\\Other Macros\\NNLS"
+   if(isdir(dir))
+      cd(dir)
+      if(isfile("Analyse2DPlot.par"))
+        lst = load("Analyse2DPlot.par")
+        assignlist(lst)
+        if(isvar("dataDir"))
+           wvDataDir = dataDir
+        endif
+        if(isvar("dataName"))
+           wvDataName = dataName
+        endif
+        if(wvDataDir != "" & wvDataName != "")
+           fileCtrl->text("$wvDataDir$\\$wvDataName$")
+        endif
+        setctrlvalues(0,lst)
+        :updateExptCtrls()
+        found = 1
+      endif
+   endif
+
+   alphaFISTA = 1
+   alphaFISTAMax = 100
+   alphaFISTAMin = 0.1
+   alphaLH = 0.1
+   alphaLHMax = 10
+   alphaLHMin = 0.001
+   alphaME = 0.1
+   alphaMEMax = 10
+   alphaMEMin = 0.001
+   alphaSlope = 0.1
+   autoContour = "yes"
+   bDelta = 20
+   bkgColor = white
+   contArray = "linspace(0.1,1,10)"
+   contourColor = "gray"
+   contourPlot = "yes"
+   dMaximum = 1e-8
+   dMinimum = 1e-11   
+   exptMode = "T1T2"
+   file = ""
+   gradRamp = 1
+   inversionMethod = "FISTA"
+   intensityPlot = "yes"
+   interpolatedPlot = "no"
+   lDelta = 5
+   maxGrad = 1
+   method = "ME"
+   nrIterations = 2000
+   nrLevels = 10
+   smoothMax = 1e-1
+   smoothMin = 1e-4
+   smoothSteps = 5
+   startValue = 200
+   t1Maximum = 1   
+   t1Minimum = 1e-3   
+   timeUnits = "milliseconds"
+   usePlotData = "yes"
+   useSingleColor = "yes"
+   x_maximum = 1   
+   x_minimum = 1e-4   
+   x_steps = 20
+   xAxisSpacing = "lin"
+   xBins = 200
+   y_steps = 20
+   yAxisSpacing = "log"
+
+   lst2 = mkparlist()
+   lstOut = mergelists(lst,lst2)
+   setctrlvalues(0,lstOut)
+
+endproc()
+
+##############################################
+# Update control labels depending on 
+# inversion experiment (T1T2 or DT2)
+##############################################
+
+procedure(updateExptCtrls)
+
+
+   if(exptModeCtrl->text == "T1T2" | exptModeCtrl->text == "T1IRT2" | exptModeCtrl->text == "T1SRT2")
+      :SetControlStatus(["canUseME = 1","col1Label = \"T2 (s)\"","col2Label = \"T1 (s)\"",
+                         "diffMode = \"none\"",
+                         "col1Content = \"T2\"","col2Content = \"T1\"",
+                         "enablelogbinx = 1","enablelogbiny = 1",
+                         "checklogbiny = 0"])
+
+   elseif(exptModeCtrl->text == "T2T2")
+      :SetControlStatus(["canUseME = 1","col1Label = \"T2 (s)\"","col2Label = \"T2 (s)\"",
+                         "diffMode = \"none\"",
+                         "col1Content = \"T2\"","col2Content = \"T2\"",
+                         "enablelogbinx = 1","enablelogbiny = 1",
+                         "checklogbiny = 0"])
+
+   elseif(exptModeCtrl->text == "DT2 (PGSE-CPMG)")
+      :SetControlStatus(["canUseME = 1","col1Label = \"T2 (s)\"","col2Label = \"D (m^2/s)\"",
+                         "diffMode = \"modGradient\"",
+                         "col1Content = \"T2\"","col2Content = \"D\"",
+                         "enablelogbinx = 1","enablelogbiny = 0",
+                         "checklogbiny = 0"])
+
+   elseif(exptModeCtrl->text == "DT2 (SGSTE-CPMG)" | exptModeCtrl->text == "DT2 (SGSE-CPMG)")
+      :SetControlStatus(["canUseME = 1","col1Label = \"T2 (s)\"","col2Label = \"D (m^2/s)\"",
+                         "diffMode = \"modDelta\"",
+                         "col1Content = \"T2\"","col2Content = \"D\"",
+                         "enablelogbinx = 1","enablelogbiny = 0",
+                         "checklogbiny = 0"])
+
+   else
+      if(exptModeCtrl->text == "Multirow-T2")
+         :SetControlStatus(["canUseME = 0","col1Label = \"T2 (s)\"",
+                            "diffMode = \"none\"",
+                            "col1Content = \"T2\"",
+                            "enablelogbinx = 1","enablelogbiny = 0",
+                            "checklogbiny = 0"])
+      elseif(exptModeCtrl->text == "Multirow-T1")
+         :SetControlStatus(["canUseME = 0","col1Label = \"T1 (s)\"",
+                            "diffMode = \"none\"",
+                            "col1Content = \"T1\"",
+                            "enablelogbinx = 1","enablelogbiny = 0",
+                            "checklogbiny = 0"])
+      elseif(exptModeCtrl->text == "Multirow-T1IR")
+         :SetControlStatus(["canUseME = 0","col1Label = \"T1 (s)\"",
+                            "diffMode = \"none\"",
+                            "col1Content = \"T1\"",
+                            "enablelogbinx = 1","enablelogbiny = 0",
+                            "checklogbiny = 0"])
+      else
+         :SetControlStatus(["canUseME = 0","col1Label = \"D (m^2/s)\"",
+                            "diffMode = \"modGradient\"",
+                            "col1Content = \"D\"",
+                            "enablelogbinx = 0","enablelogbiny = 0",
+                            "checklogbinx = 0","checklogbiny = 0"])
+      endif
+   endif
+
+   :updateAlgorithmCtrls()
+
+endproc()
+
+procedure(SetControlStatus,options)
+
+  col1Content = ""
+  col2Content = ""
+  col1Label = ""
+  col2Label = ""
+  checklogbinx = 2
+  checklogbiny = 2
+
+  assignlist(options)
+
+# Can we use different inversion algorithms
+  if(canUseME)
+      inversionMethodCtrl->enable("true") # Can change inversion method
+   else
+      inversionMethodCtrl->enable("false") # Can change inversion method
+      inversionMethodCtrl->text("LH")
+   endif
+
+# Set column titles
+   setpar(0,9,"text",col1Label)
+   setpar(0,10,"text",col2Label)
+
+   setpar(0,14,"visible","false")
+   setpar(0,16,"visible","false")
+   setpar(0,18,"visible","false")
+   setpar(0,82,"visible","false")
+   setpar(0,83,"visible","false")
+   setpar(0,19,"visible","false")
+   setpar(0,15,"visible","false")
+   setpar(0,17,"visible","false")
+   setpar(0,19,"visible","false")
+
+# Show different columns
+   if(col1Content == "T2")
+      setpar(0,14,"visible","true")
+      setpar(0,16,"visible","true")
+      setpar(0,18,"visible","true")
+   elseif(col1Content == "T1")
+      setpar(0,15,"x",78,"visible","true")
+      setpar(0,17,"x",78,"visible","true")
+      setpar(0,18,"visible","true")
+   elseif(col1Content == "D")
+      setpar(0,82,"x",78,"visible","true")
+      setpar(0,83,"x",78,"visible","true")
+      setpar(0,18,"visible","true")
+   endif
+
+   if(col2Content == "T1")
+      setpar(0,15,"x",136,"visible","true")
+      setpar(0,17,"x",136,"visible","true")
+      setpar(0,19,"visible","true")
+   elseif(col2Content == "T2")
+      setpar(0,15,"x",136,"visible","true")
+      setpar(0,17,"x",136,"visible","true")
+      setpar(0,19,"visible","true")
+   elseif(col2Content == "D")
+      setpar(0,82,"x",136,"visible","true")
+      setpar(0,83,"x",136,"visible","true")
+      setpar(0,19,"visible","true")
+   endif
+
+   if(col1Content == "D" & col2Content == "")
+     # setpar(0,41,"enable","false")
+     # setpar(0,42,"enable","false")
+      setpar(0,39,"enable","false")
+   else
+     # setpar(0,41,"enable","true")
+     # setpar(0,42,"enable","true")
+      setpar(0,39,"enable","true")
+   endif
+
+
+# Enable or disable the diffusion parameters
+   if(col1Content == "D" | col2Content == "D")
+      if(diffMode == "modGradient")
+         setpar(0,5,"enable","true")
+         setpar(0,6,"enable","true")
+         setpar(0,3,"enable","true")
+         setpar(0,4,"enable","true")
+         setpar(0,22,"enable","true")
+         setpar(0,50,"enable","true")
+         setpar(0,41,"visible","false")
+         setpar(0,42,"visible","false")
+         setpar(0,5,"visible","true")
+         setpar(0,6,"visible","true")
+      else
+         setpar(0,5,"enable","false")
+         setpar(0,6,"enable","false")
+         setpar(0,3,"enable","true")
+         setpar(0,4,"enable","true")
+         setpar(0,22,"enable","true")
+         setpar(0,50,"enable","true")
+         setpar(0,41,"visible","true")
+         setpar(0,42,"visible","true")
+         setpar(0,41,"enable","true")
+         setpar(0,42,"enable","true")
+         setpar(0,5,"visible","false")
+         setpar(0,6,"visible","false")
+      endif
+   else
+      setpar(0,5,"enable","false")
+      setpar(0,6,"enable","false")
+      setpar(0,3,"enable","false")
+      setpar(0,4,"enable","false")
+      setpar(0,22,"enable","false")
+      setpar(0,50,"enable","false")
+      setpar(0,41,"visible","false")
+      setpar(0,42,"visible","false")
+   endif
+
+# Enable or disable logbin controls
+   if(enablelogbinx)
+      setpar(0,29,"enable","true")
+      setpar(0,28,"enable","true")
+      setpar(0,30,"enable","true")
+      setpar(0,27,"enable","true")
+   else
+      setpar(0,29,"enable","false")
+      setpar(0,28,"enable","false")
+      setpar(0,30,"enable","false")
+      setpar(0,27,"enable","false")
+   endif
+
+   if(enablelogbiny)
+      setpar(0,33,"enable","true")
+      setpar(0,32,"enable","true")
+      setpar(0,34,"enable","true")
+      setpar(0,31,"enable","true")
+   else
+      setpar(0,33,"enable","false")
+      setpar(0,32,"enable","false")
+      setpar(0,34,"enable","false")
+      setpar(0,31,"enable","false")
+   endif
+
+# Check or uncheck logbin controls
+   if(checklogbinx == 1)
+      setpar(0,28,"text","yes")
+   elseif(checklogbinx == 0)
+      setpar(0,28,"text","no")
+   endif
+
+   if(checklogbiny == 1)
+      setpar(0,32,"text","yes")
+   elseif(checklogbiny == 0)
+      setpar(0,32,"text","no")
+   endif
+
+endproc()
+
+###########################################################
+# Enable or disable controls based on algorithm selected
+###########################################################
+
+procedure(updateAlgorithmCtrls)
+
+   if(inversionMethodCtrl->text == "LH")
+      alphaLHCtrl->visible("true")
+      alphaLHMinCtrl->visible("true")
+      alphaLHMaxCtrl->visible("true")
+      alphaMECtrl->visible("false")
+      alphaMEMinCtrl->visible("false")
+      alphaMEMaxCtrl->visible("false")
+      alphaFISTACtrl->visible("false")
+      alphaFISTAMinCtrl->visible("false")
+      alphaFISTAMaxCtrl->visible("false")
+      nrIterationsCtrl->visible("false")
+      startValueCtrl->visible("false")
+      nrIterationsTxtCtrl->visible("false")
+      startValueTxtCtrl->visible("false")
+   elseif(inversionMethodCtrl->text == "ME")
+      alphaLHCtrl->visible("false")
+      alphaLHMinCtrl->visible("false")
+      alphaLHMaxCtrl->visible("false")
+      alphaMECtrl->visible("true")
+      alphaMEMinCtrl->visible("true")
+      alphaMEMaxCtrl->visible("true")
+      alphaFISTACtrl->visible("false")
+      alphaFISTAMinCtrl->visible("false")
+      alphaFISTAMaxCtrl->visible("false")
+      nrIterationsCtrl->visible("false")
+      startValueCtrl->visible("false")
+      nrIterationsTxtCtrl->visible("false")
+      startValueTxtCtrl->visible("false")
+   else
+      alphaLHCtrl->visible("false")
+      alphaLHMinCtrl->visible("false")
+      alphaLHMaxCtrl->visible("false")
+      alphaMECtrl->visible("false")
+      alphaMEMinCtrl->visible("false")
+      alphaMEMaxCtrl->visible("false")
+      alphaFISTACtrl->visible("true")
+      alphaFISTAMinCtrl->visible("true")
+      alphaFISTAMaxCtrl->visible("true")
+      nrIterationsCtrl->visible("true")
+      startValueCtrl->visible("false")
+      nrIterationsTxtCtrl->visible("true")
+      startValueTxtCtrl->visible("false")
+   endif
+
+endproc()
+
+###########################################################
+# Call IL routine
+###########################################################
+
+procedure(CalculateIL)
+
+  thread(":InverseLaplaceCalc")
+
+endproc()
+
+###########################################################
+# Call the correct IL routine based on the experiment type
+###########################################################
+
+procedure(InverseLaplaceCalc, data, xr, yr, smoothing, xAxisSpacing, yAxisSpacing, xLabel, yLabel)
+
+   guiPar = getctrlvalues(0)
+   assignlist(guiPar)
+
+   if(exptMode == "Multirow-T2")
+      mode = "1DRelax"
+   elseif(exptMode == "Multirow-T1")
+      mode = "1DRelax"
+   elseif(exptMode == "Multirow-T1IR")
+      mode = "1DRelax"
+   elseif(exptMode == "Multirow-PGSE-ST")
+      mode = "1DPGSE"
+   elseif(exptMode == "Multirow-PGSE-D")
+      mode = "1DPGSE"
+   elseif(exptMode == "Multirow-PGSE-d")
+      mode = "1DPGSE"
+   elseif(exptMode == "Multirow-PGSE-G")
+      mode = "1DPGSE"
+   else
+      mode = "2D"
+   endif
+
+   if(mode == "1DPGSE") # Multirow PGSE experiments
+      if(nrArgs == 0)
+         :MultiRowPGSEIL(guiPar)
+         return
+      else
+         (mInvert,residuals,sdRes,sdIn,dataOrig,xr,yr,dataBinned) = :MultiRowPGSEIL(guiPar, data, xr, yr, smoothing, xAxisSpacing, yAxisSpacing, xLabel, yLabel)
+          return(mInvert,residuals,sdRes,sdIn,dataOrig,xr,yr,dataBinned)
+      endif
+   elseif(mode == "1DRelax") # Multirow relaxation experiments
+      if(nrArgs == 0)
+         :MultiRowRelaxationIL(guiPar)
+         return
+      else
+         (mInvert,residuals,sdRes,sdIn,dataOrig,xr,yr,dataBinned) = :MultiRowRelaxationIL(guiPar, data, xr, yr, smoothing, xAxisSpacing, yAxisSpacing, xLabel, yLabel)
+          return(mInvert,residuals,sdRes,sdIn,dataOrig,xr,yr,dataBinned)
+      endif
+   elseif(mode == "2D") # 2D experiments
+      if(nrArgs == 0)
+         :2DInverseLaplaceCalc(guiPar)
+         return
+      else
+         (mInvert,residuals,sdRes,sdIn,dataOrig,xr,yr,dataBinned) = :2DInverseLaplaceCalc(guiPar, data, xr, yr, smoothing, xAxisSpacing, yAxisSpacing, xLabel, yLabel)
+         return(mInvert,residuals,sdRes,sdIn,dataOrig,xr,yr,dataBinned)
+      endif
+   endif
+
+endproc()    
+
+
+###########################################################
+# Calculate 2D IL
+# 
+# INPUTS (optional)
+# data ....... data set to invert 
+# xr ......... range of data x-axis (min,max) 
+# yr ......... range of data y-axis (min,max) 
+# smoothing .. smoothing value to use
+#
+# OUTPUT
+# mInvert .... inverted data
+# residuals .. residuals
+# sdRes ...... standard deviation of residuals
+# dataOrig ... the original data set which has been inverted
+# xr ......... range of data x-axis (min,max)
+# yr ......... range of data y-axis (min,max)
+# dataBinned . the original data after any binning
+#
+###########################################################
+
+procedure(2DInverseLaplaceCalc, guiPar, data, xr, yr, smoothingLoc, xAxisSpacing, yAxisSpacing, xAxisLabel, yAxisLabel)
+
+   if(checkctrlvalues(0) != "ok")
+      return
+   endif
+   assignlist(guiPar)
+
+   if(nrArgs == 1)
+      :enableControls("false")
+   endif
+
+   if(exptMode == "T1T2" | exptMode == "T2T2" | exptMode == "T1IRT2" | exptMode == "T1SRT2")
+      y_minimum = t1Minimum
+      y_maximum = t1Maximum
+   else
+      y_minimum = dMinimum
+      y_maximum = dMaximum
+   endif
+
+   objNr = convergObj->ctrlnr
+   convergObj->value(0)
+
+# Get the data from a file or current plot if not passed
+   if(nrArgs == 1)
+      (data,xr,yr,xAxisSpacing,yAxisSpacing,xAxisLabel,yAxisLabel) = :GetData(guiPar)
+      if(data == null)
+         return(-1,null,null,null,null,null)
+      endif
+   endif
+
+   time(0)
+   dataOrig = data
+   (w,h) = size(data)
+
+# Input ranges
+   if(timeUnits == "microseconds")
+      if(exptMode == "DT2 (PGSE-CPMG)")
+         xMinIn = xr[0]/1e6
+         xMaxIn = xr[1]/1e6
+         yMinIn = yr[0]
+         yMaxIn = yr[1]
+      elseif(exptMode == "T1T2" | exptMode == "T2T2" |  exptMode == "T2SRT2" | 
+             exptMode == "T1IRT2" | exptMode == "DT2 (SGSTE-CPMG)")
+         xMinIn = xr[0]/1e6
+         xMaxIn = xr[1]/1e6
+         yMinIn = yr[0]/1e6
+         yMaxIn = yr[1]/1e6
+      endif
+   elseif(timeUnits == "milliseconds")
+      if(exptMode == "DT2 (PGSE-CPMG)")
+         xMinIn = xr[0]/1000
+         xMaxIn = xr[1]/1000
+         yMinIn = yr[0]
+         yMaxIn = yr[1]
+      elseif(exptMode == "T1T2" | exptMode == "T2T2" |  exptMode == "T1SRT2" | 
+             exptMode == "T1IRT2" | exptMode == "DT2 (SGSTE-CPMG)")
+         xMinIn = xr[0]/1000
+         xMaxIn = xr[1]/1000
+         yMinIn = yr[0]/1000
+         yMaxIn = yr[1]/1000
+      endif
+   else # Seconds
+      xMinIn = xr[0]
+      xMaxIn = xr[1]
+      yMinIn = yr[0]
+      yMaxIn = yr[1]
+   endif
+
+    smthFac = 1
+   (dataBinReal,dataBinImag,xaxis,yaxis,smthFac) = :processData(data,xMinIn,xMaxIn,yMinIn,yMaxIn,smthFac)
+
+   if(dataBinReal == null)
+       :resetAllControls()
+       return(-1,null,null,null,null,null)
+   endif
+
+   dataBinned = dataBinReal + i*dataBinImag
+
+# Normalise data
+   mIn = double(dataBinReal/max(dataBinReal))
+
+   xaxis = double(xaxis)
+   yaxis = double(yaxis)
+   xSize = size(xaxis)
+   ySize = size(yaxis)
+
+# Output limits
+   slow_hori = double(x_minimum)
+   fast_hori = double(x_maximum)
+   slow_vert = double(y_minimum)
+   fast_vert = double(y_maximum)
+
+# Generate output axes
+   xSpec = logvec(slow_hori, fast_hori, x_steps)
+   ySpec = logvec(slow_vert, fast_vert, y_steps)
+
+# Input data step size
+   xDataStep = (log10(xMaxIn) - log10(xMinIn))/(xSize-1)
+   yDataStep = (log10(yMaxIn) - log10(yMinIn))/(ySize-1)
+
+# Output data step size
+   xSpecStep = (log10(x_maximum)-log10(x_minimum))/(x_steps-1)
+   ySpecStep = (log10(y_maximum)-log10(y_minimum))/(y_steps-1)
+
+# Generate kernels
+   if(exptMode == "T1T2" | exptMode == "T2T2")
+      Kh = exp(-xaxis'*(1/xSpec))
+      Kv = exp(-yaxis'*(1/ySpec))
+   elseif(exptMode == "DT2 (PGSE-CPMG)" | exptMode == "DT2 (SGSTE-CPMG)" | exptMode == "DT2 (SGSE-CPMG)")
+      Kh = exp(-xaxis'*(1/xSpec))
+      Kv = exp(-yaxis'*ySpec)
+   elseif(exptMode == "T1SRT2")
+      Kh = exp(-xaxis'*(1/xSpec))
+      Kv = 1-exp(-yaxis'*(1/ySpec))
+   elseif(exptMode == "T1IRT2")
+      Kh = exp(-xaxis'*(1/xSpec))
+      Kv = 1-2*exp(-yaxis'*(1/ySpec))
+   endif
+
+# Perform the inversion - either FISTA, Maximum Entropy or Lawson and Hanson
+   if(inversionMethod == "FISTA")
+
+      if(nrArgs > 1)
+        alphaFISTA = smoothingLoc
+      endif
+      wvAlpha = alphaFISTA
+
+      smth = (x_steps*y_steps)*alphaFISTA/400
+
+    # Invert the data
+      try
+         startValue = 1
+         solution = dmatrix(x_steps, y_steps) + startValue/(x_steps*y_steps)
+         plt = plotCtrl->subplot(1,1)
+         mInvert = fista(double(mIn),double(Kh),double(Kv),double(solution),
+                         double(smth),nrIterations,2,plt,convergObj)
+      catch
+         pr lasterror()
+         if(nrArgs == 1)
+            :resetAllControls()
+         endif
+         return(null,null,-1,null,null,null,null,null)
+      endtry
+
+   elseif(inversionMethod == "ME")
+   
+      if(nrArgs > 1)
+         alphaME = smoothingLoc
+      endif
+      wvAlpha = alphaME
+      alphaME = alphaME/1000
+
+    # algorithm-internal parameters
+      svdrankvert = 8
+      svdrankhori = 8
+      eps = 1e-8
+      eta = 1e-4
+
+    # Initialise solution but use old one if available
+      solution = null
+      if(wvInversion != null & nrArgs != 1)
+         mInvert = wvInversion
+         if(size(mInvert,1) == x_steps & 
+            size(mInvert,2) == y_steps)
+            solution = double(mInvert)
+         endif
+      endif
+      if(solution == null)
+         solution = dmatrix(x_steps, y_steps) + startValue*mIn[0,0]/(y_steps*x_steps) # was 0.01
+      endif
+   
+      pr ("Starting inversion core\n")
+      time(0)
+   
+      try
+         (mInvert,regularized_error,mean_squared_error) = meil2d(mIn,xaxis,yaxis,solution,Kv,Kh,alphaME,svdrankvert,svdrankhori,eps,eta,300,":callBackME")
+         mInvert = single(mInvert)
+      catch
+         pr lasterror()
+         if(nrArgs == 1)
+            :resetAllControls()
+         endif
+         return(null,null,-1,null,null,null,null,null)
+      endtry
+
+   else
+
+    # Get the smoothing value and scale
+      if(nrArgs > 1)
+         alphaLH = smoothingLoc
+      endif
+      wvAlpha = alphaLH
+      alphaLH = 10^(5-log10(alphaLH))
+
+    # Alpha contraint
+      constraint = 1/(sqrt(xDataStep*yDataStep*xSpecStep^3*alphaLH))
+      if (constraint > 300)
+         message("Error","Make smoothing factor smaller","error")
+         if(nrArgs == 1)
+            :resetAllControls()
+         endif
+         return
+      endif
+
+    # Work out the smoothing value
+      smoothing = 1/sqrt(xDataStep^2*xSpecStep^3*alphaLH*(x_steps/20)^3)
+   
+    # Invert the data
+      try
+         mInvert = lhil2d(single(mIn),single(Kh),single(Kv),single(xSpec),single(ySpec),smoothing)
+      catch
+         pr lasterror()
+         if(nrArgs == 1)
+            :resetAllControls()
+         endif
+         return(null,null,-1,null,null,null,null,null)
+      endtry
+
+   endif
+
+   (residuals,sdRes,sdIn) = :calcResiduals(mInvert,dataOrig,xr,yr,dataBinned,
+                                           xAxisSpacing,yAxisSpacing,  
+                                           xAxisLabel,yAxisLabel)
+
+# Force convergence display to show we are finished
+   convergObj->value(100)
+
+# Display result
+  :plotResult(mInvert,max(dataBinReal))
+  wvInversion = mInvert
+
+# Enable all controls
+   if(nrArgs == 1)
+      :resetAllControls()
+   endif
+
+   if(nrArgs == 1)
+      pr "\n   Time taken for $inversionMethod$ inversion = $time()$\n"
+   endif
+
+endproc(mInvert,residuals,sdRes,sdIn,dataOrig,xr,yr,dataBinned)
+
+###########################################################
+# Load the data from a file or another plot window
+###########################################################
+
+procedure(GetData,guiPar)
+
+   assignlist(guiPar)
+
+   try
+     # wvCurPlot = curplot("2d")
+      if(usePlotDataCtrl->text == "no")
+         if(isdir(wvDataDir))
+            cd(wvDataDir)
+            if(isfile(wvDataName))
+               plotCtrl->draw("false")
+               plotCtrl->load(wvDataName)
+               plotCtrl->subplot(1,1)->showcmap("true")
+               plotCtrl->subplot(1,1)->margins(70,45,30,55)
+               plotCtrl->draw("true")
+            endif
+         endif        
+        # Grab loaded input data
+         (data,xr,yr) = plotCtrl->subplot(1,1)->getdata() 
+         xAxisSpacing  = plotCtrl->subplot(1,1)->axes->xmapping() 
+         yAxisSpacing  = plotCtrl->subplot(1,1)->axes->ymapping()
+         xLabel = plotCtrl->subplot(1,1)->xlabel->text()  
+         yLabel = plotCtrl->subplot(1,1)->ylabel->text()  
+         curplot(wvCurPlot)
+      else   
+        # Grab data from current 2D plot
+         (data,xr,yr) = wvCurPlot->getdata() 
+         xAxisSpacing  = wvCurPlot->axes->xmapping() 
+         yAxisSpacing  = wvCurPlot->axes->ymapping() 
+         xLabel = wvCurPlot->xlabel->text()  
+         yLabel = wvCurPlot->ylabel->text()  
+      endif
+   catch
+      message("Error","Input data not found","error")
+      :resetAllControls()
+      return(null,null,null,null,null)
+   endtry
+
+endproc(data,xr,yr,xAxisSpacing,yAxisSpacing,xLabel,yLabel)
+
+###########################################################
+# Calculate 1D-IL on multiple rows of relaxation data
+# 
+# INPUTS (optional)
+# guiPar ..... gui parameters
+# data ....... data set to invert 
+# xr ......... range of data x-axis (min,max) 
+# yr ......... range of data y-axis (min,max) 
+# smoothing .. smoothing value to use
+#
+# OUTPUT
+# mInvert .... inverted data
+# residuals .. residuals
+# sdRes ...... standard deviation of residuals
+# dataOrig ... the original data set which has been inverted
+# xr ......... range of data x-axis (min,max)
+# yr ......... range of data y-axis (min,max)
+# dataBinned . the original data after any binning
+#
+###########################################################
+
+
+procedure(MultiRowRelaxationIL, guiPar, data, xr, yr, smoothing, xAxisSpacing, yAxisSpacing, xLabel, yLabel)
+
+   assignlist(guiPar)
+
+   if(nrArgs == 1)
+      :enableControls("false")
+   endif
+
+# Initialise the progress bar to 0
+   objNr = convergObj->ctrlnr
+   convergObj->value(0)
+
+# Get the data from a file or current plot if not passed
+   if(nrArgs == 1)
+      (data,xr,yr,xAxisSpacing,yAxisSpacing,xLabel,yLabel) = :GetData(guiPar)
+      if(data == null)
+         return(-1,null,null,null,null,null)
+      endif
+   endif
+
+   wvYLabelTxt = yLabel
+   wvYRange = yr
+
+   time(0)
+   dataOrig = data
+   (w,h) = size(data)
+
+# Input ranges
+   if(timeUnits == "ms")
+      xMinIn = xr[0]/1000
+      xMaxIn = xr[1]/1000
+   else
+      xMinIn = xr[0]
+      xMaxIn = xr[1]
+   endif
+
+# Get the smoothing value and scale
+   if(nrArgs > 1)
+      alphaLH = smoothing
+   endif
+   wvAlpha = alphaLH
+   alphaLH = 10^(8-log10(alphaLH))
+
+# Select the design matrix
+   if(exptMode == "Multirow-T2")
+      designMatStr = "designMat = \"exp(-xData'*(1/xSpec))\""
+      sign = 1
+   elseif(exptMode == "Multirow-T1")
+      designMatStr = "designMat = \"exp(-xData'*(1/xSpec))\""
+      guiPar = setlistvalue(guiPar,"x_minimum","$t1Minimum$")
+      guiPar = setlistvalue(guiPar,"x_maximum","$t1Maximum$")
+      sign = 1
+   elseif(exptMode == "Multirow-T1IR")
+      designMatStr = "designMat = \"1-2*exp(-xData'*(1/xSpec))\""
+      guiPar = setlistvalue(guiPar,"x_minimum","$t1Minimum$")
+      guiPar = setlistvalue(guiPar,"x_maximum","$t1Maximum$")
+      sign = -1
+   endif
+
+   maxCol = max(real(data[0,~]))
+
+# Define the input matrix size
+   mInvert = matrix(x_steps,h)
+   if(binX == "yes" & w > 50)
+      dataBinReal = matrix(xBins,h)
+      dataBinImag = matrix(xBins,h)
+   else
+      dataBinReal = matrix(w,h)
+      dataBinImag = matrix(w,h)
+   endif
+
+# Override logbinning  if too few points or wrong x-axis
+   if(xAxisSpacing == "lin" & w > 50 & binX == "yes")
+      logBin = "yes"
+   else
+      logBin = "no"
+   endif
+
+# Generate the x axis
+   if(xAxisSpacing == "lin")
+      xDatas = linspace(xMinIn,xMaxIn,w)
+   else
+      xDatas = logspace(xMinIn,xMaxIn,w)
+   endif
+
+# Check for zero in xaxis
+   if(xDatas[0] == 0)
+      firstElementZero = 1
+      xDatas[0] = xDatas[1]/1e6
+   else
+      firstElementZero = 0
+   endif
+
+# Set up the parameter list for L+H calc
+   lst =  guiPar + [designMatStr,
+          "alpha = $alphaLH$",
+          "weightBins = \"yes\"",
+          "logBin = \"$binX$\""]
+
+# Loop over each row in the input data set and
+# calculate a row spectrum if the  initial data
+# point is > 0.01 of the maximum value
+   for(y = 0 to h-1)
+
+      yDatar = real(data[~,y])
+      yDatai = imag(data[~,y])
+      try
+         if(sign*yDatar[0] > maxCol/100)
+            if(logBin == "yes")
+               (xData,yDatar) = pseudologbin(xDatas,yDatar,xBins)
+               (xData,yDatai) = pseudologbin(xDatas,yDatai,xBins)
+            else
+               xData = xDatas
+            endif
+           (specX,specY,fit,chisq) = LHInvert(xData,yDatar,lst)
+            if(specX == null)
+                message("Error","Inversion failed - check parameters","error")
+               :resetAllControls()
+               return(-1,null,null,null,null,null)
+            endif
+
+            dataBinReal[~,y] = yDatar
+            dataBinImag[~,y] = yDatai
+            mInvert[~,y] = specY
+            convergObj->value(y/h*100)
+
+         endif
+      catch
+         pr lasterror()
+         :resetAllControls()
+         return(-1,null,null,null,null,null)
+      endtry
+
+   next(y)
+
+# Make a complex data set which may be binned or not
+   dataBinned = dataBinReal + i*dataBinImag
+
+# Calculate and display the residuals
+   (residuals,sdRes,sdIn) = :calcResidualsX(guiPar,mInvert,dataOrig,xr,yr,dataBinned,
+                                            xAxisSpacing,yAxisSpacing,xLabel,yLabel)
+
+# Force convergence display to show we are finished
+   convergObj->value(100)
+
+# Display inversion result
+  :plotResult(mInvert,1)
+  wvInversion = mInvert
+
+# Enable all controls
+   if(nrArgs == 1)
+      :resetAllControls()
+   endif
+
+   pr "\n   Time taken for $inversionMethod$ inversion = $time()$\n"
+
+endproc(mInvert,residuals,sdRes,sdIn,dataOrig,xr,yr,dataBinned)
+
+
+###########################################################
+# Calculate IL on multiple rows of PGSE experiments
+# 
+# INPUTS (optional)
+# guiPar ..... gui parameters
+# data ....... data set to invert 
+# xr ......... range of data x-axis (min,max) 
+# yr ......... range of data y-axis (min,max) 
+# smoothing .. smoothing value to use
+#
+# OUTPUT
+# mInvert .... inverted data
+# residuals .. residuals
+# sdRes ...... standard deviation of residuals
+# dataOrig ... the original data set which has been inverted
+# xr ......... range of data x-axis (min,max)
+# yr ......... range of data y-axis (min,max)
+# dataBinned . the original data after any binning
+#
+###########################################################
+
+
+procedure(MultiRowPGSEIL, guiPar, data, xr, yr, smoothing, xAxisSpacing, yAxisSpacing, xLabel, yLabel)
+
+   assignlist(guiPar)
+
+   if(nrArgs == 1)
+      :enableControls("false")
+   endif
+
+# Initialise the progress bar to 0
+   objNr = convergObj->ctrlnr
+   convergObj->value(0)
+
+# Get the data from a file or current plot if not passed
+   if(nrArgs == 1)
+      (data,xr,yr,xAxisSpacing,yAxisSpacing,xLabel,yLabel) = :GetData(guiPar)
+      if(data == null)
+         return(-1,null,null,null,null,null)
+      endif
+   endif
+
+   wvYLabelTxt = yLabel
+   wvYRange = yr
+
+   time(0)
+   dataOrig = data
+   (w,h) = size(data)
+
+# Input ranges
+   xMinIn = xr[0]
+   xMaxIn = xr[1]
+
+# Output ranges
+   guiPar = setlistvalue(guiPar,"x_minimum","$dMinimum$")
+   guiPar = setlistvalue(guiPar,"x_maximum","$dMaximum$")
+
+# Get the smoothing value and scale
+   if(nrArgs > 1)
+      alphaLH = smoothing
+   endif
+   wvAlpha = alphaLH
+   alphaLH = 10^(8-log10(alphaLH))
+
+    maxCol = max(real(data[0,~]))
+
+# Select the design matrix
+   if(exptMode == "Multirow-T2")
+      designMatStr = "designMat = \"exp(-xData'*(1/xSpec))\""
+      sign = 1
+   elseif(exptMode == "Multirow-T1")
+      designMatStr = "designMat = \"exp(-xData'*(1/xSpec))\""
+      sign = 1
+   elseif(exptMode == "Multirow-T1IR")
+      designMatStr = "designMat = \"1-2*exp(-xData'*(1/xSpec))\""
+      sign = -1
+   elseif(exptMode == "Multirow-PGSE-ST")
+      designMatStr = "designMat = \"exp(-xData'*xSpec)\""
+      sign = 1
+   elseif(exptMode == "Multirow-PGSE-G")
+      designMatStr = "designMat = \"exp(-xData'*xSpec)\""
+      sign = 1
+   endif
+
+# Define the input matrix size
+   mInvert = matrix(x_steps,h)
+   if(binX == "yes" & w > 50)
+      dataBinReal = matrix(xBins,h)
+      dataBinImag = matrix(xBins,h)
+   else
+      dataBinReal = matrix(w,h)
+      dataBinImag = matrix(w,h)
+   endif
+
+# Override logbinning  if too few points or wrong x-axis
+   if(xAxisSpacing == "lin" & w > 50 & binX == "yes")
+      logBin = "yes"
+   else
+      logBin = "no"
+   endif
+
+# Generate the x axis
+   if(xAxisSpacing == "lin")
+      xDatas = linspace(xMinIn,xMaxIn,w)
+   else
+      xDatas = logspace(xMinIn,xMaxIn,w)
+   endif
+
+# Scale xaxis based on type of experiment
+   DELTA = bDelta
+   delta = lDelta+gradRamp
+   if(exptMode == "Multirow-PGSE-G")
+      xDatas = (xDatas*delta*1e-3*gamma)^2*(DELTA-delta/3)*1e-3
+   elseif(exptMode == "Multirow-PGSE-d")
+      xDatas = (maxGrad*xDatas*1e-3*gamma)^2*(DELTA-xDatas/3)*1e-3
+   elseif(exptMode == "Multirow-PGSE-D")
+      xDatas = (maxGrad*delta*1e-3*gamma)^2*(xDatas-delta/3)*1e-3
+   elseif(exptMode == "Multirow-PGSE-ST")
+      xDatas = xDatas*1e9
+   endif
+
+# Check for zero in xaxis
+   if(xDatas[0] == 0)
+      firstElementZero = 1
+      xDatas[0] = xDatas[1]/1e6
+   else
+      firstElementZero = 0
+   endif
+
+# Set up the parameter list for L+H calc
+   lst =  guiPar + [designMatStr,
+          "alpha = $alphaLH$",
+          "weightBins = \"yes\"",
+          "logBin = \"$binX$\""]
+
+# Loop over each row in the input data set
+# only calculate a spectrum if the  initial data
+# point is > 0.01 of the maximum value
+   for(y = 0 to h-1)
+
+      yDatar = real(data[~,y])
+      yDatai = imag(data[~,y])
+      try
+         if(sign*yDatar[0] > maxCol/100)
+            if(logBin == "yes")
+               (xData,yDatar) = pseudologbin(xDatas,yDatar,xBins)
+               (xData,yDatai) = pseudologbin(xDatas,yDatai,xBins)
+            else
+               xData = xDatas
+            endif
+           (specX,specY,fit,chisq) = LHInvert(xData,yDatar,lst)
+            if(specX == null)
+                message("Error","Inversion failed - check parameters","error")
+               :resetAllControls()
+               return(-1,null,null,null,null,null)
+            endif
+
+            dataBinReal[~,y] = yDatar
+            dataBinImag[~,y] = yDatai
+            mInvert[~,y] = specY
+            convergObj->value(y/h*100)
+
+         endif
+      catch
+         pr lasterror()
+         :resetAllControls()
+         return(-1,null,null,null,null,null)
+      endtry
+
+   next(y)
+
+# Make a complex data set which may be binned or not
+   dataBinned = dataBinReal + i*dataBinImag
+
+# Calculate and display the residuals
+   (residuals,sdRes,sdIn) = :calcResidualsPGSEX(guiPar,mInvert,dataOrig,xr,yr,dataBinned,
+                                                xAxisSpacing,yAxisSpacing,xLabel,yLabel)
+
+# Force convergence display to show we are finished
+   convergObj->value(100)
+
+# Display inversion result
+  :plotResult(mInvert,1)
+  wvInversion = mInvert
+
+# Enable all controls
+   if(nrArgs == 1)
+      :resetAllControls()
+   endif
+
+   pr "\n   Time taken for $inversionMethod$ inversion = $time()$\n"
+
+endproc(mInvert,residuals,sdRes,sdIn,dataOrig,xr,yr,dataBinned)
+
+
+procedure(resetAllControls)
+
+   :enableControls("true")
+   :intensityPlotCallBack()
+   :updateExptCtrls()
+   :updateCurrentDataVisibility()
+
+endproc()
+
+###########################################################
+# Calculate and display deviation and SD of residuals
+#
+# INPUTS:
+# mInv is the inversion spectrum
+# mOrig is the original data
+# xr,yr x and y axes limits for mOrig
+# mBinned is the input to the inversion after binning
+#
+# OUTPUTS:
+# residuals ... the residuals matrix
+# sdRes ....... the standard deviation of residuals
+###########################################################
+
+procedure(calcResiduals,mInv,mOrig,xr,yr,mBinned,
+          xAxisSpacing,yAxisSpacing,xAxisLabel,yAxisLabel)
+
+   lst = getctrlvalues(0)
+   assignlist(lst)
+
+   useBinned = 0
+
+   if(exptMode == "T1T2" | exptMode == "T2T2" | exptMode == "T1IRT2" | exptMode == "T1SRT2")
+      y_minimum = t1Minimum
+      y_maximum = t1Maximum
+   else
+      y_minimum = dMinimum
+      y_maximum = dMaximum
+   endif
+
+   (w,h) = size(mOrig)
+
+# Input ranges
+   if(timeUnits == "microseconds")
+      if(exptMode == "DT2 (PGSE-CPMG)")
+         xMinIn = xr[0]/1e6
+         xMaxIn = xr[1]/1e6
+         yMinIn = yr[0]
+         yMaxIn = yr[1]
+      elseif(exptMode == "T1T2" | exptMode == "T2T2" | exptMode == "T1SRT2" |
+             exptMode == "T1IRT2" | exptMode == "DT2 (SGSTE-CPMG)")
+         xMinIn = xr[0]/1e6
+         xMaxIn = xr[1]/1e6
+         yMinIn = yr[0]/1e6
+         yMaxIn = yr[1]/1e6
+      endif
+   elseif(timeUnits == "milliseconds")
+      if(exptMode == "DT2 (PGSE-CPMG)")
+         xMinIn = xr[0]/1000
+         xMaxIn = xr[1]/1000
+         yMinIn = yr[0]
+         yMaxIn = yr[1]
+      elseif(exptMode == "T1T2" | exptMode == "T2T2" |  exptMode == "T1SRT2" |
+             exptMode == "T1IRT2" | exptMode == "DT2 (SGSTE-CPMG)")
+         xMinIn = xr[0]/1000
+         xMaxIn = xr[1]/1000
+         yMinIn = yr[0]/1000
+         yMaxIn = yr[1]/1000
+      endif
+   else # Seconds
+      xMinIn = xr[0]
+      xMaxIn = xr[1]
+      yMinIn = yr[0]
+      yMaxIn = yr[1]
+   endif
+
+# Make original x-axis
+   if(xAxisSpacing == "lin")
+      if(binX == "yes" & useBinned)
+         xaxis = double(pseudologvec(xMinIn,xMaxIn,xBins))
+      else
+         xaxis = double(linvec(xMinIn,xMaxIn,w))
+      endif
+   else
+      xaxis = double(logvec(xMinIn,xMaxIn,w))
+   endif
+
+# Make original y-axis
+   if(yAxisSpacing == "lin")
+      if(exptMode == "T1T2" | exptMode == "T2T2" | exptMode == "T1IRT2" | exptMode == "T1SRT2")
+         if(binY == "yes" & useBinned)
+            yaxis = double(pseudologvec(yMinIn,yMaxIn,yBins))
+         else
+            yaxis = double(linvec(yMinIn,yMaxIn,h))
+         endif
+      elseif(exptMode == "DT2 (SGSE-CPMG)")
+         lDeltaVec = linvec(yMinIn,yMaxIn,h)*1e-3
+         yaxis = double((gamma*maxGrad*lDeltaVec)^2.*(bDelta-2*lDeltaVec/3)*1e-9)
+      elseif(exptMode == "DT2 (SGSTE-CPMG)")
+         lDeltaVec = linvec(yMinIn,yMaxIn,h)*1000
+         yaxis = double((gamma*maxGrad*lDeltaVec)^2.*(bDelta-2*lDeltaVec/3)*1e-9)
+      elseif(exptMode == "DT2 (PGSE-CPMG)")
+         fac = (gamma*(lDelta+gradRamp))^2*(bDelta-(lDelta+gradRamp)/3)*1e-9
+         yaxis = double((linvec(yMinIn,yMaxIn,h))^2*fac)
+      endif
+   else
+      if(exptMode ==  "T2T2")
+         yaxis = double(pseudologvec(yMinIn,yMaxIn,h))
+      else
+         yaxis = double(logvec(yMinIn,yMaxIn,h))
+      endif
+   endif
+
+# Output limits
+   slow_hori = (x_minimum)
+   fast_hori = (x_maximum)
+   slow_vert = (y_minimum)
+   fast_vert = (y_maximum)
+
+   kernelHeight = h
+   kernelWidth = w
+
+# Generate output axes
+   xSpec = double(logvec(slow_hori, fast_hori, x_steps))
+   ySpec = double(logvec(slow_vert, fast_vert, y_steps))
+
+# Generate kernels
+   if(exptMode == "T1T2" | exptMode == "T2T2")
+      Kv = exp(-yaxis'*(1/ySpec))
+   elseif(exptMode == "T1IRT2")
+      Kv = 1-2*exp(-yaxis'*(1/ySpec))
+   elseif(exptMode == "T1SRT2")
+      Kv = 1-exp(-yaxis'*(1/ySpec))
+   else
+      Kv = exp(-yaxis'*ySpec)
+   endif
+
+   Kh = exp(-xaxis'*(1/xSpec))
+
+# Generate simulated input matrix from ouput 
+   mSim = single(Kv*double(mInv)*Kh')
+
+# Work out deviation with real input matrix
+# Use either mBinned or mOrig for deviation
+# but always mOrig for noise since it is hard 
+# to measure noise reliably from mBinned
+   if(useBinned)
+      mSrc = mBinned
+   else
+      mSrc = mOrig
+   endif
+
+   mInRe = real(mSrc)
+   mInIm = imag(mOrig)
+   (w,h) = size(mOrig)
+   mx = max(mag(mInRe))
+   mSim = mSim*mx
+   residuals = mInRe-mSim
+   sdRes = sd(residuals)
+   sdIn = sd(mInIm[[trunc(w/2):],:])
+
+   mxError = max(abs(mInRe-mSim)/mx)*100
+
+# Plot the normalized deviation as a percentage 
+   rg = plotCtrl2->subplot(1,1)
+   rg->draw("false")
+   rg->image(100*(mInRe-mSim)/mx,xr,yr)
+   rg->axes("xmapping",xAxisSpacing)
+   rg->axes("ymapping",yAxisSpacing)
+   rg->xlabel(xAxisLabel)
+   rg->ylabel(yAxisLabel)
+   if(sdIn > 0)
+      rg->title("Residuals deviation (%) SD/SD_(input) = $sdRes/sdIn,1.2f$")
+   else
+      rg->title("Residuals SD = $sdRes,1.2f$")
+   endif
+   rg->showcmap("true")
+   rg->draw("true")
+
+endproc(residuals,sdRes,sdIn) # Residuals and standard deviation of residuals
+
+###########################################################
+# Calculate and display deviation and SD of residuals
+#
+# INPUTS:
+# mInv is the inversion spectrum
+# mOrig is the original data
+# xr,yr x and y axes limits for mOrig
+# mBinned is the input to the inversion after binning
+#
+# OUTPUTS:
+# residuals ... the residuals matrix
+# sdRes ....... the standard deviation of residuals
+###########################################################
+
+procedure(calcResidualsX,guiPar,mInv,mOrig,xr,yr,mBinned,
+          xAxisSpacing,yAxisSpacing,xAxisLabel,yAxisLabel)
+
+
+   assignlist(guiPar)
+
+   useBinned = 0
+
+   (w,h) = size(mOrig)
+
+# Input ranges
+   if(timeUnits == "ms")
+      xMinIn = xr[0]/1000
+      xMaxIn = xr[1]/1000
+      yMinIn = yr[0]/1000
+      yMaxIn = yr[1]/1000
+   else
+      xMinIn = xr[0]
+      xMaxIn = xr[1]
+      yMinIn = yr[0]
+      yMaxIn = yr[1]
+   endif
+
+# Make original x-axis
+   if(xAxisSpacing == "lin")
+      if(binX == "yes" & useBinned)
+         xaxis = double(pseudologvec(xMinIn,xMaxIn,xBins))
+      else
+         xaxis = double(linvec(xMinIn,xMaxIn,w))
+      endif
+   else
+      xaxis = double(logvec(xMinIn,xMaxIn,w))
+   endif
+
+# Output limits
+   slow_hori = (x_minimum)
+   fast_hori = (x_maximum)
+
+   kernelWidth = w
+
+# Generate output axes
+   xSpec = double(logvec(slow_hori, fast_hori, x_steps))
+
+# Generate kernel
+   if(exptMode == "Multirow-T2")
+      Kh = exp(-xaxis'*(1/xSpec))
+   elseif(exptMode == "Multirow-T1")
+      Kh = exp(-xaxis'*(1/xSpec))
+   elseif(exptMode == "Multirow-T1IR")
+      Kh = (1-2*exp(-xaxis'*(1/xSpec)))
+   endif
+# Generate simulated input matrix from ouput 
+   mSim = single(double(mInv)*Kh')
+
+# Work out deviation with real input matrix
+# Use either mBinned or mOrig for deviation
+# but always mOrig for noise since it is hard 
+# to measure noise reliably from mBinned
+   if(useBinned)
+      mSrc = mBinned
+   else
+      mSrc = mOrig
+   endif
+
+   mInRe = real(mSrc)
+   mInIm = imag(mOrig)
+   (w,h) = size(mOrig)
+   mx = max(mag(mInRe))
+  # mSim = mSim*mx
+   residuals = mInRe-mSim
+
+   sdRes = sd(residuals)
+   sdIn = sd(mInIm[[trunc(w/2):],:])
+
+   mxError = max(abs(mInRe-mSim)/mx)*100
+   if(sdIn > 0)
+      sdRel = sdRes/sdIn
+   else
+      sdRel = 0
+   endif
+
+# Plot the normalized deviation as a percentage 
+   rg = plotCtrl2->subplot(1,1)
+   rg->draw("false")
+   rg->image(100*(mInRe-mSim)/mx,[x_minimum, x_maximum],yr)
+   rg->axes("xmapping",xAxisSpacing)
+   rg->axes("ymapping",yAxisSpacing)
+   rg->xlabel(xAxisLabel)
+   rg->ylabel(yAxisLabel)
+   rg->showcmap("true")
+   rg->title("Residuals deviation (%) SD/SD_(input) = $sdRel,1.2f$")
+ 
+   rg->draw("true")
+
+endproc(residuals,sdRes,sdIn) # Residuals and standard deviation of residuals
+
+
+###########################################################
+# Calculate and display deviation and SD of residuals
+#
+# INPUTS:
+# mInv is the inversion spectrum
+# mOrig is the original data
+# xr,yr x and y axes limits for mOrig
+# mBinned is the input to the inversion after binning
+#
+# OUTPUTS:
+# residuals ... the residuals matrix
+# sdRes ....... the standard deviation of residuals
+###########################################################
+
+procedure(calcResidualsPGSEX,guiPar,mInv,mOrig,xr,yr,mBinned,
+          xAxisSpacing,yAxisSpacing,xAxisLabel,yAxisLabel)
+
+   assignlist(guiPar)
+
+   useBinned = 0
+
+   (w,h) = size(mOrig)
+
+# Input ranges
+   xMinIn = xr[0]
+   xMaxIn = xr[1]
+   yMinIn = yr[0]
+   yMaxIn = yr[1]
+
+# Make original x-axis
+   if(xAxisSpacing == "lin")
+      if(binX == "yes" & useBinned)
+         xaxis = double(pseudologvec(xMinIn,xMaxIn,xBins))
+      else
+         xaxis = double(linvec(xMinIn,xMaxIn,w))
+      endif
+   else
+      xaxis = double(logvec(xMinIn,xMaxIn,w))
+   endif
+
+# Output limits
+   slow_hori = (x_minimum)
+   fast_hori = (x_maximum)
+
+   kernelWidth = w
+
+# Generate output axes
+   xSpec = double(logvec(slow_hori, fast_hori, x_steps))*1e9
+
+# Generate kernel
+   if(exptMode == "Multirow-PGSE-ST")
+      Kh = exp(-xaxis'*xSpec)
+   elseif(exptMode == "Multirow-PGSE-G")
+      Kh = exp(-xaxis'*xSpec)
+   else
+      Kh = exp(-xaxis'*(1/xSpec))
+   endif
+
+# Generate simulated input matrix from ouput 
+   mSim = single(double(mInv)*Kh')
+
+# Work out deviation with real input matrix
+# Use either mBinned or mOrig for deviation
+# but always mOrig for noise since it is hard 
+# to measure noise reliably from mBinned
+   if(useBinned)
+      mSrc = mBinned
+   else
+      mSrc = mOrig
+   endif
+
+   mInRe = real(mSrc)
+   mInIm = imag(mOrig)
+   (w,h) = size(mOrig)
+   mx = max(mag(mInRe))
+  # mSim = mSim*mx
+   residuals = mInRe-mSim
+
+   sdRes = sd(residuals)
+   sdIn = sd(mInIm[[trunc(w/2):],:])
+
+   mxError = max(abs(mInRe-mSim)/mx)*100
+   if(sdIn > 0)
+      sdRel = sdRes/sdIn
+   else
+      sdRel = 0
+   endif
+
+# Plot the normalized deviation as a percentage 
+   rg = plotCtrl2->subplot(1,1)
+   rg->draw("false")
+   rg->image(100*(mInRe-mSim)/mx,xr,yr)
+   rg->axes("xmapping",xAxisSpacing)
+   rg->axes("ymapping",yAxisSpacing)
+   rg->xlabel(xAxisLabel)
+   rg->ylabel(yAxisLabel)
+   rg->showcmap("true")
+   rg->title("Residuals deviation (%) SD/SD_(input) = $sdRel,1.2f$")
+ 
+   rg->draw("true")
+
+endproc(residuals,sdRes,sdIn) # Residuals and standard deviation of residuals
+
+
+###########################################################
+# Plot the inversion result. mx is the maximum value
+###########################################################
+
+procedure(plotResult,inversion,mx)
+
+  if(nrArgs == 0)
+    inversion = wvInversion
+    mx = 1
+  endif
+
+   if(inversion == null)
+      return
+   endif
+
+   assignlist(getctrlvalues(0))
+
+   if(exptMode == "DT2 (PGSE-CPMG)" | exptMode == "DT2 (SGSTE-CPMG)")
+      y_minimum = dMinimum
+      y_maximum = dMaximum
+   else
+      y_minimum = t1Minimum
+      y_maximum = t1Maximum
+   endif
+
+   if(exptMode == "Multirow-T2" |
+      exptMode == "Multirow-T1" |
+      exptMode == "Multirow-T1IR" |
+      exptMode == "Multirow-PGSE-ST" |
+      exptMode == "Multirow-PGSE-G")
+      multiRowMode = 1
+   else
+      multiRowMode = 0
+   endif
+
+   rg = plotCtrl->subplot(1,1)
+   rg->draw("false")
+   if(multiRowMode)
+      rg->image(inversion*mx,[x_minimum, x_maximum],wvYRange)
+      rg->axes("ymapping","lin")
+   else
+      rg->image(inversion*mx,[x_minimum, x_maximum],[y_minimum, y_maximum])
+      rg->axes("ymapping","log")
+   endif
+   rg->bkgcolor(:colorConvert(bkgColor))
+   rg->axes("xmapping","log")
+   if(exptMode == "T1T2" | exptMode == "T1IRT2" | exptMode == "T1SRT2")
+      rg->xlabel("T2 (s)")
+      rg->ylabel("T1 (s)")
+      rg->title("T1-T2 correlation spectrum: smoothing = $wvAlpha$")
+   elseif(exptMode == "T2T2")
+      rg->xlabel("T2 (s)")
+      rg->ylabel("T2 (s)")
+      rg->title("T2-T2 correlation spectrum: smoothing = $wvAlpha$")
+   elseif(exptMode == "DT2 (PGSE-CPMG)")
+      rg->xlabel("T2 (s)")
+      rg->ylabel("D (m^(2)s^(-1))")
+      rg->title("D-T2 correlation spectrum: smoothing = $wvAlpha$")
+   elseif(exptMode == "DT2 (SGSTE-CPMG)")
+      rg->xlabel("T2 (s)")
+      rg->ylabel("D (m^(2)s^(-1))")
+      rg->title("D-T2 correlation spectrum: smoothing = $wvAlpha$")
+   elseif(exptMode == "Multirow-T2")
+      rg->xlabel("T2 (s)")
+      rg->ylabel(wvYLabelTxt)
+      rg->title("T2 row spectra: smoothing = $wvAlpha$")
+   elseif(exptMode == "Multirow-T1")
+      rg->xlabel("T1 (s)")
+      rg->ylabel(wvYLabelTxt)
+      rg->title("T1 row spectra: smoothing = $wvAlpha$")
+   elseif(exptMode == "Multirow-T1IR")
+      rg->xlabel("T1 (s)")
+      rg->ylabel(wvYLabelTxt)
+      rg->title("T1-IR row spectra: smoothing = $wvAlpha$")
+   elseif(exptMode == "Multirow-PGSE-ST")
+      rg->xlabel("D (m^(2)s^(-1))")
+      rg->ylabel(wvYLabelTxt)
+      rg->title("PGSE row spectra: smoothing = $wvAlpha$")
+   elseif(exptMode == "Multirow-PGSE-G")
+      rg->xlabel("D (m^(2)s^(-1))")
+      rg->ylabel(wvYLabelTxt)
+      rg->title("PGSE row spectra: smoothing = $wvAlpha$")
+   endif
+
+   n = 0
+   if(intensityPlot == "yes")
+      n = n + 1
+   endif
+   if(contourPlot == "yes")
+      n = n + 2
+   endif
+
+   levelArray = eval(contArray)*max(single(inversion))*mx
+
+   if(useSingleColor == "no")
+      rg->contour(levelArray,n)
+   else
+      rg->contour(levelArray,n,:colorConvert(contourColor),1)
+   endif
+
+   rg->showcmap("true")
+
+# Add lines
+   if(exptMode == "T1T2" | exptMode == "T2T2" | exptMode == "T1IRT2" |  exptMode == "T1SRT2")
+      rg->addline(x_minimum,x_minimum,x_maximum,x_maximum, [255,0,0],2,"dashes")
+   elseif(exptMode == "DT2 (PGSE-CPMG)")
+      rg->addline(x_minimum,2.3e-9,x_maximum,2.3e-9, [255,0,0],2,"dashes")
+      rg->addline(x_minimum,x_minimum*5e-10,x_maximum,x_maximum*5e-10, [255,0,0],2,"dashes")
+   endif
+
+   rg->draw("true")
+
+endproc()
+
+###########################################################
+# Call backs to show Maximum entropy progress
+###########################################################
+
+procedure(callBackME,arg, p1,p2,p3)
+
+  convergObj->value(arg)
+
+endproc()
+
+###########################################################
+# Convert a color to an RGB value
+###########################################################
+
+procedure(colorConvert, col)
+
+   try
+      if(col == "gray")
+        col = "[128,128,128]"
+      elseif(col == "white")
+        col = "[255,255,255]"
+       elseif(col == "black")
+        col = "[0,0,0]"
+      elseif(col == "red")
+        col = "[255,0,0]"
+      elseif(col == "green")
+        col = "[0,255,0]"
+      elseif(col == "blue")
+        col = "[0,0,255]"
+      elseif(col == "cyan")
+        col = "[0,255,255]"
+      elseif(col == "magenta")
+        col = "[255,0,255]"
+      elseif(col == "yellow")
+        col = "[255,255,0]"
+      elseif(col == "dred")
+        col = "[128,0,0]"
+      elseif(col == "dgreen")
+        col = "[0,128,0]"
+      elseif(col == "dblue")
+        col = "[0,0,128]"
+      elseif(col == "orange")
+        col = "[255,128,0]"
+      endif
+   
+      if(col[0] != "[")
+         col = "[" + col + "]"
+      endif
+   catch
+      pr "Invalid color\n"
+      col = "[255,255,255]"
+   endtry
+
+
+endproc(eval(col))
+
+###########################################################
+# Use single color callback
+###########################################################
+
+procedure(useColorScaleCallBack)
+
+   useSingleColor = getpar(0,54,"text")
+   if(useSingleColor == "yes")
+      setpar(0,52,"enable","true")
+   else
+      setpar(0,52,"enable","false")
+   endif
+
+endproc()
+
+###########################################################
+# Load a spectrum from a file
+###########################################################
+
+procedure(loadSpectrum)
+
+  assignlist(getctrlvalues(0))
+
+# Get current path
+   path = fileCtrl->text
+   if(path == null)
+      return
+   endif
+
+# Get new filename
+   cd(getbasepath(path))
+   name = getfilename("load","Select 2D spectrum","2D files","pt2")
+   if(name == "cancel")
+      return
+   endif
+
+# Load the plot data
+   plotCtrl->load(name)
+   plotCtrl->subplot(1,1)->showcmap("true")
+   plotCtrl->subplot(1,1)->margins(70,45,30,55)
+   plotCtrl->subplot(1,1)->bkgcolor(:colorConvert(bkgColor))
+   wvInversion = plotCtrl->subplot(1,1)->getdata()
+   :enableDisplayCtrls()
+
+endproc()
+
+###########################################################
+# Save a spectrum to a file
+###########################################################
+
+procedure(saveSpectrum)
+
+# Get current path
+   path = fileCtrl->text
+   if(path == null)
+      return
+   endif
+
+# Get new filename
+   cd(getbasepath(path))
+   name = getfilename("save","Select filename for 2D spectrum","2D files","pt2")
+   if(name == "cancel")
+      return
+   endif
+
+# Save the plot data
+   plotCtrl->save(name)
+ 
+   pr("\n   2D inversion saved to:")
+   pr("\n     $getcwd()$\\$name$")
+   pr("\n")
+
+endproc()
+
+###########################################################
+# Load a smoothing curve from a file
+###########################################################
+
+procedure(loadSmoothingCurve)
+
+# Get current path
+   path = fileCtrl->text
+   if(path == null)
+      return
+   endif
+
+# Get new filename
+   cd(getbasepath(path))
+   name = getfilename("load","Select 1D smoothing curve","1D files","pt1")
+   if(name == "cancel")
+      return
+   endif
+
+# Load the plot data
+   plotCtrl1->load(name)
+   plotCtrl1->subplot(1,1)->margins(70,45,30,55)
+
+endproc()
+
+###########################################################
+# Save the smoothing curve to a file
+###########################################################
+
+procedure(saveSmoothingCurve)
+
+# Get current path
+   path = fileCtrl->text
+   if(path == null)
+      return
+   endif
+
+# Get new filename
+   cd(getbasepath(path))
+   name = getfilename("save","Select filename for 1D smoothing curve","1D files","pt1")
+   if(name == "cancel")
+      return
+   endif
+
+# Save the plot data
+   plotCtrl1->save(name)
+ 
+   pr("\n   1D smoothing curve saved to:")
+   pr("\n     $getcwd()$\\$name$")
+   pr("\n")
+
+endproc()
+   
+###########################################################
+# Enable or disable all display related controls
+###########################################################
+
+procedure(enableDisplayCtrls)
+
+   disable = (wvInversion == null)
+  
+   lst = [48,46,49,47,55,54,53,52,51,59,60,61]
+
+   for(k = 0 to size(lst)-1)
+      if(disable)
+         setpar(0,lst[k],"enable","false")
+      else
+         setpar(0,lst[k],"enable","true")
+      endif
+   next(k)
+   
+   if(disable == 0)
+      :contourPlotCallBack()
+      :useColorScaleCallBack()
+   endif
+
+endproc()
+
+###########################################################
+# Enable or disable all controls
+###########################################################
+
+procedure(enableControls, state)
+
+   lst = getobj(0)->ctrllist()
+   for(k = 0 to size(lst)-1)
+      if(lst[k] != 100)
+         setpar(0,lst[k],"enable",state)
+      endif
+   next(k)
+
+endproc()
+
+###########################################################
+# Modify control enable status based on intensity plot status
+###########################################################
+
+procedure(intensityPlotCallBack)
+
+   lst = [59,51]
+
+   for(k = 0 to size(lst)-1)
+      if(intensityPlotCtrl->text == "yes")
+         setpar(0,lst[k],"enable","false")
+      else
+         setpar(0,lst[k],"enable","true")
+      endif
+   next(k)
+
+endproc()
+
+###########################################################
+# Modify control enable status based on contour status
+###########################################################
+
+procedure(contourPlotCallBack)
+
+   lst = [55,54,53,52,60,61]
+
+   for(k = 0 to size(lst)-1)
+      if(contourPlotCtrl->text == "no")
+         setpar(0,lst[k],"enable","false")
+      else
+         setpar(0,lst[k],"enable","true")
+      endif
+   next(k)
+
+endproc()
+
+###########################################################
+# Integrate a region around a peak
+###########################################################
+
+procedure(integrateRegion)
+
+  assignlist(getctrlvalues(0))
+
+  (x1,y1,x2,y2) = getrect()
+   if(x1 == -1)
+      message("Error","Select a region about a peak first","error")
+      return()
+   endif
+
+# Extract the data from the plot
+  (m,x,y) = plotCtrl->subplot(1,1)->getdata()
+   if(m == null)
+     message("Error","No 2D plot","error")
+     return()
+   endif
+
+   submx = m[[x1:x2],[y1:y2]]
+   result = sum(submx)
+
+   xlog = logvec(x[0],x[-1],x_steps)
+   ylog = logvec(y[0],y[-1],y_steps)
+   xc = xlog[round((x1+x2)/2)]
+   yc = ylog[round((y1+y2)/2)]
+
+   txt = "Center at ($xc,1.2g$,$yc,1.2g$) Integral = $100*result/sum(m),1.2g$%"
+
+   statusCtrl->text(txt)
+
+endproc()
+
+###########################################################
+# Set the color map 
+###########################################################
+
+procedure(setColorMap)
+
+   SetColorMaps(plotCtrl->subplot(1,1),colScale->subplot(1,1))
+
+endproc()
+
+###########################################################
+# Loop over the smoothing parameters
+###########################################################
+
+procedure(smoothingLoop)
+
+   thread(":smoothingLoopCore")
+
+endproc()
+
+procedure(smoothingLoopCore)
+
+   if(checkctrlvalues(0) != "ok")
+      return
+   endif
+   guiPar = getctrlvalues(0)
+   assignlist(guiPar)
+
+   :enableControls("false")
+
+# Choose smoothing factor
+   if(inversionMethod == "LH")
+      smoothMin = alphaLHMin
+      smoothMax = alphaLHMax
+   elseif(inversionMethod == "ME")
+      smoothMin = alphaMEMin
+      smoothMax = alphaMEMax
+   elseif(inversionMethod == "FISTA")
+      smoothMin = alphaFISTAMin
+      smoothMax = alphaFISTAMax
+   endif
+
+# Get the data
+   (m,xr,yr,xAxisSpacing,yAxisSpacing,xLabel,yLabel) = :GetData(guiPar)
+   if(m == null)
+      return()
+   endif
+
+   wvYLabelTxt = yLabel
+   wvYRange = yr
+
+# Perform the inversion for different smoothing factors
+   smoothProgCtrl->value(0)
+   statusCtrl->text("")
+
+   sdRes = matrix(smoothSteps)
+   smth = logvec(smoothMin,smoothMax,smoothSteps)
+   for(s = 0 to smoothSteps-1)
+
+      smoothProgCtrl->value(100*s/smoothSteps)
+      smoothFac = smth[s]
+
+      (mInv,residuals,sdRes[s],sdOrig,mIn,xr,yr,mBin) = :InverseLaplaceCalc(m,xr,yr,smoothFac,xAxisSpacing,yAxisSpacing,xLabel,yLabel)
+      if(sdRes[s] == -1)
+         :resetAllControls()
+         return
+      endif
+
+      rg = plotCtrl1->subplot(1,1)
+      rg->draw("false")
+      rg->plot(smth,sdRes/sdOrig,"color",[255,0,0])
+      rg->title("Normalised standard deviation of residuals vs Smoothing factor")
+      rg->xlabel("Smoothing factor")
+      rg->ylabel("(SD of residuals)/(SD of input data)")
+      rg->axes->xmapping("log")
+
+   # Work out knee position (10% slope)
+      logSmth = log10(smth)
+      logSD = log10(sdRes^2)
+      dx = diff(logSmth)
+      dy = diff(logSD)
+      slope = dy/dx
+      (kneeX,kneeY) = :findKnee(logSmth,sdRes,slope,alphaSlope)
+      if(kneeX == null)
+        if(kneeY == -1)
+            statusCtrl->text("Optimal smoothing is below minimum")
+        elseif(kneeY == 1)
+            statusCtrl->text("Optimal smoothing is above maximum")
+        endif
+      else
+         kneeY = kneeY/sdOrig
+         rg->hold("on")
+         rg->plot([10^kneeX],[kneeY],"symbolshape","square")
+         rg->hold("off")
+         statusCtrl->text("Optimal smoothing = $10^kneeX,1.3f$")
+      endif
+
+      rg->draw("true")
+
+   next(s)
+
+   if(kneeX != null)
+      pr("\n   Optimal smoothing = $10^kneeX,1.3f$")
+   endif
+
+   smoothProgCtrl->value(100)
+
+   :resetAllControls()
+
+endproc()
+
+
+#######################################################
+# Find the point in the array slope where the slope
+# is 0.1. Use this position to return the log of the
+# smoothing factor at this point and the standard
+# deviation of the residual at this pooint
+#######################################################
+
+procedure(findKnee, logSmth, stdDev, slope, optimum)
+
+   N = size(slope)
+
+   if(slope[0] > optimum)
+      return(null,-1)
+   elseif(slope[-1] < optimum)
+      return(null,1)
+   endif
+
+   for(k = 1 to N-1)
+      if(slope[k] > optimum & slope[k-1] < optimum)
+         frc = (optimum-slope[k-1])/(slope[k] - slope[k-1])
+         xpos = frc*(logSmth[k]-logSmth[k-1])+logSmth[k-1]
+         ypos = frc*(stdDev[k]-stdDev[k-1])+stdDev[k-1]
+         return(xpos,ypos)
+      endif
+   next(k)
+
+endproc(null,null)
+
+#######################################################
+# Copy the currently display plot to the clipboard
+#######################################################
+
+procedure(copyPlot)
+
+   n = tabCtrl->currenttab()
+
+   if(n == 0)
+     curplot(plotCtrl->subplot(1,1)); func2d("copy plot")
+   elseif(n == 1)
+     curplot(plotCtrl2->subplot(1,1)); func2d("copy plot")
+   else
+     curplot(plotCtrl1->subplot(1,1)); func1d("copy plot")
+   endif
+
+endproc()
+
+###########################################################
+# Enable or disable controls based on the data source
+###########################################################
+
+procedure(setDataSource)
+
+   :updateCurrentDataVisibility()
+
+   if(usePlotDataCtrl->text == "yes")
+      try
+         copyplot(wvCurPlot)
+         pasteplot(plotCtrl->subplot(1,1))
+      catch
+         plotCtrl->subplot(1,1)->clear()
+      endtry
+    #  :updateCurrentPlot()
+    else
+      :loadData("usecurrent")
+   endif
+ 
+endproc()
+
+###########################################################
+# Make sure an escape enables all controls
+###########################################################
+
+procedure(processMessage)
+
+   try
+      (src,cmd) = getpar(wvWinNr,0,"text")
+   
+      if(src == "Macro" & cmd == "Escape")
+          :resetAllControls()
+          pr("\n   Inversion aborted")
+      endif
+   catch
+   endtry
+
+endproc()
+
+###########################################################
+# Load any data on start up
+###########################################################
+
+procedure(updateCurrentData)
+
+   :updateCurrentDataVisibility()
+
+   if(usePlotDataCtrl->text == "yes")
+      try
+         copyplot(wvCurPlot)
+         pasteplot(plotCtrl->subplot(1,1))
+      catch
+      endtry
+   #   :updateCurrentPlot()
+    else
+      :loadData("usecurrent")
+   endif
+
+endproc()
+
+###########################################################
+# Control the visibility of data input U.I.
+###########################################################
+
+procedure(updateCurrentDataVisibility)
+
+   if(usePlotDataCtrl->text == "yes")
+      setpar(0,44,"enable","false")
+      setpar(0,8,"enable","false")
+      setpar(0,62,"enable","true")
+      setpar(0,63,"enable","true")
+    else
+      setpar(0,44,"enable","true")
+      setpar(0,8,"enable","true")
+      setpar(0,62,"enable","false")
+      setpar(0,63,"enable","false")
+   endif
+
+endproc()
+
+procedure(updateCurrentPlot)
+
+   wvCurPlot = curplot("2d")
+   try
+      copyplot(wvCurPlot)
+      pasteplot(plotCtrl->subplot(1,1))
+   catch
+   endtry
+
+endproc()
+
+procedure(showCurrentPlot)
+ 
+   plt = wvCurPlot
+   state = plt->showcmap()
+   for(k = 1 to 8)
+      if(state == "true")
+         state = "false"
+      else
+         state = "true"
+      endif   
+      plt->showcmap(state)
+      pause(0.2)   
+   next(k)
+
+endproc()
+
+
+###########################################################
+# Call backs to show L&H progress
+###########################################################
+
+procedure(callBackNNLSx,arg)
+
+   if(isvar("convergObj"))
+     if(arg > 0)
+        larg = 50-33*(log10(arg) + 3)/2
+        convergObj->value(larg)
+      endif
+   endif
+
+endproc()
+
+procedure(callBackNNLSy,arg)
+
+   if(isvar("convergObj"))
+      if(arg > 0)
+        larg = 100-33*(log10(arg) + 3)/2
+        convergObj->value(larg)
+      endif
+   endif
+
+endproc()
+
+###########################################################
+# Log bin data if required. Also generate x and y axes
+# for input data set
+# Scale the smoothing parameter is necessary
+###########################################################
+
+procedure(processData, data, xMinIn, xMaxIn, yMinIn, yMaxIn, smth)
+
+   datar = real(data)
+   datai = imag(data)
+   (w,h) = size(datar)
+   assignlist(getctrlvalues(0))
+
+  # Handle log/linear mode x axis
+   if(xAxisSpacing == "lin")
+      if(binX == "yes")
+      #   smth = smth*(xBins/50)^2
+         dataBinReal = matrix(xBins,h)
+         dataBinImag = matrix(xBins,h)
+         xAxis = linvec(xMinIn,xMaxIn,w)
+         try
+            for(k = 0 to h-1)
+               (x,dataBinReal[~,k]) = pseudologbin(xAxis, datar[~,k], xBins)
+               (x,dataBinImag[~,k]) = pseudologbin(xAxis, datai[~,k], xBins)
+            next(k)
+         catch
+            message("Error","Can't bin input data. It needs to have\rmore than 50 points horizontally.","error")
+            return(null,null,null,null)
+         endtry
+         xAxis = x #pseudologvec(xMinIn,xMaxIn,xBins) #x
+      else
+         dataBinReal = datar
+         dataBinImag = datai
+         xAxis = linvec(xMinIn,xMaxIn,w)
+      endif
+      dataBinned = dataBinReal + i*dataBinImag
+   else # Log x axis
+     # alpha = alpha*(w/50)^2
+      xAxis = logvec(xMinIn,xMaxIn,w)
+      dataBinReal = datar
+      dataBinImag = datai
+   endif
+
+   (wr,hr) = size(dataBinReal)
+
+  # Handle log/linear mode y axis
+   if(yAxisSpacing == "lin")
+      if(exptMode == "T1T2" | exptMode == "T2T2" | exptMode == "T1IRT2" | exptMode == "T1SRT2")
+         if(binY == "yes")
+          #  alpha = alpha*(yBins/50)^2
+            dataBinReal2 = matrix(wr,yBins)
+            dataBinImag2 = matrix(wr,yBins)
+            yIn = linvec(yMinIn,yMaxIn,hr)   
+            try
+               for(k = 0 to wr-1)
+                  (y,v) = pseudologbin(yIn, trans(dataBinReal[k,~]), yBins)
+                  dataBinReal2[k,~] = v'
+                  (y,v) = pseudologbin(yIn, trans(dataBinImag[k,~]), yBins)
+                  dataBinImag2[k,~] = v'
+               next(k)
+            catch
+               message("Error","Can't bin input data. It needs to have\rmore than 50 points vertically.","error")
+               return(null,null,null,null)
+            endtry
+            dataBinReal = dataBinReal2
+            dataBinImag = dataBinImag2
+            yAxis = y
+         else
+            yAxis = linvec(yMinIn,yMaxIn,hr)
+         endif
+      else
+         if(exptMode == "DT2 (PGSE-CPMG)")
+            fac = (gamma*(lDelta+gradRamp))^2*(bDelta-(lDelta+gradRamp)/3)*1e-9
+            yAxis = (linvec(yMinIn,yMaxIn,hr))^2*fac
+         elseif(exptMode == "DT2 (SGSE-CPMG)")
+            lDeltaVec = linvec(yMinIn,yMaxIn,hr)*1e-3
+            yAxis = (gamma*maxGrad*lDeltaVec)^2.*(bDelta-2*lDeltaVec/3)*1e-9
+         elseif(exptMode == "DT2 (SGSTE-CPMG)")
+            lDeltaVec = linvec(yMinIn,yMaxIn,hr)*1000
+            yAxis = (gamma*maxGrad*lDeltaVec)^2.*(bDelta-2*lDeltaVec/3)*1e-9
+         else
+            message("Error","Invalid diffusion mode - can't process input data","error")
+            return(null,null,null,null)
+         endif
+      endif
+   else # Log y axis
+      if(exptMode ==  "T2T2")
+         yAxis = pseudologvec(yMinIn,yMaxIn,hr)
+      else
+         yAxis = logvec(yMinIn,yMaxIn,hr)
+      endif
+   endif
+
+endproc(dataBinReal,dataBinImag,xAxis,yAxis,smth)
+
+
+
+###########################################################
+# Log bin data if required. Also generate x axis
+# for input data set
+# Scale the smoothing parameter is necessary
+###########################################################
+
+procedure(processXData, data, xMinIn, xMaxIn, smth)
+
+   datar = real(data)
+   datai = imag(data)
+   (w,h) = size(datar)
+   assignlist(getctrlvalues(0))
+
+  # Handle log/linear mode x axis
+   if(xAxisSpacing == "lin")
+      if(binX == "yes")
+         dataBinReal = matrix(xBins,h)
+         dataBinImag = matrix(xBins,h)
+         xAxis = linvec(xMinIn,xMaxIn,w)
+         try
+            for(k = 0 to h-1)
+               (x,dataBinReal[~,k]) = pseudologbin(xAxis, datar[~,k], xBins)
+               (x,dataBinImag[~,k]) = pseudologbin(xAxis, datai[~,k], xBins)
+            next(k)
+         catch
+            message("Error","Can't bin input data. It needs to have\rmore than 50 points horizontally.","error")
+            return(null,null,null,null)
+         endtry
+         xAxis = x #pseudologvec(xMinIn,xMaxIn,xBins) #x
+      else
+         dataBinReal = datar
+         dataBinImag = datai
+         xAxis = linvec(xMinIn,xMaxIn,w)
+      endif
+      dataBinned = dataBinReal + i*dataBinImag
+   else # Log x axis
+     # alpha = alpha*(w/50)^2
+      xAxis = logvec(xMinIn,xMaxIn,w)
+      dataBinReal = datar
+      dataBinImag = datai
+   endif
+
+endproc(dataBinReal,dataBinImag,xAxis,smth)
+
+
+#######################################################
+# Calculate the standard deviation of matrix m
+#######################################################
+
+procedure(sd, m)
+
+   (w,h) = size(m)
+   N = w*h
+   s = sum(m)
+   avg = s/N
+   
+   sd = sqrt(sum((m-avg)^2)/(N-1))
+
+endproc(sd)
