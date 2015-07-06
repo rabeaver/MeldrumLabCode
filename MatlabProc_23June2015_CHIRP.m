@@ -5,7 +5,7 @@ close all
 
 %%
 % CHIRP params
-Pchirp = 0.015; % CHIRP Pulse Length (s)
+Pchirp = 0.010; % CHIRP Pulse Length (s)
 BWchirp = 8417; % CHIRP bandwidth (Hz)
 
 nPts = 67; % # of acqu points
@@ -13,7 +13,7 @@ nEchoes = 16; % Echoes
 tD = 6e-6; % 2 * tD (Dwell time of 4e-06 should be input as 8e-06)
 tE = 500; %us
 omitEchoPts = 3; %the number of points that are zeros from the spectrometer
-nnn = 2; %expt number
+% nnn = 2; %expt number
 
 zf = 2; % zero filling
 T = tD*(2^zf);                     % Sample time
@@ -30,13 +30,13 @@ z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
 datadir = 'C:\Users\NMRLab\Desktop\CHIRP\';
-datafile = 'CHIRP2D_15mM_BigGdH2O_2July2015';
+datafile = 'CHIRP2D_15mM_GdH2O_10mspulse_ampon_6July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
 
 % CHIRPdat = spec(1,:);
-CHIRPdat = reshape(spec2(nnn,:), nPts, nEchoes);
+CHIRPdat = reshape(spec, nPts, nEchoes);
 CHIRPdat = CHIRPdat(1:end-omitEchoPts,:);
 
 % figure(11)
@@ -57,7 +57,7 @@ CHIRPdat = padarray(CHIRPdat, size(CHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 
 
 T1T2profiles = fftshift(fft(CHIRPdat,NFFT)/L, 1); % Performs FFT algorithm
 
-figure(nnn)
+figure(1)
 subplot(1,2,1)
 hold on
 plot(t*1e6,real(CHIRPdat(:,2)));
@@ -83,9 +83,9 @@ hold off
 
 
 %% No CHIRP load section
-% filenameNO = 'CHIRP2D_doubleSample2_150msCHIRP_30June2015';
-% [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
-data = reshape(spec2(1,:),nPts,nEchoes);
+filenameNO = 'CHIRP2D_15mM_GdH2O_10mspulse_ampoff_6July2015';
+[~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
+data = reshape(spec,nPts,nEchoes);
 
 % No CHIRP raw data and fft profiles
 % noCHIRPdat = spec3(2,:);
@@ -165,17 +165,19 @@ figure(8)
 plot(abs(T1T2profiles(:,1)))
 
 %% Data Range and Inversion
-
-%indexes for data range and inversion (zero point)
-minind= 121;
+% manually select indices for data range and inversion (zero point)
+minind= 102;
+maxind = 142;
+firstinvertedind = 133;
+ 
+% automatically select indices
 % minind=find(f<-BWchirp/2,1,'last');
-maxind = 147;
 % maxind=find(f>BWchirp/2,1,'first');
 % [~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
-firstinvertedind = 133;
 % firstinvertedind = firstinvertedind + minind;
-T1T2profiles2=zeros((maxind-minind+1),nEchoes);
 
+
+T1T2profiles2=zeros((maxind-minind+1),nEchoes);
 T1T2profiles2(1:(firstinvertedind-minind),:)=abs(T1T2profcorr(minind:(firstinvertedind-1),:));
 T1T2profiles2((firstinvertedind-minind+1):(maxind-minind+1),:)=-abs(T1T2profcorr(firstinvertedind:maxind,:));
 T1T2data=T1T2profiles2/max(max(T1T2profiles2));
