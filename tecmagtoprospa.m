@@ -7,8 +7,8 @@ if ispc == 1;
     filedir = 'C:\Users\jnking01\Desktop\'; 
     filename = 'C:\Users\jnking01\Desktop\MilkT2D_2.tnt';
 elseif ismac == 1;
-    filedir = '/Users/tyler/Dropbox/Data/T2D_Water_T2D/';
-    filename = '/Users/tyler/Dropbox/Data/T2D_Water_T2D/H2O_T2D_test3_10Oct2014.tnt';
+    filedir = '/Users/jaredking/Documents/Chemistry/Research_Files_and_Data/CHIRP/';
+    filename = '/Users/jaredking/Documents/Chemistry/Research_Files_and_Data/CHIRP/GdH2O_DoubleSample_T1SatT2_8July2015.tnt';
 end
 
 cd(filedir)
@@ -18,11 +18,11 @@ cd(filedir)
 n1D = aq.td(1);
 n2D = aq.td(2);
 nPts = aq.ctd;
-nEchoes = 1024;
+nEchoes = 32;
 tEcho = 150e-6;     % echo time
-tD = 1e-6;
-ptsPer_tE = (tEcho/tD);
-ptsPerEcho = 69;
+tD = 6e-6;
+ptsPer_tE = 67;% (tEcho/tD);
+ptsPerEcho = 67;
 
 dMin = 45e-6; %minimum delta time in s
 DELTA = 1e-3; %DELTA in s
@@ -34,7 +34,7 @@ G = 6.5998;         % T/m (Smallest gradient amplitude) (6.5998 PM25; 23.8626 PM
 tauVecA = dMin:dStep:dMin+(dStep*(n2D-1));
 tauVec = tauVecA;
 
-spec2 = [spec2,zeros(n2D,int32(nEchoes*ptsPer_tE-size(spec2,2)))];
+% spec2 = [spec2,zeros(n2D,int32(nEchoes*ptsPer_tE-size(spec2,2)))];
 spec3 = reshape(spec2',int32(ptsPer_tE),nEchoes,n2D);
 spec3 = spec3(1:ptsPerEcho,:,:);
 
@@ -53,7 +53,7 @@ dISnew = reshape(dIS,2*nEchoes,n2D);
 dISnew = dISnew';
 
 
-save('dataIntSurf7.dat','dISnew','-ascii','-tabs');
+save('GdH2O_T1SatT2_8July2015.dat','dISnew','-ascii','-tabs');
 fitData = real(dataInt)./max(real(dataInt));
 % fitData = real(dataIntSurf(:,1))./max(real(dataIntSurf(:,1)));
 

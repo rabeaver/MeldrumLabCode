@@ -3,20 +3,20 @@ clc
 close all
 
 %%
-filename = 'Glycerol_T1Sat_4.tnt';
-filedir = 'C:\Users\tkmeldrum\Desktop\';
+filename = 'GdH2O_50mMvial_T1Sat_10July2015.tnt';
+filedir = 'C:\Users\NMRLab\Desktop\CHIRP\';
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 150; %us
-nEchoes = 32;
+nEchoes = 8;
 nPts = 69;
 nPtsBlank = 5;
-nT1Pts = 17;
-T1min = 3.01; %ms
-T1max = 250; %ms
-T1guess = 50; %ms 
+nT1Pts = 11;
+T1min = 0.05; %ms
+T1max = 8; %ms
+T1guess = 1.5; %ms 
 
 T1vector = linspace(T1min,T1max,nT1Pts);
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;

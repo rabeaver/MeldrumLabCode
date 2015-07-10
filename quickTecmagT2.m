@@ -3,14 +3,14 @@ clc
 close all
 
 %%
-filename = 'DoubleGdH2O_CPMG_tE300u_9July2015.tnt';
+filename = 'DoubleSample_50mMand5mM_GdH2O_CPMG_10July2015.tnt';
 filedir = 'C:\Users\NMRLab\Desktop\CHIRP\';
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 300; %us
-nEchoes = 64;
+tEcho = 500; %us
+nEchoes = 128;
 nPts = 69;
 nPtsBlank = 5;
 
@@ -22,7 +22,7 @@ dataInt = sum(data,1);
 dataIntRe = real(dataInt)./max(real(dataInt));
 dataIntIm = imag(dataInt)./max(real(dataInt));
 
-guess = [1 2e-03];
+guess = [1 15e-03];
 beta = nlinfit(echoVector,dataIntRe, @t2monofit_simple, guess);
 ypred = t2monofit_simple(beta,echoVector);
 

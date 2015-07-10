@@ -13,7 +13,7 @@ nEchoes = 16; % Echoes
 tD = 6e-6; % 2 * tD (Dwell time of 4e-06 should be input as 8e-06)
 tE = 500; %us
 omitEchoPts = 3; %the number of points that are zeros from the spectrometer
- n = 6; %expt number
+ n = 7; %expt number
 
 zf = 0; % zero filling
 T = tD*(2^zf);                     % Sample time
@@ -30,7 +30,7 @@ z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
 datadir = '/Users/jaredking/Documents/Chemistry/Research_Files_and_Data/CHIRP/';
-datafile = 'CHIRP2D_15mM_GdH2O_5mspulse_6July2015';
+datafile = 'CHIRP2D_15mM_GdH2O_20mspulse_6July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -167,13 +167,19 @@ plot(abs(T1T2profiles(:,1)))
 %% Data Range and Inversion
 
 %indexes for data range and inversion (zero point)
-% minind= 28;
-minind=find(f<-BWchirp/2,1,'last');
-% maxind = 39;
-maxind=find(f>BWchirp/2,1,'first');
-[~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
-% firstinvertedind = 34;
-firstinvertedind = firstinvertedind + minind;
+
+% manual find
+minind= 29;
+maxind = 40;
+firstinvertedind = 34;
+
+% Auto find
+% minind=find(f<-BWchirp/2,1,'last');
+% maxind=find(f>BWchirp/2,1,'first');
+% [~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
+% firstinvertedind = firstinvertedind + minind;
+
+
 T1T2profiles2=zeros((maxind-minind+1),nEchoes);
 
 T1T2profiles2(1:(firstinvertedind-minind),:)=abs(T1T2profcorr(minind:(firstinvertedind-1),:));

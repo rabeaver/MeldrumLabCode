@@ -5,7 +5,8 @@ close all
 
 %%
 % CHIRP params
-Pchirp = 0.015; % CHIRP Pulse Length (s)
+
+Pchirp = 0.010; % CHIRP Pulse Length (s)
 BWchirp = 11223; % CHIRP bandwidth (Hz)
 
 nPts = 67; % # of acqu points
@@ -29,8 +30,9 @@ f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\NMRLab\Desktop\CHIRP\';
-datafile = 'CHIRP_doubleGdH2O_10mMoutside_15mMvial_15mspulse_9July2015';
+
+datadir = '/Users/jaredking/Documents/Chemistry/Research_Files_and_Data/CHIRP/Good_Data_Sets/';
+datafile = 'CHIRP2D_15mM_GdH2O_10mspulse_ampon_40um_6July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -83,7 +85,8 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'noCHIRP_doubleGdH2O_10mMoutside_15mMvial_15mspulse_9July2015';
+
+filenameNO = 'CHIRP2D_15mM_GdH2O_10mspulse_ampoff_40um_6July2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -166,9 +169,9 @@ plot(abs(T1T2profiles(:,1)))
 
 %% Data Range and Inversion
 % manually select indices for data range and inversion (zero point)
-minind= 102;
-maxind = 160;
-firstinvertedind = 133;
+minind= 105;
+maxind = 142;
+firstinvertedind = 134;
  
 % automatically select indices
 % minind=find(f<-BWchirp/2,1,'last');
