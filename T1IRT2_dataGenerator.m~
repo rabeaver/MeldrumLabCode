@@ -37,13 +37,12 @@ data2D = T1data'*T2data; %make 2D data set
 % Add in noise
 for i = 1:length(T1axis)
     for j = 1:length(T2axis)
-        noise = randn/200;
-        while 0.5 < noise < -0.5
-            noise = randn/200;
+        noise = randn/20;
+        while -0.5 < noise < 0.5
+            noise = randn/20;
         end
     
-        data2D(i, j) = data2D(i,j) + randn/20;
-    end
+    data2D(i, :) = data2D(i,:) + randn/20;
 end
 
 surf(T2axis',T1axis,data2D) %plotting

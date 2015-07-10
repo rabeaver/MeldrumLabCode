@@ -29,7 +29,7 @@ f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research_Files_and_Data/CHIRP/';
+datadir = '/Users/jaredking/Documents/Chemistry/Research_Files_and_Data/CHIRP/Good_Data_Sets/';
 datafile = 'CHIRP2D_15mM_GdH2O_10mspulse_ampon_40um_6July2015';
 
 % Import CHIRP data
