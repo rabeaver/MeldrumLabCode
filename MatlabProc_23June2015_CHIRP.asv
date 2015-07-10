@@ -5,8 +5,8 @@ close all
 
 %%
 % CHIRP params
-Pchirp = 0.010; % CHIRP Pulse Length (s)
-BWchirp = 8417; % CHIRP bandwidth (Hz)
+Pchirp = 0.015; % CHIRP Pulse Length (s)
+BWchirp = 11223; % CHIRP bandwidth (Hz)
 
 nPts = 67; % # of acqu points
 nEchoes = 16; % Echoes
@@ -30,7 +30,7 @@ z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
 datadir = 'C:\Users\NMRLab\Desktop\CHIRP\';
-datafile = 'CHIRP2D_15mM_GdH2O_10mspulse_ampon_6July2015';
+datafile = 'CHIRP_doubleGdH2O_10mMoutside_15mMvial_15mspulse_9July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -83,7 +83,7 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'CHIRP2D_15mM_GdH2O_10mspulse_ampoff_6July2015';
+filenameNO = 'noCHIRP_doubleGdH2O_10mMoutside_15mMvial_15mspulse_9July2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -166,8 +166,8 @@ plot(abs(T1T2profiles(:,1)))
 
 %% Data Range and Inversion
 % manually select indices for data range and inversion (zero point)
-minind= 102;
-maxind = 142;
+minind= 100;
+maxind = 155;
 firstinvertedind = 133;
  
 % automatically select indices
@@ -197,7 +197,7 @@ figure
 surf(echoVec(:,1:end)*1000,t1*1000,T1T2data(:,1:end)); 
 shading flat;
 colormap('jet');
-%shading interp;
+% shading interp;
 %set(gcf,'Renderer','painters');
 %daspect([1 1 1]);
 %caxis([0 3e6])
@@ -209,8 +209,8 @@ title('T1-T2 data')
 %set(gca,'XScale','log');
 %set(gca,'YScale','log');
 %% T1 fit
-echoNr = 3;
-cftool(t1,T1T2data(:,echoNr));
+% echoNr = 3;
+% cftool(t1,T1T2data(:,echoNr));
 %%
 
 T1T2data2 = flipud(T1T2data);
