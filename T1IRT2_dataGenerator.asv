@@ -14,19 +14,19 @@ clc
 %%
 
 % User defined parameters
-T1_1 = 15.0e-3; %s
+T1_1 = 0.0e-3; %s
 w1 = 0.40; % First T1 weight
-T1_2 = 3.0e-3; %s
+T1_2 = 10.0e-3; %s
 w2 = 0.60; % Second T1 weight
-T2_1 = 12.0e-3; %s
-T2_2 = 3.0e-3; %s
+T2_1 = 15.0e-3; %s
+T2_2 = 2.0e-3; %s
 
 
 t_T1 = 200e-6; %s, time increment for T1 axis
 t_T2 = 500e-6; %s, time increment for T2 axis
 
 
-nPtsT1 = 50; %points for T1 axis
+nPtsT1 = 250; %points for T1 axis
 nPtsT2 = 64; %points for T2 axis
 %end user-defined parameters
 
