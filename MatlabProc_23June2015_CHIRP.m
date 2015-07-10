@@ -5,7 +5,12 @@ close all
 
 %%
 % CHIRP params
+<<<<<<< HEAD
 Pchirp = 0.015; % CHIRP Pulse Length (s)
+=======
+
+Pchirp = 0.010; % CHIRP Pulse Length (s)
+>>>>>>> 0f6fa5eafa2a9adb8f75d33ab5a18943098d00f8
 BWchirp = 11223; % CHIRP bandwidth (Hz)
 
 nPts = 67; % # of acqu points
@@ -29,8 +34,14 @@ f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
+<<<<<<< HEAD
 datadir = 'C:\Users\vjlee\Desktop\';
 datafile = 'CHIRP_doubleGdH2O_50mMand5mMvials_15mspulse_10July2015';
+=======
+
+datadir = '/Users/jaredking/Documents/Chemistry/Research_Files_and_Data/CHIRP/Good_Data_Sets/';
+datafile = 'CHIRP2D_15mM_GdH2O_10mspulse_ampon_40um_6July2015';
+>>>>>>> 0f6fa5eafa2a9adb8f75d33ab5a18943098d00f8
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -83,7 +94,12 @@ hold off
 
 
 %% No CHIRP load section
+<<<<<<< HEAD
 filenameNO = 'noCHIRP_doubleGdH2O_50mMand5mMvials_15mspulse_10July2015';
+=======
+
+filenameNO = 'CHIRP2D_15mM_GdH2O_10mspulse_ampoff_40um_6July2015';
+>>>>>>> 0f6fa5eafa2a9adb8f75d33ab5a18943098d00f8
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -197,7 +213,7 @@ figure
 surf(echoVec(:,1:end)*1000,t1*1000,T1T2data(:,1:end)); 
 shading flat;
 colormap('jet');
-%shading interp;
+% shading interp;
 %set(gcf,'Renderer','painters');
 %daspect([1 1 1]);
 %caxis([0 3e6])
@@ -209,8 +225,8 @@ title('T1-T2 data')
 %set(gca,'XScale','log');
 %set(gca,'YScale','log');
 %% T1 fit
-echoNr = 3;
-cftool(t1,T1T2data(:,echoNr));
+% echoNr = 3;
+% cftool(t1,T1T2data(:,echoNr));
 %%
 
 T1T2data = T1T2data(:,2:end);
