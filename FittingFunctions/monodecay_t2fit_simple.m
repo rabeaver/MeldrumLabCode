@@ -16,7 +16,7 @@ ci = nlparci(beta,resid,'jacobian',J,'alpha',alpha);
 xfit = 0:max(xdata)/1000:max(xdata);
 ypred = nlpredci(@simpleexpdecay,xfit,beta,resid,J);
 
-pm(:,1) = abs(ci(:,2) - beta(:,1)); 
+pm = abs(ci(:,2) - beta(:,1)); 
 
 
 
