@@ -6,11 +6,11 @@ close all
 %%
 % CHIRP params
 
-Pchirp = 0.010; % CHIRP Pulse Length (s)
+Pchirp = 1.00; % CHIRP Pulse Length (s)
 BWchirp = 11223; % CHIRP bandwidth (Hz)
 
 nPts = 67; % # of acqu points
-nEchoes = 16; % Echoes
+nEchoes = 32; % Echoes
 tD = 6e-6; % 2 * tD (Dwell time of 4e-06 should be input as 8e-06)
 tE = 500; %us
 omitEchoPts = 3; %the number of points that are zeros from the spectrometer
@@ -30,8 +30,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/Good_Data_Sets/';
-datafile = 'CHIRP2D_15mM_GdH2O_10mspulse_ampon_40um_6July2015';
+datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
+datafile = 'CHIRP_0.5P(2)_1spulse_tr2.5s_14July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -85,7 +85,7 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'CHIRP2D_15mM_GdH2O_10mspulse_ampoff_40um_6July2015';
+filenameNO = 'noCHIRP_0.5P(2)_1spulse_tr2.5s_14July2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -169,8 +169,8 @@ plot(abs(T1T2profiles(:,1)))
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 105;
-maxind = 142;
+minind= 99;
+maxind = 148;
 firstinvertedind = 134;
 
 % automatically select indices
@@ -189,7 +189,7 @@ t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
 
 %plot first T1 column
 figure
-plot(t1*1000,T1T2data(:,2),'linewidth',2)
+plot(t1*1000,T1T2data(:,1),'linewidth',2)
 xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
@@ -214,11 +214,11 @@ title('T1-T2 data')
 %set(gca,'XScale','log');
 %set(gca,'YScale','log');
 %% T1 fit
-echoNr = 3;
+echoNr = 1;
 cftool(t1,T1T2data(:,echoNr));
 %%
 
-T1T2data = T1T2data(:,2:end);
+T1T2data = T1T2data(:,1:end);
 T1T2data2 = flipud(T1T2data);
 save(strcat(datafile, '.dat'), 'T1T2data2', '-ascii')
 size(T1T2data)
