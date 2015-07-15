@@ -30,9 +30,11 @@ dataInt = reshape(dataInt,1,nT1Pts);
 dataIntRe = real(dataInt);
 dataIntIm = imag(dataInt);
 
-guesses = [0, max(dataIntRe), T1guess];
-beta = nlinfit(T1vector,dataIntRe,@T1_recovery,guesses);
+guesses = [1, max(dataIntRe), T1guess];
+[beta, Resids, J] = nlinfit(T1vector,dataIntRe,@T1_recovery,guesses);
 ypred = T1_recovery(beta,T1vector);
+CI = nlparci(beta, Resids, 'jacobian', J);
+
 
 figure(1)
 hold on
