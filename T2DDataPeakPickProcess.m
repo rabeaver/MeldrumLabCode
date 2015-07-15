@@ -4,8 +4,8 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = '/Users/tyler/Dropbox/Data/Biosensors/MATLAB_BSA_NPNa_Conversions/JYU_BSA_NPNa_Samples/';
-datafile = 'T2_D_BSA_Only_2_JYU.out';
+datadir = '/Users/tyler/Desktop/16HOUR_NICE_SCANS/';
+datafile = 'T2_D_NPNa_Only_3_JYU.out';
 T2lims = [1e-4 1e0];
 Dlims = [1e-11 1e-8];
 contourLevel = 0.90;
@@ -64,8 +64,8 @@ for n = 1:length(T2ind);
 end
 
 %%
-    ll = [2, 2, 2, 373]; %how to automate ll and mm?
-    mm = [82, 23, 26, 403];
+    ll = [2, 113]; %how to automate ll and mm?
+    mm = [50, 123];
   
 close all     
 %     [x,~] = ginput(2);
@@ -96,6 +96,7 @@ view([0,90])
 hold on
 for n = 1:length(T2ind)
     plot3(c.n{n}(1,ll(n):mm(n)),c.n{n}(2,ll(n):mm(n)),ones(1,mm(n)-ll(n)+1),'-r','LineWidth',3); 
+    text(min(c.n{n}(1,ll(n):mm(n))), max(c.n{n}(2,ll(n):mm(n))),1,int2str(n));
 end
 set(gca,'XScale','log','YScale','log')
     xlim(T2lims)
