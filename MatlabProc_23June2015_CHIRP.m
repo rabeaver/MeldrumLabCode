@@ -6,11 +6,11 @@ close all
 %%
 % CHIRP params
 
-Pchirp = 0.6; % CHIRP Pulse Length (s)
+Pchirp = 0.010; % CHIRP Pulse Length (s)
 BWchirp = 11223; % CHIRP bandwidth (Hz)
 
 nPts = 67; % # of acqu points
-nEchoes = 32; % Echoes
+nEchoes = 16; % Echoes
 tD = 6e-6; % 2 * tD (Dwell time of 4e-06 should be input as 8e-06)
 tE = 500; %us
 omitEchoPts = 3; %the number of points that are zeros from the spectrometer
@@ -30,8 +30,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
-datafile = 'CHIRP_0.5P(2)_600mspulse_tr2.5s_14July2015';
+datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/Good_Data_Sets/';
+datafile = 'CHIRP2D_15mM_GdH2O_10mspulse_ampon_40um_6July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -85,7 +85,7 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'noCHIRP_0.5P(2)_600mspulse_tr2.5s_14July2015';
+filenameNO = 'CHIRP2D_15mM_GdH2O_10mspulse_ampoff_40um_6July2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
