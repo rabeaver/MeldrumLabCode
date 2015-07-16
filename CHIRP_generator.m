@@ -8,9 +8,9 @@ close all
 %%%%%%% User-defined parameters %%%%%%%
 
 % dt = 500e-9 ; %time per point in waveform (s) [Scout limit is 20ns]
-N = 20000; %points to define the waveform
-tau = 20e-3; %pulse length (s)
-sliceheight = 0.060; %mm
+N = 13000; %points to define the waveform
+tau = 13e-3; %pulse length (s)
+sliceheight = 0.040; %mm
 G = 6.59; %T m-1, B0 field gradient
 offset = 0; %mm, frequency offset (if applicable)
 amplitude = 6; %dB, for Tecmag

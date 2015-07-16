@@ -5,7 +5,12 @@ close all
 
 %%
 % CHIRP params
+<<<<<<< HEAD
 Pchirp = 0.013; % CHIRP Pulse Length (s)
+=======
+
+Pchirp = 0.010; % CHIRP Pulse Length (s)
+>>>>>>> 22214c104ab381eba1632bf270945849c96473ba
 BWchirp = 11223; % CHIRP bandwidth (Hz)
 
 nPts = 67; % # of acqu points
@@ -13,7 +18,7 @@ nEchoes = 64; % Echoes
 tD = 6e-6; % 2 * tD (Dwell time of 4e-06 should be input as 8e-06)
 tE = 500; %us
 omitEchoPts = 3; %the number of points that are zeros from the spectrometer
-% nnn = 2; %expt number
+%nnn = 5; %expt number
 
 zf = 2; % zero filling
 T = tD*(2^zf);                     % Sample time
@@ -29,13 +34,19 @@ f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
+<<<<<<< HEAD
 datadir = 'C:\Users\vjlee\Desktop\';
 datafile = 'CHIRP_DoubleSample_GdH2O_50mMand5mM_13mspulse_10July2015';
+=======
+datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/Good_Data_Sets/';
+datafile = 'CHIRP2D_15mM_GdH2O_10mspulse_ampon_40um_6July2015';
+>>>>>>> 22214c104ab381eba1632bf270945849c96473ba
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
 
 % CHIRPdat = spec(1,:);
+% spec = spec2(nnn, :);
 CHIRPdat = reshape(spec, nPts, nEchoes);
 CHIRPdat = CHIRPdat(1:end-omitEchoPts,:);
 
@@ -83,7 +94,11 @@ hold off
 
 
 %% No CHIRP load section
+<<<<<<< HEAD
 filenameNO = 'noCHIRP_DoubleSample_GdH2O_50mMand5mM_13mspulse_10July2015';
+=======
+filenameNO = 'CHIRP2D_15mM_GdH2O_10mspulse_ampoff_40um_6July2015';
+>>>>>>> 22214c104ab381eba1632bf270945849c96473ba
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -159,17 +174,25 @@ title('Coil sensitivity corrected T1-T2 profiles')
 close all
 
 figure(7)
-plot(abs(T1T2profcorr(:,3)))
+plot(abs(T1T2profcorr(:,2)))
 
 figure(8)
 plot(abs(T1T2profiles(:,1)))
 
 %% Data Range and Inversion
+
 % manually select indices for data range and inversion (zero point)
+<<<<<<< HEAD
 minind= 98;
 maxind = 155;
 firstinvertedind = 135;
  
+=======
+minind= 99;
+maxind = 162;
+firstinvertedind = 139;
+
+>>>>>>> 22214c104ab381eba1632bf270945849c96473ba
 % automatically select indices
 % minind=find(f<-BWchirp/2,1,'last');
 % maxind=find(f>BWchirp/2,1,'first');
@@ -186,7 +209,7 @@ t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
 
 %plot first T1 column
 figure
-plot(t1*1000,T1T2data(:,2),'linewidth',2)
+plot(t1*1000,T1T2data(:,1),'linewidth',2)
 xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
@@ -211,8 +234,8 @@ title('T1-T2 data')
 %set(gca,'XScale','log');
 %set(gca,'YScale','log');
 %% T1 fit
-% echoNr = 3;
-% cftool(t1,T1T2data(:,echoNr));
+echoNr = 1;
+cftool(t1,T1T2data(:,echoNr));
 %%
 
 T1T2data = T1T2data(:,1:end);
