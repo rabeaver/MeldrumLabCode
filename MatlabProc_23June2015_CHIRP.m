@@ -9,19 +9,18 @@ Pchirp = 0.0025; % CHIRP Pulse Length (s)
 BWchirp = 11223; % CHIRP bandwidth (Hz)
 
 nPts = 69; % # of acqu points
-nEchoes = 64; % Echoes
+nEchoes = 16; % Echoes
 tD = 6e-6; % 2 * tD (Dwell time of 4e-06 should be input as 8e-06)
 tE = 500; %us
 omitEchoPts = 3; %the number of points that are zeros from the spectrometer
 % nnn = 5; %expt number
-eN = 3;
 
 zf = 1; % zero filling
 T = tD*(2^zf);                     % Sample time
 Fs = 1/T;                    % Sampling frequency
 L = (nPts-omitEchoPts)*(2^zf);                     % Length of signal
 NFFT = 2^nextpow2(L); % Next power of 2 from length of y
-apodize = 1; %Gaussian apodization on (1) or off (0)?
+apodize = 0; %Gaussian apodization on (1) or off (0)?
 
 
 echoVec = tE:tE:(nEchoes*tE);
@@ -31,7 +30,7 @@ z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
 datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
-datafile = 'T2D_STE_CHIRP_20dB_2048_Glycerol_17July2015';
+datafile = 'CHIRP_GdH2O_50mM_2_5msPulse_NICE_17July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -62,14 +61,14 @@ T1T2profiles = fftshift(fft(CHIRPdat,NFFT)/L, 1); % Performs FFT algorithm
 figure(1)
 subplot(1,2,1)
 hold on
-plot(t*1e6,real(CHIRPdat(:,eN)));
+plot(t*1e6,real(CHIRPdat(:,2)));
 % plot(t*1e6,imag(CHIRPdat(:,2)));
 % plot(t*1e6,abs(CHIRPdat(:,2)));
 xlabel('time [us]')
 
 subplot(1,2,2)
 hold on
-plot(z,2*abs(T1T2profiles(:,eN)),'LineWidth',1.5);
+plot(z,2*abs(T1T2profiles(:,2)),'LineWidth',1.5);
 % plot(z,2*real(T1T2profiles(:,2)));
 % plot(z,2*imag(T1T2profiles(:,2)));
 xlabel('real space [um]')
@@ -85,7 +84,7 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'T2D_STE_noCHIRP_Glycerol_17July2015';
+filenameNO = 'noCHIRP_GdH2O_50mM_2_5msPulse_NICE_17July2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -107,13 +106,13 @@ CPprofiles = fftshift(fft(noCHIRPdat,NFFT)/L,1);
 figure(3)
 subplot(1,2,1)
 hold on
-plot(t*1e6,real(noCHIRPdat(:,eN)));
+plot(t*1e6,real(noCHIRPdat(:,3)));
 % plot(t*1e6,imag(noCHIRPdat(:,3)));
 % plot(t*1e6,abs(noCHIRPdat(:,3)));
 xlabel('time [us]')
 subplot(1,2,2)
 hold on
-plot(z,2*abs(CPprofiles(:,eN)),'LineWidth',1.5);
+plot(z,2*abs(CPprofiles(:,3)),'LineWidth',1.5);
 % plot(z,2*real(CPprofiles(:,3)));
 % plot(z,2*imag(CPprofiles(:,3)));
 xlabel('real space [um]')
@@ -132,8 +131,8 @@ hold off
 
 figure(5)
 hold on
-plot(z,abs(CPprofiles(:,eN))/max(abs(CPprofiles(:,eN))),'linewidth',2,'color','k')
-plot(z,abs(T1T2profiles(:,eN))/max(abs(CPprofiles(:,eN))),'linewidth',2,'color','r')
+plot(z,abs(CPprofiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','k')
+plot(z,abs(T1T2profiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','r')
 hold off
 
 xlabel('{\it z} (um)','fontsize',12)
@@ -143,7 +142,7 @@ set(gca,'Fontsize',12,'linewidth',2)
 %% Coil Sensitivity Correction
 
 for k = 1:nEchoes
-    pcorr(:,k) = abs(CPprofiles(:,eN));
+    pcorr(:,k) = abs(CPprofiles(:,1));
 end
 
 T1T2profcorr = T1T2profiles./pcorr;
@@ -161,17 +160,17 @@ title('Coil sensitivity corrected T1-T2 profiles')
 close all
 
 figure(7)
-plot(abs(T1T2profcorr(:,eN)))
+plot(abs(T1T2profcorr(:,2)))
 
 figure(8)
-plot(abs(T1T2profiles(:,eN)))
+plot(abs(T1T2profiles(:,1)))
 
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 136;
-maxind = 161;
-% firstinvertedind = 132;
+minind= 104;
+maxind = 136;
+firstinvertedind = 132;
 
 % automatically select indices
 % minind=find(f<-BWchirp/2,1,'last');
@@ -180,27 +179,26 @@ maxind = 161;
 % firstinvertedind = firstinvertedind + minind;
 
 
-% T1T2profiles2=zeros((maxind-minind+1),nEchoes);
-% T1T2profiles2(1:(firstinvertedind-minind),:)=abs(T1T2profcorr(minind:(firstinvertedind-1),:));
-% T1T2profiles2((firstinvertedind-minind+1):(maxind-minind+1),:)=-abs(T1T2profcorr(firstinvertedind:maxind,:))+repmat(abs(T1T2profcorr(firstinvertedind,:)), maxind-firstinvertedind+1, 1);
-% T1T2data=T1T2profiles2/max(max(T1T2profiles2));
+T1T2profiles2=zeros((maxind-minind+1),nEchoes);
+T1T2profiles2(1:(firstinvertedind-minind),:)=abs(T1T2profcorr(minind:(firstinvertedind-1),:));
+T1T2profiles2((firstinvertedind-minind+1):(maxind-minind+1),:)=-abs(T1T2profcorr(firstinvertedind:maxind,:))+repmat(abs(T1T2profcorr(firstinvertedind,:)), maxind-firstinvertedind+1, 1);
+T1T2data=T1T2profiles2/max(max(T1T2profiles2));
 
-Ddat = abs(T1T2profcorr(minind:maxind,:));
-Dvec=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
+t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
 
 %plot first T1 column
 figure
-plot(Dvec*1000,Ddat(:,eN)','linewidth',2)
+plot(t1*1000,T1T2data(:,1),'linewidth',2)
 xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
 % xlim([0 1000*Pchirp])
-% ylim([-1.1 1.1])
+ylim([-1.1 1.1])
 
 %% surf of all D-T2 Profiles
 
 figure
-surf(echoVec(:,eN:end)*1000,Dvec*1000,Ddat(:,eN:end)); 
+surf(echoVec(:,1:end)*1000,t1*1000,T1T2data(:,1:end)); 
 shading flat;
 colormap('jet');
 % shading interp;
@@ -215,12 +213,13 @@ title('T1-T2 data')
 %set(gca,'XScale','log');
 %set(gca,'YScale','log');
 %% T1 fit
-cftool(Dvec,Ddat(:,eN));
+echoNr = 1;
+cftool(t1,T1T2data(:,echoNr));
 %%
 
-Ddat = Ddat(:,eN:end);
-T1T2data2 = flipud(Ddat);
+T1T2data = T1T2data(:,1:end);
+T1T2data2 = flipud(T1T2data);
 save(strcat(datafile, '.dat'), 'T1T2data2', '-ascii')
-size(Ddat)
-1e6*(Dvec(1)-Dvec(end))
-1e6*[min(Dvec), max(Dvec)]
+size(T1T2data)
+1e6*(t1(1)-t1(end))
+1e6*[min(t1), max(t1)]
