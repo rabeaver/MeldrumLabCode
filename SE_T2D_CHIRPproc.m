@@ -23,14 +23,18 @@ L = (nPts-omitEchoPts)*(2^zf);                     % Length of signal
 NFFT = 2^nextpow2(L); % Next power of 2 from length of y
 apodize = 0; %Gaussian apodization on (1) or off (0)?
 
+gammaRad = 2.675222005e8; %s-1 T-1
+gammaMHz = 42.57748; %MHz T-1
+G = 6.59; % T m-1
+DELTA = 1e-3; %s
 
 echoVec = tE:tE:(nEchoes*tE);
 t = (-(L-1)/2:L/2)*T;                % Time vector
-f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
+f = linspace(Fs/2,-Fs/2,NFFT);          %Hz, flipped from [-Fs/2,+Fs/2] to [Fs/2, -Fs/2] to get alignment with our gradient, CHIRP frequency sweep direction. TKM, 7-17-2015
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
+datadir = '/Users/tyler/Desktop/';
 datafile = 'T2D_STE_CHIRP_5dB_2048_Glycerol_2_17July2015';
 
 % Import CHIRP data
@@ -73,14 +77,14 @@ plot(z,2*abs(T1T2profiles(:,eN)),'LineWidth',1.5);
 % plot(z,2*real(T1T2profiles(:,2)));
 % plot(z,2*imag(T1T2profiles(:,2)));
 xlabel('real space [um]')
-title('Plot of Third T1T2 FFT Profile and Echo')
+title('Plot of Third T2D FFT Profile and Echo')
 
 hold off
 figure(2)
 hold on
 surf(abs(T1T2profiles));
 shading flat;
-title('Surface plot of T1T2 FFT Profiles')
+title('Surface plot of T2D FFT Profiles')
 hold off
 
 
@@ -117,14 +121,14 @@ plot(z,2*abs(CPprofiles(:,eN)),'LineWidth',1.5);
 % plot(z,2*real(CPprofiles(:,3)));
 % plot(z,2*imag(CPprofiles(:,3)));
 xlabel('real space [um]')
-title('Plot of Third T1T2 FFT Profile and Echo')
+title('Plot of Third T2D FFT Profile and Echo')
 hold off
 
 figure(4)
 hold on
 surf(abs(CPprofiles));
 shading flat;
-title('Surface plot of T1T2 FFT Profiles')
+title('Surface plot of T2D FFT Profiles')
 hold off
 
 
@@ -137,7 +141,7 @@ plot(z,abs(T1T2profiles(:,eN))/max(abs(CPprofiles(:,eN))),'linewidth',2,'color',
 hold off
 
 xlabel('{\it z} (um)','fontsize',12)
-title('T1-T2 & coil profiles')
+title('T2-D & coil profiles')
 set(gca,'Fontsize',12,'linewidth',2)
 
 %% Coil Sensitivity Correction
@@ -155,7 +159,7 @@ shading interp;
 set(gcf,'Renderer','painters');
 colorbar('linewidth',2)
 caxis([0 1])
-title('Coil sensitivity corrected T1-T2 profiles')
+title('Coil sensitivity corrected T2-D profiles')
 
 %% Find Optimal data range with these figures
 close all
@@ -169,8 +173,8 @@ plot(abs(T1T2profiles(:,eN)))
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 134;
-maxind = 142;
+minind= 114;
+maxind = 124;
 % firstinvertedind = 132;
 
 % automatically select indices
@@ -192,7 +196,9 @@ Dvec=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
 figure
 plot(Dvec*1000,Ddat(:,eN)','linewidth',2)
 xlabel('{\it t}_1 (ms)','fontsize',30)
-title('T1-T2, first T1 column')
+title('T2D')
+ylabel(strcat('signal, echo ',num2str(eN),' [arb]')); %,'fontsize',30)
+xlabel('delta [ms]');
 set(gca,'Fontsize',30,'linewidth',2)
 % xlim([0 1000*Pchirp])
 % ylim([-1.1 1.1])
@@ -208,18 +214,53 @@ colormap('jet');
 %daspect([1 1 1]);
 %caxis([0 3e6])
 colorbar %('linewidth',2)
-ylabel('{\it t}_1 (ms)'); %,'fontsize',30)
+ylabel('delta (ms)'); %,'fontsize',30)
 xlabel('{\it t}_2 (ms)'); %,'fontsize',30)
-title('T1-T2 data')
+title('T2-D data')
 % set(gca,'Fontsize',30,'linewidth',2)
 %set(gca,'XScale','log');
 %set(gca,'YScale','log');
+
+figure
+scatter(Dvec*1000,Ddat(:,eN))
+ylabel(strcat('signal, echo ',num2str(eN),' [arb]')); %,'fontsize',30)
+xlabel('delta [ms]');
+
 %% T1 fit
-cftool(Dvec,Ddat(:,eN));
+% cftool(Dvec*1000,Ddat(:,eN));
+
+%% Test for D from STE equation
+yvals = log(Ddat(:,eN)./Ddat(1,eN));
+xvals = -gammaRad^2*G^2*Dvec.^2.*(DELTA + (2/3)*Dvec);
+% cftool(xvals,yvals)
+
+% Given the followign diffusion coefficient, determine the correct value
+% for the x axis
+D = 3.5e-12; %m2 s-1
+
+test = -yvals/(-gammaRad^2*G^2*D);
+
+p3 = ones(length(test),1)*(2/3);
+p2 = ones(length(test),1)*(1e-3);
+p1 = ones(length(test),1)*(0);
+p0 = test;
+
+p = [p3,p2,p1,p0];
+
+for i = 1:length(test)
+    r(:,i) = roots(p(i,:));
+end
+
+deltaCalc = r(3,:)';
+deltaVec = linspace(max(0,deltaCalc(2)),deltaCalc(end),length(test));
+
+% retest the diffusion coefficient using this newly calculated vector
+xvals2 = -gammaRad^2*G^2*deltaVec.^2.*(DELTA + (2/3)*deltaVec);
+cftool(xvals2,yvals)
 %%
 
 Ddat = Ddat(:,eN:end);
-T1T2data2 = flipud(Ddat);
+T1T2data2 = (Ddat);
 save(strcat(datafile, '.dat'), 'T1T2data2', '-ascii')
 size(Ddat)
 1e6*(Dvec(1)-Dvec(end))
