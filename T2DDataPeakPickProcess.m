@@ -4,8 +4,8 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = '/Users/tyler/Dropbox/Data/Biosensors/MATLAB_BSA_NPNa_Conversions/JYU_BSA_NPNa_Samples/';
-datafile = 'T2_D_BSA_Only_2_JYU.out';
+datadir = '/Users/tyler/Dropbox/Data/Biosensors/16HOUR_NICE_SCANS/';
+datafile = 'T2_D_NPNa_Only_3_JYU.out';
 T2lims = [1e-4 1e0];
 Dlims = [1e-11 1e-8];
 contourLevel = 0.90;
@@ -28,16 +28,16 @@ T2axis = logspace(log10(T2lims(1)),log10(T2lims(2)),nPts);
 % cm = colormap(gray);
 
 %plot the T2D data
-% figure(1)
-% surf(T2axis,Daxis,data)
-% colormap(flipud(gray));
-% shading flat
-% set(gca,'XScale','log','YScale','log','XTick', [1e-4; 1e-3; 1e-2; 1e-1; 1e0; 1e1],'FontSize',18)
-% xlim(T2lims)
-% ylim(Dlims)
-% ylabel('\itD\rm [m^2 s^{-1}]')
-% xlabel('\itT\rm_2 [s]')
-% view([0,90])
+figure(1)
+surf(T2axis,Daxis,data)
+colormap(flipud(gray));
+shading flat
+set(gca,'XScale','log','YScale','log','XTick', [1e-4; 1e-3; 1e-2; 1e-1; 1e0; 1e1],'FontSize',18)
+xlim(T2lims)
+ylim(Dlims)
+ylabel('\itD\rm [m^2 s^{-1}]')
+xlabel('\itT\rm_2 [s]')
+view([0,90])
 
 %for each peak present in the sample, make a contour line showing the 50%
 %level. This countour is stored as "c", with some points designating the
@@ -64,14 +64,14 @@ for n = 1:length(T2ind);
 end
 
 %%
-    ll = [2, 2, 2, 373]; %how to automate ll and mm?
-    mm = [82, 23, 26, 403];
+    ll = [2,2,135]; %how to automate ll and mm?
+    mm = [49,44,136];
   
 close all     
 %     [x,~] = ginput(2);
 %     ll(n) = round(x(1));
 %     mm(n) = round(x(2));
-for n = 1:length(T2ind)
+for n = 1:1; %length(T2ind)
 %     figure(length(T2ind)+n+1)
 %     plot(c.n{n}(1,ll(n):mm(n)),c.n{n}(2,ll(n):mm(n)),'LineWidth',2);             % will need to update the number c(1,2:XXX) for different data sets. For secondary peaks, the countour line for the main peak still shows up in two places, so need to specifiy the end of the first peak. Just do this graphically.
 %     set(gca,'XScale','log','YScale','log')
@@ -94,7 +94,7 @@ ylabel('\itD\rm [m^2 s^{-1}]')
 xlabel('\itT\rm_2 [s]')
 view([0,90])
 hold on
-for n = 1:length(T2ind)
+for n = 1:1; %length(T2ind)
     plot3(c.n{n}(1,ll(n):mm(n)),c.n{n}(2,ll(n):mm(n)),ones(1,mm(n)-ll(n)+1),'-r','LineWidth',3); 
 end
 set(gca,'XScale','log','YScale','log')
