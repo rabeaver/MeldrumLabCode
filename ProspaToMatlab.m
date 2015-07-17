@@ -1,7 +1,7 @@
 
 %% T1T2
 
-cd('Z:\Data\VJL\PM5\1P_2_T2D\1');
+cd('C:\users\vjlee\desktop\');
 dataIn = load('Jamestown_13Nov2014_T1T2data_inverted.out');
 
 T2T1lim = [-3 -1];
