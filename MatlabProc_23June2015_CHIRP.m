@@ -5,22 +5,18 @@ close all
 
 %%
 % CHIRP params
-<<<<<<< HEAD
-Pchirp = 0.013; % CHIRP Pulse Length (s)
-=======
 
-Pchirp = 0.010; % CHIRP Pulse Length (s)
->>>>>>> 22214c104ab381eba1632bf270945849c96473ba
+Pchirp = 0.045; % CHIRP Pulse Length (s)
 BWchirp = 11223; % CHIRP bandwidth (Hz)
 
-nPts = 67; % # of acqu points
+nPts = 69; % # of acqu points
 nEchoes = 64; % Echoes
 tD = 6e-6; % 2 * tD (Dwell time of 4e-06 should be input as 8e-06)
 tE = 500; %us
 omitEchoPts = 3; %the number of points that are zeros from the spectrometer
 %nnn = 5; %expt number
 
-zf = 2; % zero filling
+zf = 1; % zero filling
 T = tD*(2^zf);                     % Sample time
 Fs = 1/T;                    % Sampling frequency
 L = (nPts-omitEchoPts)*(2^zf);                     % Length of signal
@@ -34,13 +30,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
-<<<<<<< HEAD
-datadir = 'C:\Users\vjlee\Desktop\';
-datafile = 'CHIRP_DoubleSample_GdH2O_50mMand5mM_13mspulse_10July2015';
-=======
-datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/Good_Data_Sets/';
-datafile = 'CHIRP2D_15mM_GdH2O_10mspulse_ampon_40um_6July2015';
->>>>>>> 22214c104ab381eba1632bf270945849c96473ba
+datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
+datafile = 'T2D_CHIRP_Glycerol_16July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -94,11 +85,7 @@ hold off
 
 
 %% No CHIRP load section
-<<<<<<< HEAD
-filenameNO = 'noCHIRP_DoubleSample_GdH2O_50mMand5mM_13mspulse_10July2015';
-=======
-filenameNO = 'CHIRP2D_15mM_GdH2O_10mspulse_ampoff_40um_6July2015';
->>>>>>> 22214c104ab381eba1632bf270945849c96473ba
+filenameNO = 'T2D_noCHIRP_Glycerol_16July2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -182,17 +169,10 @@ plot(abs(T1T2profiles(:,1)))
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-<<<<<<< HEAD
-minind= 98;
-maxind = 155;
-firstinvertedind = 135;
- 
-=======
-minind= 99;
-maxind = 162;
-firstinvertedind = 139;
+minind= 118;
+maxind = 139;
+firstinvertedind = 128;
 
->>>>>>> 22214c104ab381eba1632bf270945849c96473ba
 % automatically select indices
 % minind=find(f<-BWchirp/2,1,'last');
 % maxind=find(f>BWchirp/2,1,'first');
@@ -202,7 +182,7 @@ firstinvertedind = 139;
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes);
 T1T2profiles2(1:(firstinvertedind-minind),:)=abs(T1T2profcorr(minind:(firstinvertedind-1),:));
-T1T2profiles2((firstinvertedind-minind+1):(maxind-minind+1),:)=-abs(T1T2profcorr(firstinvertedind:maxind,:));
+T1T2profiles2((firstinvertedind-minind+1):(maxind-minind+1),:)=-abs(T1T2profcorr(firstinvertedind:maxind,:)) + repmat(abs(T1T2profcorr(firstinvertedind,:)), maxind-firstinvertedind+1, 1);
 T1T2data=T1T2profiles2/max(max(T1T2profiles2));
 
 t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
@@ -213,8 +193,8 @@ plot(t1*1000,T1T2data(:,1),'linewidth',2)
 xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
-xlim([0 1000*Pchirp])
-ylim([-1.1 1.1])
+% xlim([0 1000*Pchirp])
+% ylim([-1.1 1.1])
 
 %% surf of all D-T2 Profiles
 
