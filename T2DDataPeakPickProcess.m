@@ -39,6 +39,7 @@ T2axis = logspace(log10(T2lims(1)),log10(T2lims(2)),nPts);
 % xlabel('\itT\rm_2 [s]')
 % view([0,90])
 
+
 %for each peak present in the sample, make a contour line showing the 50%
 %level. This countour is stored as "c", with some points designating the
 %0.5 level and the actual height of that countour, and the rest defining
@@ -67,12 +68,10 @@ end
     ll = [2,  62,  90,  2, 296,  49,  79, 311]; %how to automate ll and mm?
     mm = [72, 94, 204, 88, 375, 181, 104, 596];
     lastPt = 8;
-    
+
+  
 close all     
-%     [x,~] = ginput(2);
-%     ll(n) = round(x(1));
-%     mm(n) = round(x(2));
-for n = 1:lastPt; %length(T2ind)
+for n = 1:lastPt; 
 %     figure(length(T2ind)+n+1)
 %     plot(c.n{n}(1,ll(n):mm(n)),c.n{n}(2,ll(n):mm(n)),'LineWidth',2);             % will need to update the number c(1,2:XXX) for different data sets. For secondary peaks, the countour line for the main peak still shows up in two places, so need to specifiy the end of the first peak. Just do this graphically.
 %     set(gca,'XScale','log','YScale','log')
@@ -95,7 +94,8 @@ ylabel('\itD\rm [m^2 s^{-1}]')
 xlabel('\itT\rm_2 [s]')
 view([0,90])
 hold on
-for n = 1:lastPt; %length(T2ind)
+
+for n = 1:lastPt;
     plot3(c.n{n}(1,ll(n):mm(n)),c.n{n}(2,ll(n):mm(n)),ones(1,mm(n)-ll(n)+1),'-r','LineWidth',3); 
     text(min(c.n{n}(1,ll(n):mm(n))), max(c.n{n}(2,ll(n):mm(n))),1,int2str(n));
 end
@@ -105,7 +105,7 @@ set(gca,'XScale','log','YScale','log')
     ylabel('D [m^2 s^{-1}]')
     xlabel('T_2 [s]')
 
-    %plot the T2D data
+%plot the T2D data
 % figure
 % surf(T2axis,Daxis,data)
 % colormap(flipud(gray));
