@@ -12,10 +12,10 @@ nPts = 69; % # of acqu points
 nEchoes = 16; % Echoes
 tD = 6e-6; % 2 * tD (Dwell time of 4e-06 should be input as 8e-06)
 tE = 500; %us
-omitEchoPts = 3; %the number of points that are zeros from the spectrometer
+omitEchoPts = 5; %the number of points that are zeros from the spectrometer
 % nnn = 5; %expt number
 
-zf = 1; % zero filling
+zf = 2; % zero filling
 T = tD*(2^zf);                     % Sample time
 Fs = 1/T;                    % Sampling frequency
 L = (nPts-omitEchoPts)*(2^zf);                     % Length of signal
@@ -168,15 +168,15 @@ plot(abs(T1T2profiles(:,1)))
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 104;
-maxind = 136;
-firstinvertedind = 132;
+minind= 98;
+maxind = 159;
+firstinvertedind = 129;
 
 % automatically select indices
-% minind=find(f<-BWchirp/2,1,'last');
-% maxind=find(f>BWchirp/2,1,'first');
-% [~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
-% firstinvertedind = firstinvertedind + minind;
+minind=find(f>-BWchirp/2,1,'first');
+maxind=find(f<BWchirp/2,1,'last');
+[~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
+firstinvertedind = firstinvertedind + minind;
 
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes);
