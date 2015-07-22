@@ -5,12 +5,12 @@ close all
 %%
 % CHIRP params
 
-Pchirp = 0.0020; % CHIRP Pulse Length (s)
-BWchirp = 11223; % CHIRP bandwidth (Hz)
+Pchirp = 0.0010; % CHIRP Pulse Length (s)
+BWchirp = 10381; % CHIRP bandwidth (Hz)
 
 nPts = 69; % # of acqu points
-nEchoes = 32; % Echoes
-tD = 6e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+nEchoes = 16; % Echoes
+tD = 1e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 500; %us
 omitEchoPts = 5; %the number of points that are zeros from the spectrometer
 % nnn = 5; %expt number
