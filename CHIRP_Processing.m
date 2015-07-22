@@ -13,14 +13,14 @@ nEchoes = 16; % Echoes
 tD = 6e-6; % 2 * tD (Dwell time of 4e-06 should be input as 8e-06)
 tE = 500; %us
 omitEchoPts = 3; %the number of points that are zeros from the spectrometer
- n = 7; %expt number
+n = 2; %expt number
 
-zf = 0; % zero filling
+zf = 2; % zero filling
 T = tD*(2^zf);                     % Sample time
 Fs = 1/T;                    % Sampling frequency
 L = (nPts-omitEchoPts)*(2^zf);                     % Length of signal
 NFFT = 2^nextpow2(L); % Next power of 2 from length of y
-apodize = 0; %Gaussian apodization on (1) or off (0)?
+apodize = 1; %Gaussian apodization on (1) or off (0)?
 
 
 echoVec = tE:tE:(nEchoes*tE);
@@ -29,11 +29,11 @@ f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research_Files_and_Data/CHIRP/';
-datafile = 'CHIRP2D_15mM_GdH2O_20mspulse_6July2015';
+datadir = '/Users/tyler/Desktop/Best_Data_Sets/15mM_GdH2O_Vial/';
+datafile = 'GdH2O_15mM_GreenVial_T1Sat_13July2015';
 
 % Import CHIRP data
-[~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
+[ap , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
 
 % CHIRPdat = spec(1,:);
 CHIRPdat = reshape(spec2(n,:), nPts, nEchoes);
