@@ -14,19 +14,19 @@ clc
 %%
 
 % User defined parameters
-T1_1 = 5.0e-3; %s
-w1 = 0.70; % First T1 weight
-T1_2 = 10.0e-3; %s
-w2 = 0.30; % Second T1 weight
-T2_1 = 3.0e-3; %s
-T2_2 = 8.0e-3; %s
+T1_1 = 1.5e-3; %s
+w1 = 0.20; % First T1 weight
+T1_2 = 12.5e-3; %s
+w2 = 0.80; % Second T1 weight
+T2_1 = 1.0e-3; %s
+T2_2 = 4.0e-3; %s
 
 
-t_T1 = 200e-6; %s, time increment for T1 axis
+t_T1 = 287e-6; %s, time increment for T1 axis
 t_T2 = 500e-6; %s, time increment for T2 axis
 
 
-nPtsT1 = 50; %points for T1 axis
+nPtsT1 = 68; %points for T1 axis
 nPtsT2 = 32; %points for T2 axis
 %end user-defined parameters
 
@@ -45,7 +45,7 @@ data2D = w1*(T1data1'*T2data1) + w2*(T1data2'*T2data2); %make 2D data set
 % % Add in noise
 for i = 1:length(T1axis)
     for j = 1:length(T2axis)
-        noise = randn/8;
+        noise = randn/20;
 %         while 0.5 < noise < -0.5
 %             noise = randn/10;
 %         end

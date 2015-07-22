@@ -29,8 +29,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/tyler/Desktop/';
-datafile = 'CHIRP_GdH2O_5and50mM_20mspulse_20July2015_32768scans';
+datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
+datafile = 'BigGdH2O_CHIRP_10ms_nE16_37um_nS512_20db_26June2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -84,7 +84,7 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'noCHIRP_GdH2O_5and50mM_20mspulse_20July2015_32768scans';
+filenameNO = 'BigGdH2O_noCHIRP_10ms_nE16_37um_nS512_20db_26June2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -168,9 +168,9 @@ plot(abs(T1T2profiles(:,1)))
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 114;
-maxind = 140;
-firstinvertedind = 132;
+minind= 105;
+maxind = 154;
+firstinvertedind = 133;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -212,6 +212,59 @@ title('T1-T2 data')
 % set(gca,'Fontsize',30,'linewidth',2)
 %set(gca,'XScale','log');
 %set(gca,'YScale','log');
+
+
+%% Normalize T2?
+close all
+
+T2_1 = 0.003; %T2 (s)
+T2_2 = 0.0062;
+echoVec2 = echoVec./1e6;
+
+w1 = 0.9; % Weights
+w2 = 0.3;
+
+T2dat1 = w1.*exp(-echoVec2./T2_1);
+T2dat2 = w2.*exp(-echoVec2./T2_2);
+
+T2dat = T2dat1 + T2dat2;
+
+figure()
+plot( T2dat);
+
+for i = 1:nEchoes
+    T1T2datadiv(:,i) = T1T2data(:,i)/T2dat(i);
+end
+
+figure()
+surf(T1T2datadiv); shading flat
+
+%% T1Test
+
+T1_1 = 0.0015; % T1 (s)
+T1_2 = 0.0125;
+
+w1 = .2; % Weights
+w2 = .8;
+
+t1eh = linspace(max(t1), 0, length(t1));
+
+T1data1 = 1-2.*exp(-t1eh./T1_1);
+T1data2 = 1-2.*exp(-t1eh./T1_2);
+
+T1dat = w1.*T1data1 + w2.*T1data2;
+
+% t1new=2*Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
+t1new = linspace(max(t1), 0, length(t1));
+
+
+figure()
+hold on
+plot(t1eh, T1dat+1-.5857, '-r')
+plot(t1, T1T2data(:,1), '*b')
+hold off
+
+
 %% T1 fit
 echoNr = 3;
 cftool(t1,T1T2data(:,echoNr));
