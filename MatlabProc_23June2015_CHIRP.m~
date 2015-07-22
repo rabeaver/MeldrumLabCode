@@ -5,7 +5,7 @@ close all
 %%
 % CHIRP params
 
-Pchirp = 0.010; % CHIRP Pulse Length (s)
+Pchirp = 0.020; % CHIRP Pulse Length (s)
 BWchirp = 11223; % CHIRP bandwidth (Hz)
 
 nPts = 69; % # of acqu points
@@ -30,7 +30,7 @@ z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
 datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
-datafile = 'BigGdH2O_CHIRP_10ms_nE16_37um_nS512_20db_26June2015';
+datafile = 'BigGdH2O_noCHIRP_10ms_nE16_37um_nS512_20db_26June2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
