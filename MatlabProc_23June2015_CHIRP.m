@@ -8,11 +8,11 @@ close all
 Pchirp = 0.0010; % CHIRP Pulse Length (s)
 BWchirp = 10381; % CHIRP bandwidth (Hz)
 
-nPts = 69; % # of acqu points
+nPts = 66; % # of acqu points
 nEchoes = 16; % Echoes
-tD = 1e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tD = 4e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 500; %us
-omitEchoPts = 5; %the number of points that are zeros from the spectrometer
+omitEchoPts = 2; %the number of points that are zeros from the spectrometer
 % nnn = 5; %expt number
 
 zf = 2; % zero filling
@@ -168,9 +168,9 @@ plot(abs(T1T2profiles(:,1)))
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 105;
-maxind = 154;
-firstinvertedind = 133;
+minind= 119;
+maxind = 137;
+firstinvertedind = 123;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
