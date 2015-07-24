@@ -5,12 +5,11 @@ close all
 %%
 filename = 'CuH2O_1000mMstock_WHAT_CPMG_tE500u_22July2015.tnt';
 filedir = 'C:\Users\NMRLab\Desktop\CHIRP\Copper_II\';
-
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 500; %us
-nEchoes = 8;
+nEchoes = 16;
 nPts = 69;
 nPtsBlank = 5;
 
@@ -22,7 +21,7 @@ dataInt = sum(data,1);
 dataIntRe = real(dataInt)./max(real(dataInt));
 dataIntIm = imag(dataInt)./max(real(dataInt));
 
-guess = [0.3 2e-03];% 0.6 0.5e-03];
+guess = [0.3 2e-03];% 0.6 6e-03];
 beta = nlinfit(echoVector,dataIntRe, @t2monofit_simple, guess);
 ypred = t2monofit_simple(beta,echoVector);
 
