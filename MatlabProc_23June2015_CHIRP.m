@@ -5,15 +5,15 @@ close all
 %%
 % CHIRP params
 
-Pchirp = 0.0010; % CHIRP Pulse Length (s)
-BWchirp = 10381; % CHIRP bandwidth (Hz)
+Pchirp = 0.040; % CHIRP Pulse Length (s)
+BWchirp = 11223; % CHIRP bandwidth (Hz)
 
-nPts = 66; % # of acqu points
-nEchoes = 16; % Echoes
-tD = 4e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+nPts = 69; % # of acqu points
+nEchoes = 32; % Echoes
+tD = 6e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 500; %us
-omitEchoPts = 2; %the number of points that are zeros from the spectrometer
-% nnn = 5; %expt number
+omitEchoPts = 5; %the number of points that are zeros from the spectrometer
+nnn = 5; %expt number
 
 zf = 2; % zero filling
 T = tD*(2^zf);                     % Sample time
@@ -29,14 +29,14 @@ f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
-datafile = 'BigGdH2O_CHIRP_10ms_nE16_37um_nS512_20db_26June2015';
+datadir = 'C:\Users\NMRLab\Desktop\CHIRP\';
+datafile = 'CHIRP_Glycerol_40mspw_amptest_24July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
 
 % CHIRPdat = spec(1,:);
-% spec = spec2(nnn, :);
+spec = spec2(nnn, :);
 CHIRPdat = reshape(spec, nPts, nEchoes);
 CHIRPdat = CHIRPdat(1:end-omitEchoPts,:);
 
@@ -84,12 +84,12 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'BigGdH2O_noCHIRP_10ms_nE16_37um_nS512_20db_26June2015';
-[~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
-data = reshape(spec,nPts,nEchoes);
+% filenameNO = 'BigGdH2O_noCHIRP_10ms_nE16_37um_nS512_20db_26June2015';
+% [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
+% data = reshape(spec,nPts,nEchoes);
 
 % No CHIRP raw data and fft profiles
-% data = spec2(1,:);
+data = spec2(1,:);
 noCHIRPdat = reshape(data, nPts, nEchoes);
 noCHIRPdat = noCHIRPdat(1:end-omitEchoPts,:);
 if apodize == 1
@@ -159,18 +159,30 @@ title('Coil sensitivity corrected T1-T2 profiles')
 %% Find Optimal data range with these figures
 close all
 
-figure(7)
-plot(abs(T1T2profcorr(:,2)))
-
 figure(8)
 plot(abs(T1T2profiles(:,1)))
+
+t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
+
+
+figure(7)
+subplot(2,1,1)
+plot(abs(T1T2profcorr(:,2)))
+xlim([0 L])
+subplot(2,1,2)
+plot(t1_fig7,abs(T1T2profcorr(:,2)))
+xlim([min(t1_fig7), max(t1_fig7)]);
+set(gca,'XDir','reverse')
+xlabel('CHIRPtime (s)')
+
+
 
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 119;
-maxind = 137;
-firstinvertedind = 123;
+minind= 92;
+maxind = 150;
+firstinvertedind = 131;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -241,11 +253,11 @@ surf(T1T2datadiv); shading flat
 
 %% T1Test
 
-T1_1 = 0.0015; % T1 (s)
+T1_1 = 0.0215; % T1 (s)
 T1_2 = 0.0125;
 
-w1 = .2; % Weights
-w2 = .8;
+w1 = 1; % Weights
+w2 = 0;
 
 t1eh = linspace(max(t1), 0, length(t1));
 
