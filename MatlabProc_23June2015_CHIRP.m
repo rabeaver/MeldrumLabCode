@@ -84,7 +84,7 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'noCHIRP_Glycerol_40mspw_5db_24July2015';
+filenameNO = 'noCHIRP_Glycerol_40mspw_offset7um_5db_25.July2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -159,11 +159,23 @@ title('Coil sensitivity corrected T1-T2 profiles')
 %% Find Optimal data range with these figures
 close all
 
-figure(7)
-plot(abs(T1T2profcorr(:,2)))
-
 figure(8)
 plot(abs(T1T2profiles(:,1)))
+
+t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
+
+
+figure(7)
+subplot(2,1,1)
+plot(abs(T1T2profcorr(:,2)))
+xlim([0 L])
+subplot(2,1,2)
+plot(t1_fig7,abs(T1T2profcorr(:,2)))
+xlim([min(t1_fig7), max(t1_fig7)]);
+set(gca,'XDir','reverse')
+xlabel('CHIRPtime (s)')
+
+
 
 %% Data Range and Inversion
 
@@ -193,7 +205,7 @@ xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
 % xlim([0 1000*Pchirp])
-ylim([-1.1 1.1])
+% ylim([-1.1 1.1])
 
 %% surf of all D-T2 Profiles
 
@@ -241,11 +253,11 @@ surf(T1T2datadiv); shading flat
 
 %% T1Test
 
-T1_1 = 0.0015; % T1 (s)
+T1_1 = 0.0215; % T1 (s)
 T1_2 = 0.0125;
 
-w1 = .2; % Weights
-w2 = .8;
+w1 = 1; % Weights
+w2 = 0;
 
 t1eh = linspace(max(t1), 0, length(t1));
 

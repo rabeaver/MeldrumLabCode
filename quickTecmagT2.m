@@ -3,9 +3,8 @@ clc
 close all
 
 %%
-filename = 'CuH2O_500mM_CPMG_tE500u_22July2015.tnt';
-filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/Copper_II/';
-
+filename = 'CuH2O_1000mMstock_WHAT_CPMG_tE500u_22July2015.tnt';
+filedir = 'C:\Users\NMRLab\Desktop\CHIRP\Copper_II\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
