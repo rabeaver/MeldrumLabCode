@@ -190,9 +190,10 @@ firstinvertedind = 	66;
 % [~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
 % firstinvertedind = firstinvertedind + minind;
 
+
 T1T2profiles2=zeros((maxind-minind+1),nEchoes);
-T1T2profiles2((maxind-firstinvertedind+1):(maxind-minind+1),:) = (-abs(T1T2profcorr(minind:firstinvertedind,:))+repmat(abs(T1T2profcorr(firstinvertedind,:)), firstinvertedind-minind+1, 1));
-T1T2profiles2(1:(maxind-firstinvertedind),:) = (abs(T1T2profcorr((firstinvertedind+1):maxind,:)));
+T1T2profiles2(1:(maxind-firstinvertedind),:) = (-abs(T1T2profcorr((firstinvertedind+1):maxind,:)));
+T1T2profiles2((maxind-firstinvertedind+1):(maxind-minind+1),:) = (abs(T1T2profcorr(minind:firstinvertedind,:))+repmat(abs(T1T2profcorr(firstinvertedind,:)), firstinvertedind-minind+1, 1));
 
 
 % T1T2profiles2(1:(firstinvertedind-minind),:) = abs(T1T2profcorr(minind:(firstinvertedind-1),:));
