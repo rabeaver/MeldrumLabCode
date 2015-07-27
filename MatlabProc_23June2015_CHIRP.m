@@ -6,10 +6,10 @@ close all
 % CHIRP params
 
 Pchirp = 0.040; % CHIRP Pulse Length (s)
-BWchirp = 11223; % CHIRP bandwidth (Hz)
+BWchirp = 1403; % CHIRP bandwidth (Hz)
 
 nPts = 69; % # of acqu points
-nEchoes = 32; % Echoes
+nEchoes = 256; % Echoes
 tD = 6e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 500; %us
 omitEchoPts = 5; %the number of points that are zeros from the spectrometer
@@ -30,13 +30,13 @@ z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
 datadir = 'C:\Users\NMRLab\Desktop\CHIRP\';
-datafile = 'CHIRP_Glycerol_40mspw_amptest_24July2015';
+datafile = 'CHIRP_Glycerol_40mspw_sliceheight5um_offset0_5um_5db_25July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
 
 % CHIRPdat = spec(1,:);
-spec = spec2(nnn, :);
+% spec = spec2(nnn, :);
 CHIRPdat = reshape(spec, nPts, nEchoes);
 CHIRPdat = CHIRPdat(1:end-omitEchoPts,:);
 
@@ -84,12 +84,12 @@ hold off
 
 
 %% No CHIRP load section
-% filenameNO = 'BigGdH2O_noCHIRP_10ms_nE16_37um_nS512_20db_26June2015';
-% [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
-% data = reshape(spec,nPts,nEchoes);
+filenameNO = 'noCHIRP_Glycerol_40mspw_offset7um_5db_25.July2015';
+[~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
+data = reshape(spec,nPts,nEchoes);
 
 % No CHIRP raw data and fft profiles
-data = spec2(1,:);
+% data = spec2(1,:);
 noCHIRPdat = reshape(data, nPts, nEchoes);
 noCHIRPdat = noCHIRPdat(1:end-omitEchoPts,:);
 if apodize == 1
@@ -180,9 +180,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 92;
-maxind = 150;
-firstinvertedind = 131;
+minind= 93;
+maxind = 135;
+firstinvertedind = 130;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -205,7 +205,7 @@ xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
 % xlim([0 1000*Pchirp])
-ylim([-1.1 1.1])
+% ylim([-1.1 1.1])
 
 %% surf of all D-T2 Profiles
 
