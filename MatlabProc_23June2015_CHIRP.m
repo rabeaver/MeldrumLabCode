@@ -5,14 +5,14 @@ close all
 %%
 % CHIRP params
 
-Pchirp = 0.0010; % CHIRP Pulse Length (s)
-BWchirp = 10381; % CHIRP bandwidth (Hz)
+Pchirp = 0.040; % CHIRP Pulse Length (s)
+BWchirp = 11223; % CHIRP bandwidth (Hz)
 
-nPts = 66; % # of acqu points
-nEchoes = 16; % Echoes
-tD = 4e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+nPts = 69; % # of acqu points
+nEchoes = 256; % Echoes
+tD = 6e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 500; %us
-omitEchoPts = 2; %the number of points that are zeros from the spectrometer
+omitEchoPts = 5; %the number of points that are zeros from the spectrometer
 % nnn = 5; %expt number
 
 zf = 2; % zero filling
@@ -30,7 +30,7 @@ z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
 datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
-datafile = 'BigGdH2O_CHIRP_10ms_nE16_37um_nS512_20db_26June2015';
+datafile = 'CHIRP_Glycerol_40mspw_5db_24July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -84,7 +84,7 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'BigGdH2O_noCHIRP_10ms_nE16_37um_nS512_20db_26June2015';
+filenameNO = 'noCHIRP_Glycerol_40mspw_5db_24July2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -168,9 +168,9 @@ plot(abs(T1T2profiles(:,1)))
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 119;
-maxind = 137;
-firstinvertedind = 123;
+minind= 1;
+maxind = 142;
+firstinvertedind = 133;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
