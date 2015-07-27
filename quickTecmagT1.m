@@ -3,22 +3,25 @@ clc
 close all
 
 %%
-filename = '0P2_T1Sat_12.tnt';
-filedir = 'C:\Users\jhyu\Desktop\';
+
+filename = 'CuH2O_500mMvial_T1Sat_22July2015.tnt';
+filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/Copper_II/';
+
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 150; %us
-nEchoes = 512;
-nPts = 35;
-nPtsBlank = 2;
-nT1Pts = 40;
-T1min = .05; %ms
-T1max = 1650; %ms
-T1guess = 330; %ms 
 
-T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Linspace T1sat
+nEchoes = 8;
+nPts = 69;
+nPtsBlank = 5;
+nT1Pts = 11;
+T1min = 0.638; %ms
+T1max = 34; %ms
+T1guess = 6.8; %ms 
+
+T1vector = linspace(T1min,T1max,nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 
 % T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat

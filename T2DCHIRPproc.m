@@ -34,7 +34,7 @@ f = linspace(Fs/2,-Fs/2,NFFT);          %Hz, flipped from [-Fs/2,+Fs/2] to [Fs/2
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/tyler/Desktop/';
+datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
 datafile = 'T2D_STE_CHIRP_5dB_2048_Glycerol_2_17July2015';
 
 % Import CHIRP data
@@ -178,8 +178,8 @@ maxind = 124;
 % firstinvertedind = 132;
 
 % automatically select indices
-% minind=find(f<-BWchirp/2,1,'last');
-% maxind=find(f>BWchirp/2,1,'first');
+% minind=find(f>BWchirp/2,1,'last');
+% maxind=find(f<-BWchirp/2,1,'first');
 % [~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
 % firstinvertedind = firstinvertedind + minind;
 
