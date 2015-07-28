@@ -4,28 +4,36 @@ close all
 
 %%
 % CHIRP params
+%===================================
+%===== User-defined paramaters =====
+%===================================
 
-Pchirp = 0.050; % CHIRP Pulse Length (s)
-sliceheight = 0.040; %mm
+Pchirp = 0.10; % CHIRP Pulse Length (s)
+sliceheight = 0.300; %mm
+
+nPts = 76; % # of acqu points
+nEchoes = 16; % Echoes
+tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 700; %us
+omitEchoPts = 2; %the number of points that are zeros from the spectrometer
+% nnn = 1; %expt number (for 2D CHIRP expts)
+
+zf = 1; % levels of zero filling
+apodize = 1; %Gaussian apodization on (1) or off (0)?
+
+%===================================
+%=== END User-defined paramaters ===
+%===================================
+
 
 G = 6.59; %T m-1, B0 field gradient
 gamma = 42.576; %MHz T-1
 BWchirp = sliceheight*G*gamma*1000; % CHIRP bandwidth (Hz)
 
-nPts = 69; % # of acqu points
-nEchoes = 32; % Echoes
-tD = 6e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 500; %us
-omitEchoPts = 3; %the number of points that are zeros from the spectrometer
-% nnn = 1; %expt number
-
-zf = 2; % zero filling
 T = tD*(2^zf);                     % Sample time
 Fs = 1/T;                    % Sampling frequency
 L = (nPts-omitEchoPts)*(2^zf);                     % Length of signal
 NFFT = 2^nextpow2(L); % Next power of 2 from length of y
-apodize = 1; %Gaussian apodization on (1) or off (0)?
-
 
 echoVec = tE:tE:(nEchoes*tE);
 t = (-(L-1)/2:L/2)*T;                % Time vector
@@ -33,8 +41,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\jhyu\Desktop\';
-datafile = 'CHIRP_GdH2O_5and50mM_beakercon_20mspulse_21July2015_32768scans';
+datadir = 'C:\Users\NMRLab\Desktop\CHIRP\';
+datafile = 'CHIRP_RubStop_100mspw_sliceheight300um_Td8u_76pts_128scans_200nsWave_15dB_16nE_28July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -88,7 +96,7 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'noCHIRP_GdH2O_5and50mM_beakercon_20mspulse_21July2015_32768scans';
+filenameNO = 'noCHIRP_RubStop_100mspw_sliceheight300um_Td8u_76pts_128scans_200nsWave_15dB_16nE_28July2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -155,7 +163,6 @@ figure(6)
 pcolor(abs(T1T2profcorr)); 
 colormap('jet');
 shading interp;
-set(gcf,'Renderer','painters');
 colorbar('linewidth',2)
 caxis([0 1])
 title('Coil sensitivity corrected T1-T2 profiles')
@@ -172,10 +179,14 @@ t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 figure(7)
 subplot(2,1,1)
 plot(abs(T1T2profcorr(:,2)))
-xlim([0 L])
+xlim([0 NFFT])
+ylim([0 1.1])
 subplot(2,1,2)
 plot(t1_fig7,abs(T1T2profcorr(:,2)))
+line([0 0],[-2 2])
+line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
+ylim([0 1.1])
 set(gca,'XDir','reverse')
 xlabel('CHIRPtime (s)')
 
@@ -184,16 +195,16 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-% minind= 54;
-% maxind = 81;
-% firstinvertedind = 	66;
+minind= 1;
+maxind = 256;
+firstinvertedind = 207;
 
 % automatically select indices
-minind=find(f>-BWchirp/2,1,'first');
-maxind=find(f<BWchirp/2,1,'last');
-[~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
+% minind=find(f>-BWchirp/2,1,'first');
+% maxind=find(f<BWchirp/2,1,'last');
+% [~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
 % firstinvertedind = firstinvertedind + minind;
-firstinvertedind = NFFT/2;
+% % firstinvertedind = NFFT/2;
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes);
 % T1T2profiles2((maxind-firstinvertedind+1):(maxind-minind+1),:) = (-abs(T1T2profcorr(minind:firstinvertedind,:))+repmat(abs(T1T2profcorr(firstinvertedind,:)), firstinvertedind-minind+1, 1));
@@ -202,30 +213,32 @@ T1T2profiles2(1:firstinvertedind-minind+1,:) = (abs(T1T2profcorr(minind:firstinv
 T1T2profiles2(firstinvertedind-minind+2:end,:) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,:)));
 
 close all
-T1guess = 0.018;
+T1guess = 0.052;
 T1T2profilesTest = zeros(NFFT,1);
 T1T2profilesTest(1:NFFT/2) = (abs(T1T2profcorr(1:NFFT/2)));
 T1T2profilesTest(NFFT/2+1:NFFT) = -(abs(T1T2profcorr(NFFT/2+1:NFFT)));
 
-T1test = -(1-2*exp((t1_fig7-Pchirp)/T1guess));
-T1test2 = (1-2*exp(-t1_fig7/T1guess));
-figure
-subplot(2,1,1)
-plot(T1T2profilesTest(:,1))
-xlim([0 NFFT])
-ylim([-2 2]);
-subplot(2,1,2)
-hold on
-plot(t1_fig7,T1T2profilesTest(:,1),'-k')
-plot(t1_fig7,T1test,'-r')
-plot(t1_fig7,T1test2,'-b')
-% xlim([0, Pchirp]);
-% xlim([min(t1_fig7), 0.02]);
-ylim([-2 2]);
-xlabel('CHIRPtime (s)')
-set(gca,'XDir','reverse')
+% T1test = (1-2*exp((t1_fig7-Pchirp)/T1guess));
+% T1test2 = (1-2*exp(-t1_fig7/T1guess));
+% figure
+% subplot(2,1,1)
+% plot(T1T2profilesTest(:,1))
+% xlim([0 NFFT])
+% ylim([-2 2]);
+% subplot(2,1,2)
+% hold on
+% plot(t1_fig7,T1T2profilesTest(:,1),'-k')
+% % plot(t1_fig7,T1test,'-r')
+% % plot(t1_fig7,T1test2,'-b')
+% line([0 0],[-2 2])
+% line([Pchirp Pchirp],[-2 2])
+% % xlim([0, Pchirp]);
+% % xlim([min(t1_fig7), 0.02]);
+% ylim([-2 2]);
+% xlabel('CHIRPtime (s)')
+% set(gca,'XDir','reverse')
 
-%%
+%
 
 
 % T1T2profiles2(1:(firstinvertedind-minind),:) = abs(T1T2profcorr(minind:(firstinvertedind-1),:));
@@ -240,7 +253,22 @@ xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
 % xlim([0 1000*Pchirp])
-% ylim([-1.1 1.1])
+ylim([-1.1 1.1])
+
+%% Only using first half of data
+minind=find(f>-BWchirp/2,1,'first');
+[~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
+firstinvertedind = firstinvertedind + minind;
+T1T2data2 = (abs(T1T2profcorr(1:firstinvertedind,:)));
+t2=Pchirp*(BWchirp/2-f(1:firstinvertedind))/BWchirp;
+%plot first T1 column
+figure
+scatter(t2*1000,T1T2data2(:,1),'linewidth',2)
+xlabel('{\it t}_1 (ms)','fontsize',30)
+title('T1-T2, first T1 column')
+set(gca,'Fontsize',30,'linewidth',2)
+% xlim([0 1000*Pchirp])
+ylim([-1.1 1.1])
 
 %% surf of all D-T2 Profiles
 
@@ -321,5 +349,5 @@ T1T2data = T1T2data(:,1:end);
 T1T2data2 = flipud(T1T2data);
 save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii')
 size(T1T2data)
-1e6*(t1(1)-t1(end))
+1e6*abs(t1(1)-t1(end))
 1e6*[min(t1), max(t1)]
