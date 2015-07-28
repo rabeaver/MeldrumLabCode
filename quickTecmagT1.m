@@ -3,13 +3,16 @@ clc
 close all
 
 %%
+
 filename = 'CuH2O_500mMvial_T1Sat_22July2015.tnt';
 filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/Copper_II/';
+
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 150; %us
+
 nEchoes = 8;
 nPts = 69;
 nPtsBlank = 5;
@@ -40,5 +43,12 @@ figure(1)
 hold on
 scatter(T1vector,dataIntRe);
 plot(T1vector,ypred);
+
+%% Make 2D data set for T1SRT2
+
+data2d = sum(abs(data),1);
+data2d = reshape(data2d,nEchoes, nT1Pts);
+
+surf(data2d); shading flat
 
 

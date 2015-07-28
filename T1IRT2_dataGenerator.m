@@ -63,6 +63,6 @@ ylim([min(T1axis) max(T1axis)]);
 xlim([min(T2axis) max(T2axis)]);
 
 % Save the data
-saveDir = 'C:\Users\vjlee\Desktop\';
-saveName = 'DataSim_32by20';
+saveDir = 'C:\Users\jhyu\Desktop\';
+saveName = 'T1IRDataSim';
 save(strcat(saveDir, saveName, '.dat'), 'data2D', '-ascii');
