@@ -3,13 +3,13 @@ clc
 close all
 
 %%
-filename = 'CuH2O_50mM_CPMG_tE500u_23July2015.tnt';
-filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/Copper_II/';
+filename = 'Glycerol_CPMG_24July2015.tnt';
+filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 500; %us
-nEchoes = 32;
+nEchoes = 128;
 nPts = 69;
 nPtsBlank = 5;
 

@@ -5,7 +5,7 @@ close all
 %%
 % CHIRP params
 
-Pchirp = 0.050; % CHIRP Pulse Length (s)
+Pchirp = 0.040; % CHIRP Pulse Length (s)
 sliceheight = 0.040; %mm
 
 G = 6.59; %T m-1, B0 field gradient
@@ -13,7 +13,7 @@ gamma = 42.576; %MHz T-1
 BWchirp = sliceheight*G*gamma*1000; % CHIRP bandwidth (Hz)
 
 nPts = 69; % # of acqu points
-nEchoes = 32; % Echoes
+nEchoes = 256; % Echoes
 tD = 6e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 500; %us
 omitEchoPts = 3; %the number of points that are zeros from the spectrometer
@@ -24,7 +24,7 @@ T = tD*(2^zf);                     % Sample time
 Fs = 1/T;                    % Sampling frequency
 L = (nPts-omitEchoPts)*(2^zf);                     % Length of signal
 NFFT = 2^nextpow2(L); % Next power of 2 from length of y
-apodize = 1; %Gaussian apodization on (1) or off (0)?
+apodize = 0; %Gaussian apodization on (1) or off (0)?
 
 
 echoVec = tE:tE:(nEchoes*tE);
@@ -33,8 +33,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\jhyu\Desktop\';
-datafile = 'CHIRP_GdH2O_5and50mM_beakercon_20mspulse_21July2015_32768scans';
+datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
+datafile = 'CHIRP_Glycerol_40mspw_sliceheight20um_5db_25July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -88,7 +88,7 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'noCHIRP_GdH2O_5and50mM_beakercon_20mspulse_21July2015_32768scans';
+filenameNO = 'noCHIRP_Glycerol_40mspw_sliceheight20um_5db_25July2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -172,7 +172,7 @@ t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 figure(7)
 subplot(2,1,1)
 plot(abs(T1T2profcorr(:,2)))
-xlim([0 L])
+xlim([0 length(T1T2profiles(:,1))])
 subplot(2,1,2)
 plot(t1_fig7,abs(T1T2profcorr(:,2)))
 xlim([min(t1_fig7), max(t1_fig7)]);
@@ -184,16 +184,16 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-% minind= 54;
-% maxind = 81;
-% firstinvertedind = 	66;
+minind= 188;
+maxind = 274;
+firstinvertedind = 	259;
 
 % automatically select indices
-minind=find(f>-BWchirp/2,1,'first');
-maxind=find(f<BWchirp/2,1,'last');
-[~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
-% firstinvertedind = firstinvertedind + minind;
-firstinvertedind = NFFT/2;
+% minind=find(f>-BWchirp/2,1,'first');
+% maxind=find(f<BWchirp/2,1,'last');
+% [~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
+% % firstinvertedind = firstinvertedind + minind;
+% firstinvertedind = NFFT/2;
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes);
 % T1T2profiles2((maxind-firstinvertedind+1):(maxind-minind+1),:) = (-abs(T1T2profcorr(minind:firstinvertedind,:))+repmat(abs(T1T2profcorr(firstinvertedind,:)), firstinvertedind-minind+1, 1));
