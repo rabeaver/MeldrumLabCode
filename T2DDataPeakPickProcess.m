@@ -5,7 +5,7 @@ close all
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
 datadir = '/Users/tyler/Desktop/BLANKS/';
-datafile = 'T2_D_7_3_NPNa_only_1_JUNE25.out';
+datafile = 'T2_D_7_3_NPNa_Only_1_25JUN.out';
 T2lims = [1e-4 1e0];
 Dlims = [1e-11 1e-8];
 contourLevel = 0.90;
@@ -38,7 +38,7 @@ ylim(Dlims)
 ylabel('\itD\rm [m^2 s^{-1}]')
 xlabel('\itT\rm_2 [s]')
 view([0,90])
-%%
+
 
 %for each peak present in the sample, make a contour line showing the 50%
 %level. This countour is stored as "c", with some points designating the
@@ -78,7 +78,7 @@ for n = 1:lastPt;
 %     xlim(T2lims)
 %     ylim(Dlims)
 %     ylabel('D [m^2 s^{-1}]')
-%     xlabel('T_2 [s]')
+%     xlabel('T_2 [s]'
     D(n,:) =[ min(c.n{n}(2,ll(n):mm(n))) Daxis(T2ind(n)) max(c.n{n}(2,ll(n):mm(n)))];
     T2(n,:) = [ min(c.n{n}(1,ll(n):mm(n))) T2axis(Dind(n)) max(c.n{n}(1,ll(n):mm(n)))]*1e3;
 end
