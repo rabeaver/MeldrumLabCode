@@ -18,8 +18,8 @@ tE = 700; %us
 omitEchoPts = 2; %the number of points that are zeros from the spectrometer
 % nnn = 1; %expt number (for 2D CHIRP expts)
 
-zf = 4; % levels of zero filling
-apodize = 1; %Gaussian apodization on (1) or off (0)?
+zf = 1; % levels of zero filling
+apodize = 0; %Gaussian apodization on (1) or off (0)?
 
 %===================================
 %=== END User-defined paramaters ===
