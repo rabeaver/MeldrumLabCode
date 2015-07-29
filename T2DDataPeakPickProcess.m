@@ -20,7 +20,7 @@ Daxis = logspace(log10(Dlims(1)),log10(Dlims(2)),nPts);
 T2axis = logspace(log10(T2lims(1)),log10(T2lims(2)),nPts);
 
 
-%this part requires teh extrema2.m and extrema.m functions, available from
+%this part requires the extrema2.m and extrema.m functions, available from
 %the mathworks file exchange. Finds the indices of the various peaks.
 [xymax,smax,~,~] = extrema2(data);
 [T2ind,Dind] = ind2sub([nPts,nPts],smax);
@@ -65,9 +65,9 @@ for n = 1:length(T2ind);
 end
 
 %%
-    ll = [10, 13, 72,  30,  252,  49,  79, 311]; %how to automate ll and mm?
-    mm = [28, 53, 110, 48,  280, 181, 104, 596];
-    lastPt = 5;
+    ll = [2,   2,  90,  2, 296,  49,  79, 311]; %how to automate ll and mm?
+    mm = [50, 25, 204, 88, 375, 181, 104, 596];
+    lastPt = 2;
 
   
 close all     

@@ -3,20 +3,23 @@ clc
 close all
 
 %%
-filename = 'GdH2O_15mM_GreenVial_T1Sat_13July2015.tnt';
-filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
+
+filename = 'CuH2O_500mMvial_T1Sat_22July2015.tnt';
+filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/Copper_II/';
+
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 500; %us
-nEchoes = 16;
-nPts = 67;
-nPtsBlank = 3;
-nT1Pts = 38;
-T1min = 0.05; %ms
-T1max = 5.437; %ms
-T1guess = 1; %ms 
+tEcho = 150; %us
+
+nEchoes = 8;
+nPts = 69;
+nPtsBlank = 5;
+nT1Pts = 11;
+T1min = 0.638; %ms
+T1max = 34; %ms
+T1guess = 6.8; %ms 
 
 T1vector = linspace(T1min,T1max,nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
@@ -40,5 +43,12 @@ figure(1)
 hold on
 scatter(T1vector,dataIntRe);
 plot(T1vector,ypred);
+
+%% Make 2D data set for T1SRT2
+
+data2d = sum(abs(data),1);
+data2d = reshape(data2d,nEchoes, nT1Pts);
+
+surf(data2d); shading flat
 
 
