@@ -12,13 +12,13 @@ Pchirp = 0.10; % CHIRP Pulse Length (s)
 sliceheight = 0.300; %mm
 
 nPts = 76; % # of acqu points
-nEchoes = 16; % Echoes
+nEchoes = 128; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700; %us
 omitEchoPts = 2; %the number of points that are zeros from the spectrometer
 % nnn = 1; %expt number (for 2D CHIRP expts)
 
-zf = 1; % levels of zero filling
+zf = 4; % levels of zero filling
 apodize = 1; %Gaussian apodization on (1) or off (0)?
 
 %===================================
@@ -30,8 +30,8 @@ G = 6.59; %T m-1, B0 field gradient
 gamma = 42.576; %MHz T-1
 BWchirp = sliceheight*G*gamma*1000; % CHIRP bandwidth (Hz)
 
-T = tD*(2^zf);                     % Sample time
-Fs = 1/T;                    % Sampling frequency
+T = tD; %*(2^zf);                     % Sample time
+Fs = 1/T                    % Sampling frequency
 L = (nPts-omitEchoPts)*(2^zf);                     % Length of signal
 NFFT = 2^nextpow2(L); % Next power of 2 from length of y
 
@@ -40,9 +40,11 @@ t = (-(L-1)/2:L/2)*T;                % Time vector
 f = linspace(-Fs/2,Fs/2,NFFT);          %Hz
 z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 
+% range(f)
+
 %%
-datadir = 'C:\Users\NMRLab\Desktop\CHIRP\';
-datafile = 'CHIRP_RubStop_100mspw_sliceheight300um_Td8u_76pts_128scans_200nsWave_15dB_16nE_28July2015';
+datadir = '/Users/tyler/Desktop/CHIRP/';
+datafile = 'CHIRP_Glycerol_100mspw_sliceheight300um_Td8u_76pts_64scans_200nsWave_15dB_28July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -58,7 +60,7 @@ CHIRPdat = CHIRPdat(1:end-omitEchoPts,:);
 %%
 
 pVec = 1:1:(nPts-omitEchoPts);
-filt = exp(-(pVec-(nPts-omitEchoPts)/2).^2/((nPts-omitEchoPts)/5)^2);
+filt = exp(-(pVec-(nPts-omitEchoPts)/2).^2/((nPts-omitEchoPts)/3)^2);
 % plot(filt)
 filt = repmat(filt',1,nEchoes);
 if apodize == 1
@@ -96,7 +98,7 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'noCHIRP_RubStop_100mspw_sliceheight300um_Td8u_76pts_128scans_200nsWave_15dB_16nE_28July2015';
+filenameNO = 'noCHIRP_Glycerol_100mspw_sliceheight300um_Td8u_76pts_64scans_200nsWave_15dB_28July2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -195,9 +197,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 1;
-maxind = 256;
-firstinvertedind = 207;
+minind= 338;
+maxind = 1652;
+firstinvertedind = 1555;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
