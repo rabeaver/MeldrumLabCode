@@ -8,18 +8,18 @@ close all
 %===== User-defined paramaters =====
 %===================================
 
-Pchirp = 0.10; % CHIRP Pulse Length (s)
+Pchirp = 0.015; % CHIRP Pulse Length (s)
 sliceheight = 0.300; %mm
 
-nPts = 76; % # of acqu points
-nEchoes = 128; % Echoes
+nPts = 77; % # of acqu points
+nEchoes = 8; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700; %us
-omitEchoPts = 2; %the number of points that are zeros from the spectrometer
+omitEchoPts = 1; %the number of points that are zeros from the spectrometer
 % nnn = 1; %expt number (for 2D CHIRP expts)
 
-zf = 1; % levels of zero filling
-apodize = 0; %Gaussian apodization on (1) or off (0)?
+zf = 2; % levels of zero filling
+apodize = 1; %Gaussian apodization on (1) or off (0)?
 
 %===================================
 %=== END User-defined paramaters ===
@@ -42,8 +42,8 @@ z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 % range(f)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
-datafile = 'CHIRP_Glycerol_40mspw_sliceheight20um_5db_25July2015';
+datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/ExcelDataSets/15mMGdH2O/';
+datafile = 'CHIRP_15mM_GdH2O_15mspw_sliceheight300um_tE700u_Td8u_77pts_200nsWave_5dB_8nE_29July2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -97,7 +97,7 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'noCHIRP_Glycerol_40mspw_sliceheight20um_5db_25July2015';
+filenameNO = 'noCHIRP_15mM_GdH2O_15mspw_sliceheight300um_tE700u_Td8u_77pts_200nsWave_5dB_8nE_29July2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -179,15 +179,11 @@ t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
 figure(7)
 subplot(2,1,1)
-plot(abs(T1T2profcorr(:,2)))
-<<<<<<< HEAD
-xlim([0 length(T1T2profiles(:,1))])
-=======
+plot(abs(T1T2profcorr(:,1)))
 xlim([0 NFFT])
 ylim([0 1.1])
->>>>>>> e8a759cc27023e0b4278147a493c0f58d169c66f
 subplot(2,1,2)
-plot(t1_fig7,abs(T1T2profcorr(:,2)))
+plot(t1_fig7,abs(T1T2profcorr(:,1)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
@@ -200,9 +196,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 338;
-maxind = 1652;
-firstinvertedind = 1555;
+minind= 122;
+maxind = 406;
+firstinvertedind = 384;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -347,7 +343,7 @@ hold off
 
 
 %% T1 fit
-echoNr = 3;
+echoNr = 1;
 cftool(t1,T1T2data(:,echoNr));
 %%
 
