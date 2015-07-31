@@ -4,8 +4,8 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = '/Users/tyler/Desktop/BLANKS/';
-datafile = 'T2_D_7_3_NPNa_Only_1_25JUN.out';
+datadir = 'C:\Users\jhyu\Desktop\';
+datafile = 'T2_D_3_7_BSA_Ibuprofen_1_30July.out';
 T2lims = [1e-4 1e0];
 Dlims = [1e-11 1e-8];
 contourLevel = 0.90;
@@ -50,7 +50,7 @@ view([0,90])
 %Note: may need to adjust limits for drawing contours for peaks greater
 %than 1--the figure will look weird if you don't. An explanation of how to
 %do so is below.
-
+%%
 %peak 1
 for n = 1:length(T2ind); 
 % n = 5;
@@ -65,9 +65,9 @@ for n = 1:length(T2ind);
 end
 
 %%
-    ll = [2,   2,  90,  2, 296,  49,  79, 311]; %how to automate ll and mm?
-    mm = [50, 25, 204, 88, 375, 181, 104, 596];
-    lastPt = 2;
+    ll = [2,   282,  323,  2, 296,  49,  79, 311]; %how to automate ll and mm?
+    mm = [70, 312, 341, 88, 375, 181, 104, 596];
+    lastPt = 3;
 
   
 close all     
