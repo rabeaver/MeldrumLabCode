@@ -8,14 +8,14 @@ close all
 %===== User-defined paramaters =====
 %===================================
 
-Pchirp = 0.015; % CHIRP Pulse Length (s)
-sliceheight = 0.300; %mm
+Pchirp = 0.08; % CHIRP Pulse Length (s)
+sliceheight = 0.350; %mm
 
-nPts = 77; % # of acqu points
-nEchoes = 8; % Echoes
+nPts = 76; % # of acqu points
+nEchoes = 64; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700; %us
-omitEchoPts = 1; %the number of points that are zeros from the spectrometer
+omitEchoPts = 2; %the number of points that are zeros from the spectrometer
 % nnn = 1; %expt number (for 2D CHIRP expts)
 
 zf = 2; % levels of zero filling
@@ -42,8 +42,8 @@ z = f/280.47;           %um, 280.47 Hz/um (for PM25)
 % range(f)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/ExcelDataSets/15mMGdH2O/';
-datafile = 'CHIRP_15mM_GdH2O_15mspw_sliceheight300um_tE700u_Td8u_77pts_200nsWave_5dB_8nE_29July2015';
+datadir = 'C:\Users\jhyu\Desktop\';
+datafile = 'CHIRP_doublesample_Glycerol_75mM_CuIIH2O_80mspw_sliceheight350um_tE700u_Td8u_76pts_50nsWave_15dB_64nE_31July2015_2';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -59,7 +59,7 @@ CHIRPdat = CHIRPdat(1:end-omitEchoPts,:);
 %%
 
 pVec = 1:1:(nPts-omitEchoPts);
-filt = exp(-(pVec-(nPts-omitEchoPts)/2).^2/((nPts-omitEchoPts)/3)^2);
+filt = exp(-(pVec-(nPts-omitEchoPts)/2).^2/((nPts-omitEchoPts)/20)^2);
 % plot(filt)
 filt = repmat(filt',1,nEchoes);
 if apodize == 1
@@ -97,7 +97,7 @@ hold off
 
 
 %% No CHIRP load section
-filenameNO = 'noCHIRP_15mM_GdH2O_15mspw_sliceheight300um_tE700u_Td8u_77pts_200nsWave_5dB_8nE_29July2015';
+filenameNO = 'noCHIRP_doublesample_Glycerol_75mM_CuIIH2O_80mspw_sliceheight350um_tE700u_Td8u_76pts_50nsWave_15dB_64nE_31July2015_2';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,filenameNO,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -172,18 +172,18 @@ title('Coil sensitivity corrected T1-T2 profiles')
 close all
 
 figure(8)
-plot(abs(T1T2profiles(:,1)))
+plot(abs(T1T2profiles(:,3)))
 
 t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
 
 figure(7)
 subplot(2,1,1)
-plot(abs(T1T2profcorr(:,1)))
+plot(abs(T1T2profcorr(:,3)))
 xlim([0 NFFT])
 ylim([0 1.1])
 subplot(2,1,2)
-plot(t1_fig7,abs(T1T2profcorr(:,1)))
+plot(t1_fig7,abs(T1T2profcorr(:,3)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
@@ -196,9 +196,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 122;
-maxind = 406;
-firstinvertedind = 384;
+minind= 201;
+maxind = 500;
+firstinvertedind = 427;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -250,7 +250,7 @@ t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
 
 %plot first T1 column
 figure
-scatter(t1*1000,T1T2data(:,1),'linewidth',2)
+scatter(t1*1000,T1T2data(:,3),'linewidth',2)
 xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
@@ -343,7 +343,7 @@ hold off
 
 
 %% T1 fit
-echoNr = 1;
+echoNr = 3;
 cftool(t1,T1T2data(:,echoNr));
 %%
 
