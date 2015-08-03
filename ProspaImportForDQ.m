@@ -5,7 +5,8 @@ close all
 %% Get data
 
 % Get Parameters
-parfilestem = sprintf('%s', 'C:\Users\jhyu\Desktop\1\acqu');
+filedir = sprintf('%s', 'C:\Users\jhyu\Desktop\1\');
+parfilestem = strcat(filedir,'acqu');
 
 params.acqTime = readpar_Kea(strcat(parfilestem,'.par'),'acqTime');
 params.bandwidth = readpar_Kea(strcat(parfilestem,'.par'),'bandwidth');
@@ -20,35 +21,26 @@ params.nrEchoes = readpar_Kea(strcat(parfilestem,'.par'),'nrEchoes');
 params.echoTime = readpar_Kea(strcat(parfilestem,'.par'),'echoTime');
 
 % Datafile
-file = sprintf('%s', 'C:\Users\jhyu\Desktop\1\dataRe.dat');
-data = load(file); % Open datafile
-
-% Separate data
-dataRe = data(1:params.nrEchoes,:);
-dataIm = data((params.nrEchoes+1):(params.nrEchoes*2),:);
+dataRe = load(strcat(filedir,'dataRe.dat')); % Open datafile
+dataIm = load(strcat(filedir,'dataIm.dat'));
 
 % Time vector
+tau = load(strcat(filedir,'data.dat'));
+tau = tau(:,1);
 echoVec = (1:params.nrEchoes)*params.echoTime;
 
-%% User Defined Parameters
+dataRe2 = reshape(dataRe,length(tau),params.nrPts,params.nrEchoes);
+dataRe2 = sum(dataRe2,2);
+dataRe2 = reshape(dataRe2,length(tau),params.nrEchoes);
 
-% Range tested in ILT
-T2min = 1e-04; % Minimum T2 time (s)
-T2max = 1e0; % Max T2 time (s)
-% --
+dataIm2 = reshape(dataIm,length(tau),params.nrPts,params.nrEchoes);
+dataIm2 = sum(dataIm2,2);
+dataIm2 = reshape(dataIm2,length(tau),params.nrEchoes);
 
-smoothing = 1e07; % Smoothing parameter "Alpha" (1e7 is a good place to start)
-beta = -1; % Not really user defined... Never changes
-steps = 64; % Number of points in ILT; can't be bigger than number of echoes
+dataCp = complex(dataRe2,dataIm2);
 
-%% Do ILT
+%%
+plot(echoVec,dataRe2(1,:))
 
-[spec, tau, chisq] = upnnlsmooth1D(dataRe', echoVec', T2min, T2max, smoothing, beta, steps);
-
-%% Plot Spectrum
-
-figure(1)
-hold on
-plot(spec, tau)
-set('gca', 'xscale', 'log')
-hold off
+%%
+surf(echoVec,tau,real(dataCp)); shading flat

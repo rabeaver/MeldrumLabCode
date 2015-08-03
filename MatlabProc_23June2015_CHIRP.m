@@ -8,15 +8,15 @@ close all
 %===== User-defined paramaters =====
 %===================================
 
-Pchirp = 1.500;                     % CHIRP Pulse Length (s)
-sliceheight = 0.350;                %mm
+Pchirp = 0.08; % CHIRP Pulse Length (s)
+sliceheight = 0.350; %mm
 
-nPts = 76;                          % # of acqu points
-nEchoes = 128;                       % Echoes
-tD = 8e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700;                           %us
-omitEchoPts = 0;                    %the number of points that are zeros from the spectrometer
-% nnn = 1;                          %expt number (for 2D CHIRP expts)
+nPts = 76; % # of acqu points
+nEchoes = 64; % Echoes
+tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 700; %us
+omitEchoPts = 2; %the number of points that are zeros from the spectrometer
+% nnn = 1; %expt number (for 2D CHIRP expts)
 
 zf = 1;                             % levels of zero filling
 apodize = 1;                        %Gaussian apodization on (1) or off (0)?
@@ -88,7 +88,6 @@ hold off
 
 
 %% No CHIRP load section
-
 close all
 
 noCHIRPfile = 'noCHIRP_H2O_150umH2O_double_1500mspw_sliceheight350um_tE700u_Td8u_76pts_250nsWave_5dB_64nE_31July2015';
@@ -165,7 +164,7 @@ T1T2profcorr = T1T2profiles./pcorr;
 close all
 
 figure(8)
-plot(abs(T1T2profiles(:,1)))
+plot(abs(T1T2profiles(:,3)))
 
 t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
@@ -207,7 +206,7 @@ t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
 
 %plot first T1 column
 figure
-scatter(t1*1000,T1T2data(:,1),'linewidth',2)
+scatter(t1*1000,T1T2data(:,3),'linewidth',2)
 xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)

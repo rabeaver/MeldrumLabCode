@@ -3,14 +3,14 @@ clc
 close all
 
 %%
-filename = 'Glycerol_CPMG_24July2015.tnt';
-filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
+filename = 'BeadPack_CPMG_30July2015_3.tnt';
+filedir = 'C:\Users\NMRLab\Desktop\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 500; %us
+tEcho = 150; %us
 nEchoes = 128;
-nPts = 69;
+nPts = 11;
 nPtsBlank = 5;
 
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
