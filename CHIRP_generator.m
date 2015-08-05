@@ -7,13 +7,13 @@ close all
 
 %%%%%%% User-defined parameters %%%%%%%
 tic
-dt = 250e-9 ; %time per point in waveform (s) [Scout limit is 20ns]
+dt = 50e-9 ; %time per point in waveform (s) [Scout limit is 20ns]
 % N = 500000; %points to define the waveform
-tau = 1.5; %pulse length (s)
+tau = 0.040; %pulse length (s)
 sliceheight = 0.350; %mm
 G = 6.59; %T m-1, B0 field gradient
 offset = 0; %mm, frequency offset (if applicable)
-amplitude = 5; %dB, for Tecmag
+amplitude = 10; %dB, for Tecmag
 % NOTE: positive offset moves to the left in the FT spectrum (negative
 % position)
 
