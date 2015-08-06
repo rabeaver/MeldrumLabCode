@@ -25,5 +25,15 @@ end
 %%
 p = sum(p,2) + flipAngle;
 
+phase = zeros(length(p));
+for i = 1:length(p)
+    if p(i) < 0
+        phase(i) = 0.5;
+    end
+end
+
+p = abs(p);
+
 plot(pulseTime,p)
+plot(pulseTime, phase)
 
