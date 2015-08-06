@@ -5,7 +5,7 @@ close all
 %% Get data
 
 % Get Parameters
-parfilestem = sprintf('%s', 'C:\Users\vjlee\Desktop\2\acqu');
+parfilestem = sprintf('%s', 'C:\Users\jhyu\Desktop\1\acqu');
 
 params.acqTime = readpar_Kea(strcat(parfilestem,'.par'),'acqTime');
 params.bandwidth = readpar_Kea(strcat(parfilestem,'.par'),'bandwidth');
@@ -20,7 +20,7 @@ params.nrEchoes = readpar_Kea(strcat(parfilestem,'.par'),'nrEchoes');
 params.echoTime = readpar_Kea(strcat(parfilestem,'.par'),'echoTime');
 
 % Datafile
-file = sprintf('%s', 'C:\Users\vjlee\Desktop\2\data2.csv');
+file = sprintf('%s', 'C:\Users\jhyu\Desktop\1\dataRe.dat');
 data = load(file); % Open datafile
 
 % Separate data

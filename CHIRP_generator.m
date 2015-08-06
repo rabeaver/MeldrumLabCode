@@ -27,15 +27,14 @@ SW = sliceheight*G*gamma*1000; %Hz
 offsetHz = offset*1000*G*gamma; %Hz
 
 phase = zeros(N,1);
-toc
 ind = 1:N;
 f = (ind-N/2)*(SW/N);
 inc = 2*pi*f*dt;
 cinc = cumsum(inc);
 o_inc = 2*pi*offsetHz*dt;
-toc
 phase = phase + cinc' - o_inc;
 phase = mod((phase*360/2/pi),360);
+toc
 dlmwrite('CHIRP_Phase.dat',phase);
 toc
 
@@ -46,9 +45,10 @@ xlabel('time [s]')
 ylabel('phase [deg]')
 ylim([0 360])
 
-toc
+
 tamp = linspace(0,tau,N);
 amp = amplitude*(1-(cos(pi*tamp/tau)).^40);
+toc
 dlmwrite('CHIRP_Amp.dat',amp');
 toc
 figure(2)
@@ -56,4 +56,3 @@ plot(tamp,amp,'-k')
 xlabel('time [s]')
 ylabel('amplitude [dB]')
 ylim([0 amplitude+1])
-toc
