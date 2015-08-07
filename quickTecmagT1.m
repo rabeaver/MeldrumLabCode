@@ -4,7 +4,7 @@ close all
 
 %%
 
-filename = '100mMCuII_glycerol_T1Sat_4Aug2015.tnt';
+filename = '100mMCuII_glycerol_T1IR_5Aug2015_04.tnt';
 filedir = 'C:\Users\NMRLab\Desktop\CHIRP\';
 
 
@@ -17,11 +17,11 @@ nEchoes = 8;
 nPts = 69;
 nPtsBlank = 5;
 nT1Pts = 11;
-T1min = 0.095; %ms
-T1max = 5; %ms
+T1min = .05; %ms
+T1max = 110; %ms
 T1guess = 1; %ms 
 
-T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
+% T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 
 T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
@@ -35,7 +35,7 @@ dataIntIm = imag(dataInt);
 
 
 %% cftool
-cftool(T1vector, dataIntRe)
+cftool(T1vector, -dataIntRe./min(dataIntRe))
 
 %%
 guesses = [1, max(dataIntRe), T1guess];

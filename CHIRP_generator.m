@@ -9,7 +9,7 @@ close all
 tic
 dt = 50e-9 ; %time per point in waveform (s) [Scout limit is 20ns]
 % N = 500000; %points to define the waveform
-tau = 0.040; %pulse length (s)
+tau = 0.060; %pulse length (s)
 sliceheight = 0.350; %mm
 G = 6.59; %T m-1, B0 field gradient
 offset = 0; %mm, frequency offset (if applicable)
