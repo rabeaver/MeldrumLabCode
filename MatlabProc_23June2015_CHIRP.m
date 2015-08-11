@@ -12,7 +12,7 @@ Pchirp = 0.04; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
 
 nPts = 76; % # of acqu points
-nEchoes = 64; % Echoes
+nEchoes = 16; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
@@ -20,7 +20,7 @@ omitEchoPts = 0; %the number of points that are zeros from the spectrometer
 
 zf = 1;                             % levels of zero filling
 apodize = 1;                        %Gaussian apodization on (1) or off (0)?
-apofac = 3;                         % Amount of Apodization
+apofac = 5;                         % Amount of Apodization
 
 %===================================
 %=== END User-defined paramaters ===
@@ -41,8 +41,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      %Hz
 z = f/280.47;                       %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
-datafile = 'CHIRP_doubleSample_15mMGdH2O_Glycerol_40mspw_sliceheight350um_Td8u_76pts_512scans_50nsWave_10dB_3Aug2015';
+datadir = 'C:\Users\NMRLab\Desktop\CHIRP\';
+datafile = 'CHIRP_Brick_40mspw_sliceheight350um_Td8u_76pts_512scans_50nsWave_10dB_6Aug2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -90,7 +90,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_doubleSample_15mMGdH2O_Glycerol_40mspw_sliceheight350um_Td8u_76pts_512scans_50nsWave_10dB_3Aug2015';
+noCHIRPfile = 'noCHIRP_Brick_40mspw_sliceheight350um_Td8u_76pts_512scans_50nsWave_10dB_6Aug2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -187,6 +187,7 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
+\
 minind= 72;
 maxind = 221;
 firstinvertedind = 203;
