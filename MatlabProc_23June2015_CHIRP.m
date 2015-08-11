@@ -188,7 +188,7 @@ xlabel('CHIRPtime (s)')
 
 % manually select indices for data range and inversion (zero point)
 minind= 72;
-maxind = 228;
+maxind = 221;
 firstinvertedind = 203;
 
 % automatically select indices
