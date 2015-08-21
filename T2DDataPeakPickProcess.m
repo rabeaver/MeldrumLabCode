@@ -4,7 +4,7 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = '/Users/tyler/Desktop/BLANKS/';
+datadir = '/Users/tyler/Desktop/';
 datafile = 'T2_D_7_3_NPNa_only_1_JUNE25.out';
 T2lims = [1e-4 1e0];
 Dlims = [1e-11 1e-8];
