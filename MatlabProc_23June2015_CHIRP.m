@@ -19,7 +19,7 @@ omitEchoPts = 0; %the number of points that are zeros from the spectrometer
 % nnn = 1; %expt number (for 2D CHIRP expts)
 
 zf = 1;                             % levels of zero filling
-apodize = 1;                        %Gaussian apodization on (1) or off (0)?
+apodize = 0;                        %Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
 %===================================
@@ -41,7 +41,7 @@ f = linspace(-Fs/2,Fs/2,NFFT);      %Hz
 z = f/280.47;                       %um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\NMRLab\Desktop\CHIRP\';
+datadir = '/Users/tyler/Desktop/50Mm_GdH2O_vial/';
 datafile = 'CHIRP_Brick_40mspw_sliceheight350um_Td8u_76pts_512scans_50nsWave_10dB_6Aug2015';
 
 % Import CHIRP data
