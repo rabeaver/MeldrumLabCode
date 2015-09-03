@@ -52,28 +52,29 @@ ylim([0 360])
 
 tamp = linspace(0,tau,N);
 
-% WURST shaping
 if WURSTshape == 1
-    w_amp = amplitude*(1-(cos(pi*tamp/tau)).^40);
-    dlmwrite('CHIRP_wAmp.dat',w_amp');
-    figure(2)
-    plot(tamp,w_amp,'-k')
-    xlabel('time [s]')
-    ylabel('amplitude [dB]')
-    ylim([0 amplitude+1])
+% WURST shaping
+w_amp = amplitude*(1-(cos(pi*tamp/tau)).^40);
+dlmwrite('CHIRP_wAmp.dat',w_amp');
+figure(2)
+plot(tamp,w_amp,'-k')
+xlabel('time [s]')
+ylabel('amplitude [dB]')
+ylim([0 amplitude+1])
 
-% Linear shaping
 elseif LINEARshape == 1
-    lshapeLeft = linspace(0,1,round(length(tamp)*linearPct));
-    lshapeRight = linspace(1,0,round(length(tamp)*linearPct));
-    lshape = [lshapeLeft,ones(1,length(tamp)-2*length(lshapeLeft)),lshapeRight];
-    l_amp = amplitude*lshape;
-    dlmwrite('CHIRP_lAmp.dat',l_amp');
-    figure(2)
-    plot(tamp,l_amp,'-k')
-    xlabel('time [s]')
-    ylabel('amplitude [dB]')
-    ylim([0 amplitude+1])
-
+% Linear shaping
+% linearPct = 0.05;
+lshapeLeft = linspace(0,1,round(length(tamp)*linearPct));
+lshapeRight = linspace(1,0,round(length(tamp)*linearPct));
+lshape = [lshapeLeft,ones(1,length(tamp)-2*length(lshapeLeft)),lshapeRight];
+l_amp = amplitude*lshape;
+dlmwrite('CHIRP_lAmp.dat',l_amp');
+% toc
+figure(2)
+plot(tamp,l_amp,'-k')
+xlabel('time [s]')
+ylabel('amplitude [dB]')
+ylim([0 amplitude+1])
 end
 
