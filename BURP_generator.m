@@ -25,5 +25,18 @@ end
 %%
 p = sum(p,2) + flipAngle;
 
-plot(pulseTime,p)
+phase = zeros(length(p),1);
+for i = 1:length(p)
+    if p(i) < 0
+        phase(i) = 2;
+    end
+end
 
+p = abs(p);
+p = p./max(p) .* 60;
+plot(pulseTime,p)
+% plot(pulseTime, phase)
+
+
+dlmwrite('BURP_amp.dat', p);
+dlmwrite('BURP_phase.dat', phase);
