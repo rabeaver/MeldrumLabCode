@@ -4,22 +4,22 @@ close all
 
 %%
 
-filename = 'CuH2O_500mMvial_T1Sat_22July2015.tnt';
-filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/Copper_II/';
+filename = 'DoubleSample_15mMGdH2O_Glycerol_2DT1IR_BURP_LONGLONGLONG_30Aug2015.tnt';
+filedir = 'C:\users\jnking01\desktop\messyprocfolder\';
 
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 150; %us
+tEcho = 700; %us
 
-nEchoes = 8;
-nPts = 69;
-nPtsBlank = 5;
-nT1Pts = 11;
-T1min = 0.638; %ms
-T1max = 34; %ms
-T1guess = 6.8; %ms 
+nEchoes = 64;
+nPts = 76;
+nPtsBlank = 2;
+nT1Pts = 153;
+T1min = 1.331; %ms
+T1max = 31.681; %ms
+T1guess = 0; %ms 
 
 T1vector = linspace(T1min,T1max,nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
@@ -46,9 +46,10 @@ plot(T1vector,ypred);
 
 %% Make 2D data set for T1SRT2
 
-data2d = sum(abs(data),1);
+data2d = sum(real(data),1);
 data2d = reshape(data2d,nEchoes, nT1Pts);
+data2d = data2d';
 
 surf(data2d); shading flat
 
-
+save('DoubleSample_15mMGdH2O_Glycerol_2DT1IR_BURP_LONGLONGLONG_30Aug2015.dat', 'data2d', '-ascii')

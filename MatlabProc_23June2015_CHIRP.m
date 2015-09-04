@@ -4,9 +4,9 @@ close all
 
 %%
 % CHIRP params
-%===================================
-%===== User-defined paramaters =====
-%===================================
+% ===================================
+% ===== User-defined paramaters =====
+% ===================================
 
 Pchirp = 0.04; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
@@ -18,31 +18,31 @@ tE = 700; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
 % nnn = 1; %expt number (for 2D CHIRP expts)
 
-zf = 1;                             % levels of zero filling
-apodize = 1;                        %Gaussian apodization on (1) or off (0)?
-apofac = 3;                         % Amount of Apodization
+zf = 1;                             % Levels of zero filling
+apodize = 0;                        % Gaussian apodization on (1) or off (0)?
+apofac = 5;                         % Amount of Apodization
 
-%===================================
-%=== END User-defined paramaters ===
-%===================================
+% ===================================
+% === END User-defined paramaters ===
+% ===================================
 
-G = 6.59;                           %T m-1, B0 field gradient
-gamma = 42.576;                     %MHz T-1
+G = 6.59;                           % T m-1, B0 field gradient
+gamma = 42.576;                     % MHz T-1
 BWchirp = sliceheight*G*gamma*1000; % CHIRP bandwidth (Hz)
 
 T = tD;                             % Sample time
-Fs = 1/T;                           % Sampling frequency
+Fs = 1/T;                           % Sampling frequency 
 L = (nPts-omitEchoPts)*(2^zf);      % Length of signal
 NFFT = 2^nextpow2(L);               % Next power of 2 from length of y
 
 echoVec = tE:tE:(nEchoes*tE);
 t = (-(L-1)/2:L/2)*T;               % Time vector
-f = linspace(-Fs/2,Fs/2,NFFT);      %Hz
-z = f/280.47;                       %um, 280.47 Hz/um (for PM25)
+f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
+z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/';
-datafile = 'CHIRP_doubleSample_15mMGdH2O_Glycerol_40mspw_sliceheight350um_Td8u_76pts_512scans_50nsWave_10dB_3Aug2015';
+datadir = 'C:\Users\jnking01\Desktop\MessyProcFolder\';
+datafile = 'CHIRP_doubleSample_15mMGdH2O_Glycerol_40mspw_sliceheight350um_Td8u_76pts_1024scans_50nsWave_10dB_3Aug2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -90,7 +90,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_doubleSample_15mMGdH2O_Glycerol_40mspw_sliceheight350um_Td8u_76pts_512scans_50nsWave_10dB_3Aug2015';
+noCHIRPfile = 'noCHIRP_doubleSample_15mMGdH2O_Glycerol_40mspw_sliceheight350um_Td8u_76pts_1024scans_50nsWave_10dB_3Aug2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -187,9 +187,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 72;
-maxind = 228;
-firstinvertedind = 203;
+minind= 70;
+maxind = 222;
+firstinvertedind = 194;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
