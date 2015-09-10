@@ -41,7 +41,7 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\NMRLab\Desktop\CHIRP\T2D\';
+datadir = 'C:\Users\tkmeldrum\Desktop\T2D\';
 datafile = 'CHIRP_20dB_T1T2_1200us_350um_50mMGdH2O_2048_nP40_10Sept2015';
 
 % Import CHIRP data
