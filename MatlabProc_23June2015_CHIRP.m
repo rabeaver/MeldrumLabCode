@@ -8,13 +8,13 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.04; % CHIRP Pulse Length (s)
+Pchirp = 0.0012; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
 
-nPts = 76; % # of acqu points
-nEchoes = 16; % Echoes
+nPts = 40; % # of acqu points
+nEchoes = 8; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700; %us
+tE = 400; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
 % nnn = 1; %expt number (for 2D CHIRP expts)
 
@@ -41,8 +41,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\jnking01\Desktop\MessyProcFolder\';
-datafile = 'CHIRP_doubleSample_15mMGdH2O_Glycerol_40mspw_sliceheight350um_Td8u_76pts_1024scans_50nsWave_10dB_3Aug2015';
+datadir = 'C:\Users\NMRLab\Desktop\CHIRP\T2D\';
+datafile = 'CHIRP_20dB_T1T2_1200us_350um_50mMGdH2O_2048_nP40_10Sept2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -90,8 +90,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_Brick_40mspw_sliceheight350um_Td8u_76pts_512scans_50nsWave_10dB_6Aug2015';
->>>>>>> 7fec4d41de994fc904db17d60df5ad80b50b8fd5
+noCHIRPfile = 'noCHIRP_20dB_T1T2_1200us_350um_50mMGdH2O_2048_nP40_10Sept2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -188,9 +187,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 72;
-maxind = 221;
-firstinvertedind = 203;
+minind= 33;
+maxind = 100;
+firstinvertedind = 90;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -212,7 +211,7 @@ xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
 % xlim([0 1000*Pchirp])
-ylim([-1.1 1.1])
+% ylim([-1.1 1.1])
 
 
 %% surf of all T1-T2 Profiles

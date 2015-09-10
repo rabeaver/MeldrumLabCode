@@ -7,17 +7,17 @@ close all
 
 %%%%%%% User-defined parameters %%%%%%%
 % tic
-dt = 1000e-9 ; %time per point in waveform (s) [Scout limit is 20ns]
+dt = 100e-9 ; %time per point in waveform (s) [Scout limit is 20ns]
 % N = 500000; %points to define the waveform
-tau = 0.006; %pulse length (s)
+tau = 0.0012; %pulse length (s)
 sliceheight = 0.350; %mm
 G = 6.59; %T m-1, B0 field gradient
 offset = 0; %mm, frequency offset (if applicable)
-amplitude = 10; %dB, for Tecmag
+amplitude = 20; %pwr, for Tecmag
 % NOTE: positive offset moves to the left in the FT spectrum (negative
 % position)
 WURSTshape = 0;
-LINEARshape = 0;
+LINEARshape = 1;
 linearPct = 0.05; % percent of the front end and back end of the pulse that will be linearly ramped
 
 
@@ -29,6 +29,7 @@ N = round(tau/dt); %number of points per pulse waveform
 gamma = 42.576; %MHz T-1
 SW = sliceheight*G*gamma*1000; %Hz
 offsetHz = offset*1000*G*gamma; %Hz
+R = SW / tau;
 
 phase = zeros(N,1);
 ind = 1:N;
