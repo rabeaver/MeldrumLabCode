@@ -4,26 +4,26 @@ close all
 
 %%
 
-filename = 'DoubleSample_15mMGdH2O_Glycerol_2DT1IR_BURP_LONGLONGLONG_30Aug2015.tnt';
+filename = '150mMGdH2O_T1IR_BURP__tE400u_10Sep2015.tnt';
 filedir = 'C:\users\jnking01\desktop\messyprocfolder\';
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 700; %us
+tEcho = 400; %us
 
-nEchoes = 64;
-nPts = 76;
+nEchoes = 8;
+nPts = 40;
 nPtsBlank = 2;
-nT1Pts = 153;
-T1min = 1.331; %ms
-T1max = 31.681; %ms
+nT1Pts = 21;
+T1min = 0.1; %ms
+T1max = 4; %ms
 T1guess = 0; %ms 
 
-% T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
+T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 
-T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
+% T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 
 data = reshape(spec2',nPts,nEchoes,nT1Pts);
 data = data(1:(nPts-nPtsBlank),:,:);
@@ -56,4 +56,4 @@ data2d = data2d';
 
 surf(data2d); shading flat
 
-save('DoubleSample_15mMGdH2O_Glycerol_2DT1IR_BURP_LONGLONGLONG_30Aug2015.dat', 'data2d', '-ascii')
+save('150mMGdH2O_T1IR_BURP_10Sep2015.dat', 'data2d', '-ascii')
