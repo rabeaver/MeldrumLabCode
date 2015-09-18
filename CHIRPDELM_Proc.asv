@@ -8,8 +8,8 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.0012; % CHIRP Pulse Length (s)
-sliceheight = 0.100; %mm
+Pchirp = 0.000622; % CHIRP Pulse Length (s)
+sliceheight = 0.350; %mm
 
 nPts = 76; % # of acqu points
 nEchoes = 64; % Echoes
@@ -41,8 +41,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\NMRLab\Desktop\CHIRP\T2D\';
-datafile = 'CHIRP_glycerol_T2DTest_20dB_1.2ms_100um_1024sc_15Sept2015';
+datadir = 'C:\Users\NMRLab\Desktop\CHIRP\DELM\';
+datafile = 'CHIRP_DELM_Glycerol_test3_17Sept2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -69,12 +69,12 @@ T1T2profiles = fftshift(fft(CHIRPdat,NFFT)/L, 1); % Performs FFT algorithm
 figure(1)
 subplot(1,2,1)
 hold on
-plot(t*1e6,real(CHIRPdat(:,1)));
+plot(t*1e6,real(CHIRPdat(:,3)));
 xlabel('time [us]')
 
 subplot(1,2,2)
 hold on
-plot(z,2*abs(T1T2profiles(:,1)),'LineWidth',1.5);
+plot(z,2*abs(T1T2profiles(:,3)),'LineWidth',1.5);
 xlabel('real space [um]')
 title('Plot of first T1T2 FFT Profile and Echo')
 
@@ -90,7 +90,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_glycerol_T2DTest_20dB_1.2ms_100um_1024sc_15Sept2015';
+noCHIRPfile = 'noCHIRP_DELM_Glycerol_test3_17Sept2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -112,11 +112,11 @@ CPprofiles = fftshift(fft(noCHIRPdat,NFFT)/L,1);
 figure(3)
 subplot(1,2,1)
 hold on
-plot(t*1e6,real(noCHIRPdat(:,1)));
+plot(t*1e6,real(noCHIRPdat(:,3)));
 xlabel('time [us]')
 subplot(1,2,2)
 hold on
-plot(z,2*abs(CPprofiles(:,1)),'LineWidth',1.5);
+plot(z,2*abs(CPprofiles(:,3)),'LineWidth',1.5);
 xlabel('real space [um]')
 title('Plot of first T1T2 FFT Profile and Echo')
 hold off
