@@ -40,4 +40,3 @@ plot(pulseTime,p)
 
 dlmwrite('BURP_amp.dat', p);
 dlmwrite('BURP_phase.dat', phase);
-
