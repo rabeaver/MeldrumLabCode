@@ -4,27 +4,26 @@ close all
 
 %%
 
-filename = '100mMCuII_glycerol_T1IR_5Aug2015_04.tnt';
-filedir = 'C:\Users\NMRLab\Desktop\CHIRP\';
-
+filename = '150mMGdH2O_T1IR_BURP__tE400u_10Sep2015.tnt';
+filedir = 'C:\users\jnking01\desktop\messyprocfolder\';
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 150; %us
+tEcho = 400; %us
 
 nEchoes = 8;
-nPts = 69;
-nPtsBlank = 5;
-nT1Pts = 11;
-T1min = .05; %ms
-T1max = 110; %ms
-T1guess = 1; %ms 
+nPts = 40;
+nPtsBlank = 2;
+nT1Pts = 21;
+T1min = 0.1; %ms
+T1max = 4; %ms
+T1guess = 0; %ms 
 
-% T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
+T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 
-T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
+% T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 
 data = reshape(spec2',nPts,nEchoes,nT1Pts);
 data = data(1:(nPts-nPtsBlank),:,:);
@@ -51,9 +50,10 @@ plot(T1vector,ypred);
 
 %% Make 2D data set for T1SRT2
 
-data2d = sum(abs(data),1);
+data2d = sum(real(data),1);
 data2d = reshape(data2d,nEchoes, nT1Pts);
+data2d = data2d';
 
 surf(data2d); shading flat
 
-
+save('150mMGdH2O_T1IR_BURP_10Sep2015.dat', 'data2d', '-ascii')
