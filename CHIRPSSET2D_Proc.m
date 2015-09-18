@@ -46,8 +46,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\bmfortman\Documents\Data\CHIRP T2D\';
-datafile = 'CHIRP_glycerol_T2DTest_20dB_1.2ms_100um_1024sc_15Sept2015';
+datadir = 'C:\Users\NMRLab\Desktop\CHIRP\T2D\';
+datafile = 'CHIRP_glycerol_T2DTest_20dB_1.2ms_100um_8192sc_16Sept2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -95,7 +95,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_glycerol_T2DTest_20dB_1.2ms_100um_1024sc_15Sept2015';
+noCHIRPfile = 'noCHIRP_glycerol_T2DTest_20dB_1.2ms_100um_8192sc_16Sept2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -192,20 +192,33 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 104;
-maxind = 158;
+minind= 111;
+maxind = 156;
 % firstinvertedind = 110; %commented out for t2d
 % this is where I'm starting to put in some diffusion code. 
 
+tAxist2d =diff(t1_fig7); % gives the distance between each time point based on the time figure above
+tDift2d = abs(round(deltaMax./tAxist2d(1))); % makes into an integer based on the time domainabove
+
 T2Ddat = abs(T1T2profcorr(minind:maxind,:)); %crops data set according to above indices
-deltaSteps = linspace(deltaMin,deltaMax,(maxind-minind+1)); % calculates the delta steps based on the above chosen indices
+deltaSteps = linspace(deltaMin,deltaMax,tDift2d); % calculates the delta steps based on the above chosen indices
 
 yD = log(T2Ddat./T2Ddat(1))';
 xD = -gammaRad^2*G^2.*deltaSteps.^2.*(DELTA + (2/3)*deltaSteps);
 
-figure
-plot(xD,(yD(1,:)))
+T2Dsize = size(T2Ddat,1); % cuts down delta points to math those selected for the indices,assuming that the 
+%first point is the first part of the chirp
 
+figure
+plot(xD(1:T2Dsize),(yD(1,:)))
+
+%% CF tool
+a = 1;
+b = T2Dsize;
+
+cftool(xD(a:b),yD(1,a:b))
+
+%% continue T1T2 script
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
 % maxind=find(f<BWchirp/2,1,'last');
