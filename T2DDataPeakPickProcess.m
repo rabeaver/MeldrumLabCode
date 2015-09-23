@@ -4,8 +4,8 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = '/Users/tyler/Desktop/50Mm_GdH2O_vial/';
-datafile = 'T2_D_7_3_NPNa_only_1_JUNE25.out';
+datadir = 'C:\Users\jhyu\Desktop\';
+datafile = 'T2_D_9_1_BSA_Ibuprofen_1_5Aug.out';
 T2lims = [1e-4 1e0];
 Dlims = [1e-11 1e-8];
 contourLevel = 0.90;
@@ -65,8 +65,8 @@ for n = 1:length(T2ind);
 end
 
 %%
-    ll = [2,   282,  323,  2, 296,  49,  79, 311]; %how to automate ll and mm?
-    mm = [70, 312, 341, 88, 375, 181, 104, 596];
+    ll = [2,   142,  2, 681, 296,  49,  79, 311]; %how to automate ll and mm?
+    mm = [60, 172, 38, 703, 375, 181, 104, 596];
     lastPt = 3;
 
   
