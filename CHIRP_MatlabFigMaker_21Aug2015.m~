@@ -156,7 +156,7 @@ set(gca,'XScale','log','YScale','log','FontUnits','points','FontWeight','normal'
 line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2,'Color','red','LineStyle','--')
 xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
 ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-title('15 mM Gd, noCHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
+title('Double noCHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
 
 
 clear('data','xaxis','yaxis')
@@ -179,29 +179,7 @@ set(gca,'XScale','log','YScale','log','FontUnits','points','FontWeight','normal'
 line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2,'Color','red','LineStyle','--')
 xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
 ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-title('15 mM Gd, CHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-
-% new rubber
-data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/CHIRPExcelTableData/newRubber_CHIRP.out');
-lowlim = 1e-4;
-hilim = 1e0;
-
-xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
-yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
-
-figure(h)
-subplot(sampleCt,2,10)
-surf(xaxis,yaxis,data)
-colormap('gray')
-colormap(flipud(colormap))
-shading flat
-view([0 90])
-set(gca,'XScale','log','YScale','log','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2,'Color','red','LineStyle','--')
-xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-title('new rubber, noCHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-
+title('15 mM Gd CHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
 
 
 %% export
