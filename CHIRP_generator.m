@@ -7,9 +7,16 @@ close all
 
 %%%%%%% User-defined parameters %%%%%%%
 % tic
+<<<<<<< HEAD
 dt = 1e-6 ; %time per point in waveform (s) [Scout limit is 20ns]
 tau = 0.001; %pulse length (s)
 sliceheight = 0.100; %mm
+=======
+dt = 60e-9 ; %time per point in waveform (s) [Scout limit is 20ns]
+% N = 500000; %points to define the waveform
+tau = 0.008; %pulse length (s)
+sliceheight = 0.350; %mm
+>>>>>>> 3786e25e63e2af8502f3d632638e3be7b89bb323
 G = 6.59; %T m-1, B0 field gradient
 offset = 0; %mm, frequency offset (if applicable)
 amplitude = 20; %pwr, for Tecmag
