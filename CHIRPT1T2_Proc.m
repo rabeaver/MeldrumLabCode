@@ -8,11 +8,11 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.0012; % CHIRP Pulse Length (s)
-sliceheight = 0.100; %mm
+Pchirp = 0.045; % CHIRP Pulse Length (s)
+sliceheight = 0.350; %mm
 
 nPts = 76; % # of acqu points
-nEchoes = 64; % Echoes
+nEchoes = 16; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
@@ -41,8 +41,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\NMRLab\Desktop\CHIRP\T2D\';
-datafile = 'CHIRP_glycerol_T2DTest_20dB_1.2ms_100um_1024sc_15Sept2015';
+datadir = 'C:\Users\jnking01\Desktop\';
+datafile = 'CHIRP_newRubber_45mspw_512scans_100nsWave_5dB_22Sep2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -90,7 +90,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_glycerol_T2DTest_20dB_1.2ms_100um_1024sc_15Sept2015';
+noCHIRPfile = 'noCHIRP_newRubber_45mspw_512scans_100nsWave_5dB_22Sep2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -187,9 +187,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 100;
-maxind = 150;
-firstinvertedind = 110;
+minind= 105;
+maxind = 220;
+firstinvertedind = 206;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');

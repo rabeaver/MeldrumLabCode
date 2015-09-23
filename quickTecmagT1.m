@@ -4,20 +4,20 @@ close all
 
 %%
 
-filename = '150mMGdH2O_T1IR_BURP__tE400u_10Sep2015.tnt';
-filedir = 'C:\users\jnking01\desktop\messyprocfolder\';
+filename = 'newRubber_T1IRLong_22Sept2015.tnt';
+filedir = 'C:\users\jnking01\desktop\';
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 400; %us
+tEcho = 700; %us
 
-nEchoes = 8;
-nPts = 40;
+nEchoes = 16;
+nPts = 76;
 nPtsBlank = 2;
-nT1Pts = 21;
+nT1Pts = 11;
 T1min = 0.1; %ms
-T1max = 4; %ms
+T1max = 75; %ms
 T1guess = 0; %ms 
 
 T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
@@ -34,7 +34,7 @@ dataIntIm = imag(dataInt);
 
 
 %% cftool
-cftool(T1vector, -dataIntRe./min(dataIntRe))
+cftool(T1vector, dataIntRe./max(dataIntRe))
 
 %%
 guesses = [1, max(dataIntRe), T1guess];
@@ -56,4 +56,4 @@ data2d = data2d';
 
 surf(data2d); shading flat
 
-save('150mMGdH2O_T1IR_BURP_10Sep2015.dat', 'data2d', '-ascii')
+save('newRubber_T1IRLong_22Sept2015.dat', 'data2d', '-ascii')
