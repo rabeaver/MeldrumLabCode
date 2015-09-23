@@ -140,7 +140,7 @@ title('Double CHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'Fo
 % 15 mM Gd
 data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/CHIRPExcelTableData/15mMGd_IRBURP.out');
 lowlim = 1e-4;
-hilim = 1e0;
+hilim = 1e-1;
 
 xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
 yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
@@ -183,8 +183,8 @@ title('15 mM Gd, CHIRP','FontUnits','points','FontWeight','normal','FontSize',9,
 
 % new rubber
 data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/CHIRPExcelTableData/newRubber_CHIRP.out');
-lowlim = 1e-4;
-hilim = 1e0;
+lowlim = 1e-3;
+hilim = 1e-1;
 
 xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
 yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
