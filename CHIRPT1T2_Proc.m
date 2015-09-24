@@ -8,11 +8,11 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.045; % CHIRP Pulse Length (s)
+Pchirp = 0.060; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
 
 nPts = 76; % # of acqu points
-nEchoes = 16; % Echoes
+nEchoes = 64; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
@@ -41,8 +41,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\jnking01\Desktop\';
-datafile = 'CHIRP_newRubber_45mspw_512scans_100nsWave_5dB_22Sep2015';
+datadir = 'C:\Users\NMRLab\Desktop\CHIRP\';
+datafile = 'CHIRP_newGenEXP_glycerol_60ms_512scans_100nsWave_5dB_24Sep2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -90,7 +90,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_newRubber_45mspw_512scans_100nsWave_5dB_22Sep2015';
+noCHIRPfile = 'noCHIRP_newGenEXP_glycerol_60ms_512scans_100nsWave_5dB_24Sep2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -187,9 +187,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 105;
-maxind = 220;
-firstinvertedind = 206;
+minind= 111;
+maxind = 204;
+firstinvertedind = 196;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -203,6 +203,8 @@ T1T2profiles2(firstinvertedind-minind+2:end,:) = -(abs(T1T2profcorr(firstinverte
 % T1T2data=T1T2profiles2;
 T1T2data=T1T2profiles2/max(max(T1T2profiles2));
 t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
+t1Axis = 
+% t1log = logspace(log10((Pchirp*BWchirp/2-f(minind))/BWchirp),log10((Pchirp*BWchirp/2-f(maxind))/BWchirp),(maxind-minind+1));
 
 %plot first T1 column
 figure
@@ -212,7 +214,6 @@ title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
 % xlim([0 1000*Pchirp])
 % ylim([-1.1 1.1])
-
 
 %% surf of all T1-T2 Profiles
 
