@@ -41,7 +41,7 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\NMRLab\Desktop\CHIRP\';
+datadir = 'C:\Users\tkmeldrum\Desktop\CHIRP\';
 datafile = 'CHIRP_newGenEXP_glycerol_60ms_512scans_100nsWave_5dB_24Sep2015';
 
 % Import CHIRP data
@@ -187,9 +187,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 111;
-maxind = 204;
-firstinvertedind = 196;
+minind= 29;
+maxind = 166;
+firstinvertedind = 42;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -203,7 +203,7 @@ T1T2profiles2(firstinvertedind-minind+2:end,:) = -(abs(T1T2profcorr(firstinverte
 % T1T2data=T1T2profiles2;
 T1T2data=T1T2profiles2/max(max(T1T2profiles2));
 t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
-t1Axis = 
+
 % t1log = logspace(log10((Pchirp*BWchirp/2-f(minind))/BWchirp),log10((Pchirp*BWchirp/2-f(maxind))/BWchirp),(maxind-minind+1));
 
 %plot first T1 column
@@ -212,8 +212,8 @@ scatter(t1*1000,T1T2data(:,1),'linewidth',2)
 xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
-% xlim([0 1000*Pchirp])
-% ylim([-1.1 1.1])
+xlim([0 1000*Pchirp])
+ylim([-1.1 1.1])
 
 %% surf of all T1-T2 Profiles
 
@@ -264,3 +264,44 @@ hold on
 plot(t1new, T1dat, '-r')
 plot(t1, T1T2data(:,1), '*b')
 hold off
+
+%% Additional proc for exp CHIRPs
+%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%
+
+t1_exp = Pchirp - linspace(t1_fig7(minind),t1_fig7(maxind),maxind-minind+1);
+T1T2Data_exp = -(T1T2data);
+
+%plot first T1 column
+figure
+scatter(t1_exp*1000,T1T2Data_exp(:,1),'linewidth',2)
+xlabel('{\it t}_1 (ms)','fontsize',30)
+title('T1-T2, first T1 column')
+set(gca,'Fontsize',30,'linewidth',2)
+xlim([0 1000*Pchirp])
+% ylim([-1.1 1.1])
+
+% surf of all T1-T2 Profiles
+
+figure
+surf(echoVec(:,1:end)*1000,t1_exp*1000,T1T2Data_exp(:,1:end)); 
+shading flat;
+colormap('jet');
+% shading interp;
+colorbar 
+ylabel('{\it t}_1 (ms)'); 
+xlabel('{\it t}_2 (ms)');
+title('T1-T2 data')
+
+
+%% Save data, display ILT Data params
+close all
+
+T1T2data = T1T2data(:,1:end);
+T1T2data2 = -(T1T2data);
+save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii')
+size(T1T2data)
+1e6*abs(t1(1)-t1(end))
+1e6*[min(t1_exp), max(t1_exp)]
+
