@@ -3,13 +3,13 @@ clc
 close all
 
 %%
-filename = '100mMCuII_Glycerol_CPMG.tnt';
+filename = 'Glycerol_CPMG.tnt';
 filedir = 'C:\Users\NMRLab\Desktop\CHIRP\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 700; %us
-nEchoes = 8;
+nEchoes = 128;
 nPts = 76;
 nPtsBlank = 4;
 
@@ -21,7 +21,7 @@ dataInt = sum(data,1);
 dataIntRe = real(dataInt)./max(real(dataInt));
 dataIntIm = imag(dataInt)./max(real(dataInt));
 
-guess = [1 8e-4];% 0.6 6e-03];
+guess = [1 15e-3];% 0.6 6e-03];
 beta = nlinfit(echoVector,dataIntRe, @t2monofit_simple, guess);
 ypred = t2monofit_simple(beta,echoVector);
 
