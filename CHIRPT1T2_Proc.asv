@@ -8,6 +8,7 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
+<<<<<<< HEAD
 Pchirp = 0.040; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
 PreCPMGdelay = 40e-6; %s
@@ -42,9 +43,13 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '~/Desktop/CHIRP/';
-datafile = 'CHIRP_newGenEXP_glycerol_60ms_512scans_100nsWave_5dB_24Sep2015';
-
+<<<<<<< HEAD
+datadir = 'C:\Users\tkmeldrum\Desktop\CHIRP_Manuscript2\Raw Data\Double_15mM_Glycerol\';
+datafile = 'CHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_256scans_100nsWave_29Sept2015';
+=======
+datadir = 'C:\Users\NMRlab\Desktop\CHIRP\';
+datafile = 'CHIRP_newGenEXP_50mMGd_4800us_256scans_100nsWave_10dB_25Sep2015';
+>>>>>>> 5a7206b318abc5ea3d99939167182fbb18ebc23d
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -92,7 +97,11 @@ hold off
 %% No CHIRP load section
 close all
 
+<<<<<<< HEAD
 noCHIRPfile = 'noCHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_256scans_100nsWave_29Sept2015';
+=======
+noCHIRPfile = 'noCHIRP_newGenEXP_50mMGd_4800us_256scans_100nsWave_10dB_25Sep2015';
+>>>>>>> 5a7206b318abc5ea3d99939167182fbb18ebc23d
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -189,9 +198,15 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
+<<<<<<< HEAD
 minind= 33;
 maxind = 213;
 firstinvertedind = 204;
+=======
+minind= 29;
+maxind = 165;
+firstinvertedind = 38;
+>>>>>>> 5a7206b318abc5ea3d99939167182fbb18ebc23d
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
