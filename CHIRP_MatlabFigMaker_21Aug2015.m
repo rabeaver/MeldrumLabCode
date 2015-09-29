@@ -2,12 +2,13 @@ clear
 clc
 close all
 
-sampleCt = 5;
-
-% 50 mM Gd
-data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/ExcelTableData/50mMGd_noCHIRP.out');
-lowlim = 1e-4;
-hilim = 1e-2;
+sampleCt = 3;
+viewlim = [1e-3 1e-1];
+%%
+% Glycerol
+data = load('/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Glycerol/Glycerol_T1IR_BURP_10Sep2015.out');
+lowlim = 1e-3;
+hilim = 1e-1;
 
 xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
 yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
@@ -15,31 +16,33 @@ yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
 h = figure('Units','centimeters','Position', [0 0 19 28])
 subplot(sampleCt,2,1)
 grid on
-surf(xaxis,yaxis,data)
+surf(xaxis,yaxis,data./sum(sum(data)))
 set(gca,'XScale','log','YScale','log','TickLabelInterpreter', 'latex','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-colormap('gray')
+% colormap('gray')
 colormap(flipud(colormap))
 shading flat
 view([0 90])
 line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2,'Color','red','LineStyle','--')
 xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
 ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-title('50 mM Gd, noCHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-
+title('Glycerol, noCHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
+colorbar
+xlim(viewlim)
+ylim(viewlim)
 
 clear('data','xaxis','yaxis')
 
-data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/ExcelTableData/50mMGd_CHIRP.out');
-lowlim = 1e-4;
-hilim = 1e-2;
+data = load('/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Glycerol/Glycerol_CHIRP_29Sep2015.out');
+% lowlim = 1e-4;
+% hilim = 1e-2;
 
 xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
 yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
 
 figure(h)
 subplot(sampleCt,2,2)
-surf(xaxis,yaxis,data)
-colormap('gray')
+surf(xaxis,yaxis,data./sum(sum(data)))
+% colormap('gray')
 colormap(flipud(colormap))
 shading flat
 view([0 90])
@@ -47,11 +50,14 @@ set(gca,'XScale','log','YScale','log','FontUnits','points','FontWeight','normal'
 line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2,'Color','red','LineStyle','--')
 xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
 ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-title('50 mM Gd, CHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-
-% Glycerol
-data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/ExcelTableData/Glycerol_noCHIRP.out');
-lowlim = 1e-3;
+title('Glycerol, CHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
+colorbar
+xlim(viewlim)
+ylim(viewlim)
+%
+% 15 mM Gd
+data = load('/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/15mMGd/Inverted_FISTA6000_400x400_15mM_T1IRBURP.out');
+lowlim = 1e-4;
 hilim = 1e-1;
 
 xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
@@ -59,95 +65,7 @@ yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
 
 figure(h)
 subplot(sampleCt,2,3)
-surf(xaxis,yaxis,data)
-colormap('gray')
-colormap(flipud(colormap))
-shading flat
-view([0 90])
-set(gca,'XScale','log','YScale','log','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2,'Color','red','LineStyle','--')
-xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-title('Glycerol noCHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-
-
-clear('data','xaxis','yaxis')
-
-data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/ExcelTableData/Glycerol_CHIRP.out');
-% lowlim = 1e-4;
-% hilim = 1e-2;
-
-xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
-yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
-
-figure(h)
-subplot(sampleCt,2,4)
-surf(xaxis,yaxis,data)
-colormap('gray')
-colormap(flipud(colormap))
-shading flat
-view([0 90])
-set(gca,'XScale','log','YScale','log','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2,'Color','red','LineStyle','--')
-xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-title('Glycerol CHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-
-% Double
-data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/ExcelTableData/DoubleSample_noCHIRP.out');
-lowlim = 1e-4;
-hilim = 1e0;
-
-xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
-yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
-
-figure(h)
-subplot(sampleCt,2,5)
-surf(xaxis,yaxis,data)
-colormap('gray')
-colormap(flipud(colormap))
-shading flat
-view([0 90])
-set(gca,'XScale','log','YScale','log','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2,'Color','red','LineStyle','--')
-xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-title('Double noCHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-
-
-clear('data','xaxis','yaxis')
-
-data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/ExcelTableData/DoubleSample_CHIRP.out');
-% lowlim = 1e-4;
-% hilim = 1e-2;
-
-xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
-yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
-
-figure(h)
-subplot(sampleCt,2,6)
-surf(xaxis,yaxis,data)
-colormap('gray')
-colormap(flipud(colormap))
-shading flat
-view([0 90])
-set(gca,'XScale','log','YScale','log','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2,'Color','red','LineStyle','--')
-xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-title('Double CHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-
-% 15 mM Gd
-data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/CHIRPExcelTableData/15mMGd_IRBURP.out');
-lowlim = 1e-4;
-hilim = 1e-1;
-
-xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
-yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
-
-figure(h)
-subplot(sampleCt,2,7)
-surf(xaxis,yaxis,data)
+surf(xaxis,yaxis,data./sum(sum(data)))
 colormap('gray')
 colormap(flipud(colormap))
 shading flat
@@ -157,11 +75,13 @@ line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2
 xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
 ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
 title('15 mM Gd, noCHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-
+xlim(viewlim)
+ylim(viewlim)
+colorbar
 
 clear('data','xaxis','yaxis')
 
-data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/CHIRPExcelTableData/15mM_GdH2O_CHIRP_22Sept2015.out');
+data = load('/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/15mMGd/Inverted_FISTA6000_400x400_15mM_CHIRP.out');
 % lowlim = 1e-4;
 % hilim = 1e-2;
 
@@ -169,10 +89,10 @@ xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
 yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
 
 figure(h)
-subplot(sampleCt,2,8)
-surf(xaxis,yaxis,data)
-colormap('gray')
-colormap(flipud(colormap))
+subplot(sampleCt,2,4)
+surf(xaxis,yaxis,data./sum(sum(data)))
+% colormap('gray')
+% colormap(flipud(colormap))
 shading flat
 view([0 90])
 set(gca,'XScale','log','YScale','log','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
@@ -180,29 +100,57 @@ line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2
 xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
 ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
 title('15 mM Gd, CHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
+xlim(viewlim)
+ylim(viewlim)
+colorbar
+%
+% Double
+% data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/ExcelTableData/DoubleSample_noCHIRP.out');
+lowlim = 1e-4;
+hilim = 1e0;
 
-% new rubber
-data = load('/Users/tyler/Dropbox/Manuscripts/CHIRP/CHIRPExcelTableData/newRubber_CHIRP.out');
-lowlim = 1e-3;
-hilim = 1e-1;
+% xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
+% yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
+% 
+% figure(h)
+% subplot(sampleCt,2,5)
+% surf(xaxis,yaxis,data./sum(sum(data)))
+% colormap('gray')
+% colormap(flipud(colormap))
+% shading flat
+% view([0 90])
+% set(gca,'XScale','log','YScale','log','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
+% line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2,'Color','red','LineStyle','--')
+% xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
+% ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
+% title('Double noCHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
+% xlim(viewlim)
+% ylim(viewlim)
+
+clear('data','xaxis','yaxis')
+
+data = load('/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Double_15mM_Glycerol/CHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_29Sept2015.out');
+% lowlim = 1e-4;
+% hilim = 1e-2;
 
 xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
 yaxis = logspace(log10(lowlim), log10(hilim), size(data,2));
 
 figure(h)
-subplot(sampleCt,2,10)
-surf(xaxis,yaxis,data)
-colormap('gray')
-colormap(flipud(colormap))
+subplot(sampleCt,2,6)
+surf(xaxis,yaxis,data./sum(sum(data)))
+% colormap('gray')
+% colormap(flipud(colormap))
 shading flat
 view([0 90])
 set(gca,'XScale','log','YScale','log','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
 line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2,'Color','red','LineStyle','--')
 xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
 ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-title('new rubber, noCHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-
-
+title('Double CHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
+colorbar
+xlim(viewlim)
+ylim(viewlim)
 
 %% export
 

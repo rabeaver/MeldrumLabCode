@@ -41,7 +41,7 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\tkmeldrum\Desktop\CHIRP\';
+datadir = '~/Desktop/CHIRP/';
 datafile = 'CHIRP_newGenEXP_glycerol_60ms_512scans_100nsWave_5dB_24Sep2015';
 
 % Import CHIRP data

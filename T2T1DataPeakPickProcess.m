@@ -4,10 +4,10 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Glycerol/';
-datafile = 'Glycerol_T1IR_BURP_10Sep2015.out';
-T2lims = [1e-3 1e-1];
-T1lims = [1e-3 1e-1];
+datadir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Double_15mM_Glycerol/';
+datafile = 'CHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_29Sept2015.out';
+T2lims = [1e-4 1e0];
+T1lims = [1e-8 1e-4];
 contourLevel = 0.50;
 
 %load the data and remove 0 values (replace with NaN)
@@ -65,9 +65,9 @@ for n = 1:length(T2ind);
 end
 
 %%
-    ll = [2,   142,  2, 681, 296,  49,  79, 311]; %how to automate ll and mm?
-    mm = [60, 172, 38, 703, 375, 181, 104, 596];
-    lastPt = 3;
+    ll = [305, 496,  557, 681, 296,  49,  79, 311]; %how to automate ll and mm?
+    mm = [407, 644, 707, 703, 375, 181, 104, 596];
+    lastPt = 2;
 
   
 close all     
@@ -79,9 +79,12 @@ for n = 1:lastPt;
 %     ylim(Dlims)
 %     ylabel('D [m^2 s^{-1}]')
 %     xlabel('T_2 [s]'
-    T1(n,:) =[ min(c.n{n}(2,ll(n):mm(n))) T1axis(T2ind(n)) max(c.n{n}(2,ll(n):mm(n)))];
-    T2(n,:) = [ min(c.n{n}(1,ll(n):mm(n))) T2axis(Dind(n)) max(c.n{n}(1,ll(n):mm(n)))]*1e3;
+    T1(n,:) =[ min(c.n{n}(2,ll(n):mm(n))) T2axis(T1ind(n)) max(c.n{n}(2,ll(n):mm(n)))]*1e3;
+    T2(n,:) = [ min(c.n{n}(1,ll(n):mm(n))) T1axis(T2ind(n)) max(c.n{n}(1,ll(n):mm(n)))]*1e3;
 end
+
+T1(:,4) = T1(:,3)-T1(:,2);
+T2(:,4) = T2(:,3)-T2(:,2);
 
 figure(1)
 surf(T2axis,T1axis,data)
@@ -89,20 +92,20 @@ colormap(flipud(gray));
 shading flat
 set(gca,'XScale','log','YScale','log','XTick', [1e-4; 1e-3; 1e-2; 1e-1; 1e0; 1e1],'FontSize',18)
 xlim(T2lims)
-ylim(Dlims)
+ylim(T1lims)
 ylabel('\itD\rm [m^2 s^{-1}]')
 xlabel('\itT\rm_2 [s]')
 view([0,90])
 hold on
 
 for n = 1:lastPt;
-    plot3(c.n{n}(1,ll(n):mm(n)),c.n{n}(2,ll(n):mm(n)),ones(1,mm(n)-ll(n)+1),'-r','LineWidth',3); 
+    plot3(c.n{n}(1,ll(n):mm(n)),c.n{n}(2,ll(n):mm(n)),5e-4*ones(1,mm(n)-ll(n)+1),'-r','LineWidth',3); 
     text(min(c.n{n}(1,ll(n):mm(n))), max(c.n{n}(2,ll(n):mm(n))),1,int2str(n));
 end
 set(gca,'XScale','log','YScale','log')
     xlim(T2lims)
-    ylim(Dlims)
-    ylabel('D [m^2 s^{-1}]')
+    ylim(T1lims)
+    ylabel('T_1 [s]')
     xlabel('T_2 [s]')
 
 %plot the T2D data
@@ -124,14 +127,14 @@ if length(T2ind) > 1
     ll2 = 1;
     mm2 = 5;
     figure(n)
-    [c2,~] = contour(T2axis,Daxis,data./data(T2ind(n),Dind(n)),[contourLevel,contourLevel]);
+    [c2,~] = contour(T2axis,T1axis,data./data(T2ind(n),T1ind(n)),[contourLevel,contourLevel]);
     plot(c2(1,ll2:mm2),c2(2,ll2:mm2),'LineWidth',2);             % will need to update the number c(1,2:XXX) for different data sets. For secondary peaks, the countour line for the main peak still shows up in two places, so need to specifiy the end of the first peak. Just do this graphically.
     set(gca,'XScale','log','YScale','log')
     xlim(T2lims)
-    ylim(Dlims)
-    ylabel('D [m^2 s^{-1}]')
+    ylim(T1lims)
+    ylabel('T_1 [s]')
     xlabel('T_2 [s]')
-    D(n,:) =[ min(c2(2,ll2:mm2)) Daxis(T2ind(n)) max(c2(2,ll2:mm2))];    % same here and below
+    T1(n,:) =[ min(c2(2,ll2:mm2)) T1axis(T2ind(n)) max(c2(2,ll2:mm2))];    % same here and below
     T2(n,:) = [ min(c2(1,ll2:mm2)) T2axis(Dind(n)) max(c2(1,ll2:mm2))]*1e3;
 end
 
