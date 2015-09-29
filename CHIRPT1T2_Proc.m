@@ -8,7 +8,7 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.060; % CHIRP Pulse Length (s)
+Pchirp = 0.040; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
 
 nPts = 76; % # of acqu points
@@ -41,8 +41,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\tkmeldrum\Desktop\CHIRP\';
-datafile = 'CHIRP_newGenEXP_glycerol_60ms_512scans_100nsWave_5dB_24Sep2015';
+datadir = 'C:\Users\tkmeldrum\Desktop\CHIRP_Manuscript2\Raw Data\Double_15mM_Glycerol\';
+datafile = 'CHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_256scans_100nsWave_29Sept2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -90,7 +90,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_newGenEXP_glycerol_60ms_512scans_100nsWave_5dB_24Sep2015';
+noCHIRPfile = 'noCHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_256scans_100nsWave_29Sept2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -187,9 +187,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 29;
-maxind = 166;
-firstinvertedind = 42;
+minind= 33;
+maxind = 213;
+firstinvertedind = 204;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -201,7 +201,7 @@ T1T2profiles2(1:firstinvertedind-minind+1,:) = (abs(T1T2profcorr(minind:firstinv
 T1T2profiles2(firstinvertedind-minind+2:end,:) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,:)));
 
 % T1T2data=T1T2profiles2;
-T1T2data=T1T2profiles2/max(max(T1T2profiles2));
+T1T2data=T1T2profiles2/max(max(abs(T1T2profiles2)));
 t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
 
 % t1log = logspace(log10((Pchirp*BWchirp/2-f(minind))/BWchirp),log10((Pchirp*BWchirp/2-f(maxind))/BWchirp),(maxind-minind+1));
