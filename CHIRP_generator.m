@@ -9,7 +9,7 @@ close all
 % tic
 
 dt = 100e-9 ;             % time per point in waveform (s) [Scout limit is 20ns]
-tau = 0.060;            % pulse length (s)
+tau = 0.0048;            % pulse length (s)
 sliceheight = 0.350;     % mm
 
 G = 6.59;               %T m-1, B0 field gradient
