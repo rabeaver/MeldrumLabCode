@@ -8,12 +8,12 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.0048; % CHIRP Pulse Length (s)
+Pchirp = 0.040; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
 PreCPMGdelay = 40e-6; %s
 
 nPts = 76; % # of acqu points
-nEchoes = 8; % Echoes
+nEchoes = 64; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
@@ -43,7 +43,7 @@ z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
 datadir = 'C:\Users\NMRlab\Desktop\CHIRP\';
-datafile = 'CHIRP_newGenEXP_50mMGd_4800us_256scans_100nsWave_10dB_25Sep2015';
+datafile = 'CHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_29Sept2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -91,7 +91,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_newGenEXP_50mMGd_4800us_256scans_100nsWave_10dB_25Sep2015';
+noCHIRPfile = 'noCHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_29Sept2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -171,11 +171,11 @@ t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
 figure(7)
 subplot(2,1,1)
-plot(abs(T1T2profcorr(:,1)))
+plot(abs(T1T2profcorr(:,3)))
 xlim([0 NFFT])
 ylim([0 1.1])
 subplot(2,1,2)
-plot(t1_fig7,abs(T1T2profcorr(:,1)))
+plot(t1_fig7,abs(T1T2profcorr(:,3)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
@@ -189,8 +189,8 @@ xlabel('CHIRPtime (s)')
 
 % manually select indices for data range and inversion (zero point)
 minind= 29;
-maxind = 165;
-firstinvertedind = 38;
+maxind = 223;
+firstinvertedind = 184;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -292,7 +292,7 @@ colormap('jet');
 % shading interp;
 colorbar 
 ylabel('{\it t}_1 (ms)'); 
-set(gca,'yscale','log')
+% set(gca,'yscale','log')
 xlabel('{\it t}_2 (ms)');
 title('T1-T2 data')
 

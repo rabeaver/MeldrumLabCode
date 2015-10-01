@@ -8,19 +8,19 @@ close all
 %%%%%%% User-defined parameters %%%%%%%
 % tic
 
-dt = 100e-9 ;             % time per point in waveform (s) [Scout limit is 20ns]
-tau = 0.0048;            % pulse length (s)
-sliceheight = 0.350;     % mm
+dt = 100e-9;             % time per point in waveform (s) [Scout limit is 20ns]
+tau = 0.0036;            % pulse length (s)
+sliceheight = 0.100;     % mm
 
 G = 6.59;               %T m-1, B0 field gradient
 offset = 0;             %mm, frequency offset (if applicable)
-amplitude = 10;         %pwr, for Tecmag
+amplitude = 7;         %pwr, for Tecmag
 % NOTE: positive offset moves to the left in the FT spectrum (negative
 % position)
 
 % frequency ramping for CHIRP
-LINramp = 0;
-EXPramp = 1; 
+LINramp = 1;
+EXPramp = 0; 
 
 % shape for edges of amplitude profile
 WURSTshape = 0;

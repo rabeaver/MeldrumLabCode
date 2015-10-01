@@ -8,7 +8,7 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.0012; % CHIRP Pulse Length (s)
+Pchirp = 0.0024; % CHIRP Pulse Length (s)
 sliceheight = 0.100; %mm
 
 nPts = 76; % # of acqu points
@@ -22,9 +22,9 @@ zf = 1;                             % levels of zero filling
 apodize = 0;                        %Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
-deltaMax = 2.4e-3; % lil deltamax time in s
-deltaMin = 0%deltaMax-Pchirp; % calculates the minimum value of delta from the chirp
-DELTA = 2e-3; % Big delta time in s
+deltaMax = 4.8e-3; % lil deltamax time in s
+deltaMin = deltaMax-2*Pchirp; % calculates the minimum value of delta from the chirp
+DELTA = 4e-3; % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
@@ -47,7 +47,7 @@ z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
 datadir = 'C:\Users\NMRLab\Desktop\CHIRP\T2D\';
-datafile = 'CHIRP_glycerol_T2DTest_20dB_1.2ms_100um_8192sc_16Sept2015';
+datafile = 'CHIRP_glycerol_T2DTest_7dB_2.4ms_100um_4msD_1024sc_Newestphs_1Oct2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -95,7 +95,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_glycerol_T2DTest_20dB_1.2ms_100um_8192sc_16Sept2015';
+noCHIRPfile = 'noCHIRP_glycerol_T2DTest_7dB_2.4ms_100um_4msD_1024sc_Newestphs_1Oct2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -192,13 +192,13 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 111;
-maxind = 156;
+minind= 105;
+maxind = 150;
 % firstinvertedind = 110; %commented out for t2d
 % this is where I'm starting to put in some diffusion code. 
 
 tAxist2d =diff(t1_fig7); % gives the distance between each time point based on the time figure above
-tDift2d = abs(round(deltaMax./tAxist2d(1))); % makes into an integer based on the time domainabove
+tDift2d = abs(round((deltaMax-deltaMin)/tAxist2d(1))); % makes into an integer based on the time domainabove
 
 T2Ddat = abs(T1T2profcorr(minind:maxind,:)); %crops data set according to above indices
 deltaSteps = linspace(deltaMin,deltaMax,tDift2d); % calculates the delta steps based on the above chosen indices
@@ -210,7 +210,11 @@ T2Dsize = size(T2Ddat,1); % cuts down delta points to math those selected for th
 %first point is the first part of the chirp
 
 figure
-plot(xD(1:T2Dsize),(yD(1,:)))
+plot(xD(1:T2Dsize),(yD(1,:))) 
+
+% time axis are set depending on evenly spaced time points and assuming
+% that the FIRST POINT taken for the indices is the 1st point of the chirp
+% pulse
 
 %% CF tool
 a = 1;
