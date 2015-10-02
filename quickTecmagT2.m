@@ -3,7 +3,7 @@ clc
 close all
 
 %%
-filename = 'Glycerol_CPMG.tnt';
+filename = 'Glycerol_CPMG_5.tnt';
 filedir = 'C:\Users\NMRLab\Desktop\CHIRP\';
 fileloc = strcat(filedir,filename);
 

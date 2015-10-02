@@ -92,6 +92,7 @@ hold off
 close all
 
 noCHIRPfile = 'noCHIRPlin_mortar_200ms_256scans_100nsWave_3dB_30Sep2015';
+
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -171,11 +172,11 @@ t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
 figure(7)
 subplot(2,1,1)
-plot(abs(T1T2profcorr(:,1)))
+plot(abs(T1T2profcorr(:,3)))
 xlim([0 NFFT])
 ylim([0 1.1])
 subplot(2,1,2)
-plot(t1_fig7,abs(T1T2profcorr(:,1)))
+plot(t1_fig7,abs(T1T2profcorr(:,3)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);

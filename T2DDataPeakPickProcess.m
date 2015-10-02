@@ -4,11 +4,11 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = 'C:\Users\jhyu\Desktop\';
-datafile = 'T2_D_9_1_BSA_Ibuprofen_1_5Aug.out';
-T2lims = [1e-4 1e0];
-Dlims = [1e-11 1e-8];
-contourLevel = 0.90;
+datadir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Glycerol/';
+datafile = 'Glycerol_T1IR_BURP_10Sep2015.out';
+T2lims = [1e-3 1e-1];
+T1lims = [1e-3 1e-1];
+contourLevel = 0.50;
 
 %load the data and remove 0 values (replace with NaN)
 data = load(strcat(datadir,datafile));
@@ -16,26 +16,26 @@ data(data == 0) = NaN;
 nPts = size(data,1);
 
 %this calculates the axes based on the limits above
-Daxis = logspace(log10(Dlims(1)),log10(Dlims(2)),nPts);
+T1axis = logspace(log10(T1lims(1)),log10(T1lims(2)),nPts);
 T2axis = logspace(log10(T2lims(1)),log10(T2lims(2)),nPts);
 
 
 %this part requires the extrema2.m and extrema.m functions, available from
 %the mathworks file exchange. Finds the indices of the various peaks.
 [xymax,smax,~,~] = extrema2(data);
-[T2ind,Dind] = ind2sub([nPts,nPts],smax);
+[T2ind,T1ind] = ind2sub([nPts,nPts],smax);
 
 % cm = colormap(gray);
 
 % %plot the T2D data
 figure(1)
-surf(T2axis,Daxis,data)
+surf(T2axis,T1axis,data)
 colormap(flipud(gray));
 shading flat
 set(gca,'XScale','log','YScale','log','XTick', [1e-4; 1e-3; 1e-2; 1e-1; 1e0; 1e1],'FontSize',18)
 xlim(T2lims)
-ylim(Dlims)
-ylabel('\itD\rm [m^2 s^{-1}]')
+ylim(T1lims)
+ylabel('\itT\rm_1 [s]')
 xlabel('\itT\rm_2 [s]')
 view([0,90])
 
@@ -56,7 +56,7 @@ for n = 1:length(T2ind);
 % n = 5;
     
 
-    [c.n{n},~] = contour(T2axis,Daxis,data./data(T2ind(n),Dind(n)),[contourLevel,contourLevel]);
+    [c.n{n},~] = contour(T2axis,T1axis,data./data(T2ind(n),T1ind(n)),[contourLevel,contourLevel]);
 end
 
 for n = 1:length(T2ind);
@@ -79,12 +79,12 @@ for n = 1:lastPt;
 %     ylim(Dlims)
 %     ylabel('D [m^2 s^{-1}]')
 %     xlabel('T_2 [s]'
-    D(n,:) =[ min(c.n{n}(2,ll(n):mm(n))) Daxis(T2ind(n)) max(c.n{n}(2,ll(n):mm(n)))];
+    T1(n,:) =[ min(c.n{n}(2,ll(n):mm(n))) T1axis(T2ind(n)) max(c.n{n}(2,ll(n):mm(n)))];
     T2(n,:) = [ min(c.n{n}(1,ll(n):mm(n))) T2axis(Dind(n)) max(c.n{n}(1,ll(n):mm(n)))]*1e3;
 end
 
 figure(1)
-surf(T2axis,Daxis,data)
+surf(T2axis,T1axis,data)
 colormap(flipud(gray));
 shading flat
 set(gca,'XScale','log','YScale','log','XTick', [1e-4; 1e-3; 1e-2; 1e-1; 1e0; 1e1],'FontSize',18)
