@@ -8,13 +8,12 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-<<<<<<< HEAD
-Pchirp = 0.040; % CHIRP Pulse Length (s)
+Pchirp = 0.2; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
 PreCPMGdelay = 40e-6; %s
 
 nPts = 76; % # of acqu points
-nEchoes = 8; % Echoes
+nEchoes = 64; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
@@ -43,13 +42,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-<<<<<<< HEAD
-datadir = 'C:\Users\tkmeldrum\Desktop\CHIRP_Manuscript2\Raw Data\Double_15mM_Glycerol\';
-datafile = 'CHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_256scans_100nsWave_29Sept2015';
-=======
-datadir = 'C:\Users\NMRlab\Desktop\CHIRP\';
-datafile = 'CHIRP_newGenEXP_50mMGd_4800us_256scans_100nsWave_10dB_25Sep2015';
->>>>>>> 5a7206b318abc5ea3d99939167182fbb18ebc23d
+datadir = 'C:\Users\vjlee\Desktop\';
+datafile = 'CHIRPlin_mortar_200ms_256scans_100nsWave_3dB_30Sep2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -97,11 +91,8 @@ hold off
 %% No CHIRP load section
 close all
 
-<<<<<<< HEAD
-noCHIRPfile = 'noCHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_256scans_100nsWave_29Sept2015';
-=======
-noCHIRPfile = 'noCHIRP_newGenEXP_50mMGd_4800us_256scans_100nsWave_10dB_25Sep2015';
->>>>>>> 5a7206b318abc5ea3d99939167182fbb18ebc23d
+noCHIRPfile = 'noCHIRPlin_mortar_200ms_256scans_100nsWave_3dB_30Sep2015';
+
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -181,11 +172,11 @@ t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
 figure(7)
 subplot(2,1,1)
-plot(abs(T1T2profcorr(:,1)))
+plot(abs(T1T2profcorr(:,3)))
 xlim([0 NFFT])
 ylim([0 1.1])
 subplot(2,1,2)
-plot(t1_fig7,abs(T1T2profcorr(:,1)))
+plot(t1_fig7,abs(T1T2profcorr(:,3)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
@@ -198,15 +189,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-<<<<<<< HEAD
-minind= 33;
-maxind = 213;
-firstinvertedind = 204;
-=======
-minind= 29;
-maxind = 165;
-firstinvertedind = 38;
->>>>>>> 5a7206b318abc5ea3d99939167182fbb18ebc23d
+minind= 50;
+maxind = 223;
+firstinvertedind = 200;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -255,8 +240,8 @@ T1T2data = T1T2data(:,1:end);
 T1T2data2 = flipud(T1T2data);
 save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii')
 size(T1T2data)
-1e6*abs(t1(1)-t1(end))
-1e6*[min(t1), max(t1)]
+1e6*abs(t1(1)-t1(end)) %#ok<NOPTS>
+1e6*[min(t1), max(t1)] %#ok<NOPTS>
 
 %% T1Test
 % For comparing your data to the data what you expect
@@ -281,45 +266,4 @@ hold on
 plot(t1new, T1dat, '-r')
 plot(t1, T1T2data(:,1), '*b')
 hold off
-
-%% Additional proc for exp CHIRPs
-%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%
-
-t1_exp = Pchirp + PreCPMGdelay - linspace(t1_fig7(minind),t1_fig7(maxind),maxind-minind+1);
-T1T2Data_exp = -(T1T2data);
-
-%plot first T1 column
-figure
-scatter(t1_exp*1000,T1T2Data_exp(:,1),'linewidth',2)
-xlabel('{\it t}_1 (ms)','fontsize',30)
-title('T1-T2, first T1 column')
-set(gca,'Fontsize',30,'linewidth',2)
-xlim([0 1000*Pchirp])
-% ylim([-1.1 1.1])
-
-% surf of all T1-T2 Profiles
-
-figure
-surf(echoVec(:,1:end)*1000,t1_exp*1000,T1T2Data_exp(:,1:end)); 
-shading flat;
-colormap('jet');
-% shading interp;
-colorbar 
-ylabel('{\it t}_1 (ms)'); 
-set(gca,'yscale','log')
-xlabel('{\it t}_2 (ms)');
-title('T1-T2 data')
-
-
-%% Save data, display ILT Data params
-close all
-
-T1T2data = T1T2data(:,1:end);
-T1T2data2 = -(T1T2data);
-save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii')
-size(T1T2data)
-1e6*abs(t1(1)-t1(end))
-1e6*[min(t1_exp), max(t1_exp)]
 
