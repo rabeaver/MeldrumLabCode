@@ -8,8 +8,9 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.000622; % CHIRP Pulse Length (s)
+Pchirp = 0.2; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
+PreCPMGdelay = 40e-6; %s
 
 nPts = 76; % # of acqu points
 nEchoes = 64; % Echoes
@@ -41,8 +42,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\NMRLab\Desktop\CHIRP\DELM\';
-datafile = 'CHIRP_DELM_Glycerol_test3_17Sept2015';
+datadir = 'C:\Users\vjlee\Desktop\';
+datafile = 'CHIRPlin_mortar_200ms_256scans_100nsWave_3dB_30Sep2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -69,12 +70,12 @@ T1T2profiles = fftshift(fft(CHIRPdat,NFFT)/L, 1); % Performs FFT algorithm
 figure(1)
 subplot(1,2,1)
 hold on
-plot(t*1e6,real(CHIRPdat(:,3)));
+plot(t*1e6,real(CHIRPdat(:,1)));
 xlabel('time [us]')
 
 subplot(1,2,2)
 hold on
-plot(z,2*abs(T1T2profiles(:,3)),'LineWidth',1.5);
+plot(z,2*abs(T1T2profiles(:,1)),'LineWidth',1.5);
 xlabel('real space [um]')
 title('Plot of first T1T2 FFT Profile and Echo')
 
@@ -90,7 +91,8 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_DELM_Glycerol_test3_17Sept2015';
+noCHIRPfile = 'noCHIRPlin_mortar_200ms_256scans_100nsWave_3dB_30Sep2015';
+
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -112,11 +114,11 @@ CPprofiles = fftshift(fft(noCHIRPdat,NFFT)/L,1);
 figure(3)
 subplot(1,2,1)
 hold on
-plot(t*1e6,real(noCHIRPdat(:,3)));
+plot(t*1e6,real(noCHIRPdat(:,1)));
 xlabel('time [us]')
 subplot(1,2,2)
 hold on
-plot(z,2*abs(CPprofiles(:,3)),'LineWidth',1.5);
+plot(z,2*abs(CPprofiles(:,1)),'LineWidth',1.5);
 xlabel('real space [um]')
 title('Plot of first T1T2 FFT Profile and Echo')
 hold off
@@ -170,11 +172,11 @@ t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
 figure(7)
 subplot(2,1,1)
-plot(abs(T1T2profcorr(:,1)))
+plot(abs(T1T2profcorr(:,3)))
 xlim([0 NFFT])
 ylim([0 1.1])
 subplot(2,1,2)
-plot(t1_fig7,abs(T1T2profcorr(:,1)))
+plot(t1_fig7,abs(T1T2profcorr(:,3)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
@@ -187,9 +189,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 100;
-maxind = 150;
-firstinvertedind = 110;
+minind= 50;
+maxind = 223;
+firstinvertedind = 200;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -201,8 +203,10 @@ T1T2profiles2(1:firstinvertedind-minind+1,:) = (abs(T1T2profcorr(minind:firstinv
 T1T2profiles2(firstinvertedind-minind+2:end,:) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,:)));
 
 % T1T2data=T1T2profiles2;
-T1T2data=T1T2profiles2/max(max(T1T2profiles2));
+T1T2data=T1T2profiles2/max(max(abs(T1T2profiles2)));
 t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
+
+% t1log = logspace(log10((Pchirp*BWchirp/2-f(minind))/BWchirp),log10((Pchirp*BWchirp/2-f(maxind))/BWchirp),(maxind-minind+1));
 
 %plot first T1 column
 figure
@@ -210,9 +214,8 @@ scatter(t1*1000,T1T2data(:,1),'linewidth',2)
 xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
-% xlim([0 1000*Pchirp])
-% ylim([-1.1 1.1])
-
+xlim([0 1000*Pchirp])
+ylim([-1.1 1.1])
 
 %% surf of all T1-T2 Profiles
 
@@ -237,8 +240,8 @@ T1T2data = T1T2data(:,1:end);
 T1T2data2 = flipud(T1T2data);
 save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii')
 size(T1T2data)
-1e6*abs(t1(1)-t1(end))
-1e6*[min(t1), max(t1)]
+1e6*abs(t1(1)-t1(end)) %#ok<NOPTS>
+1e6*[min(t1), max(t1)] %#ok<NOPTS>
 
 %% T1Test
 % For comparing your data to the data what you expect
@@ -263,3 +266,4 @@ hold on
 plot(t1new, T1dat, '-r')
 plot(t1, T1T2data(:,1), '*b')
 hold off
+

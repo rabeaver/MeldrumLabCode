@@ -7,45 +7,84 @@ close all
 
 %%%%%%% User-defined parameters %%%%%%%
 % tic
-dt = 60e-9 ; %time per point in waveform (s) [Scout limit is 20ns]
-% N = 500000; %points to define the waveform
-tau = 0.008; %pulse length (s)
-sliceheight = 0.350; %mm
-G = 6.59; %T m-1, B0 field gradient
-offset = 0; %mm, frequency offset (if applicable)
-amplitude = 20; %pwr, for Tecmag
+
+dt = 100e-9;             % time per point in waveform (s) [Scout limit is 20ns]
+tau = 0.001497;            % pulse length (s)
+sliceheight = 0.350;     % mm
+
+G = 6.59;               %T m-1, B0 field gradient
+offset = 0;             %mm, frequency offset (if applicable)
+amplitude = 55;         %pwr, for Tecmag
 % NOTE: positive offset moves to the left in the FT spectrum (negative
 % position)
+
+% frequency ramping for CHIRP
+LINramp = 1;
+EXPramp = 0; 
+
+% shape for edges of amplitude profile
 WURSTshape = 0;
 LINEARshape = 1;
-linearPct = 0.05; % percent of the front end and back end of the pulse that will be linearly ramped
+linearPct = 0.05;       % percent of the front end and back end of the pulse
+                        % that will be linearly ramped
 
 
 %%%%%%% END User-defined parameters %%%%%%%
 
-
-N = round(tau/dt); %number of points per pulse waveform
-% dt = (tau/N); %time per point in waveform (s) [Scout limit is 20 ns]
-gamma = 42.576; %MHz T-1
-SW = sliceheight*G*gamma*1000; %Hz
+N = round(tau/dt);              %number of points per pulse waveform
+gamma = 42.576;                 %MHz T-1
+SW = sliceheight*G*gamma*1000;  %Hz
+% SW_s = SW*2*pi;               %rad s-1
 offsetHz = offset*1000*G*gamma; %Hz
-R = SW / tau;
+f0 = -SW/2;                     %initial frequency (Hz)
+% f0_s = -SW_s/2;               %initial frequency (s-1)
+    
+    
+% CALCULATION OF PHASE %
 
-phase = zeros(N,1);
-ind = 1:N;
-f = (ind-N/2)*(SW/N);
-inc = 2*pi*f*dt;
-cinc = cumsum(inc);
-o_inc = 2*pi*offsetHz*dt;
-phase = phase + cinc' - o_inc;
-phase = mod((phase*360/2/pi),360);
-% toc
-dlmwrite('CHIRP_Phase.dat',phase);
-% toc
+% Linear phase ramping
+if LINramp == 1;
+    
+%analytical expressions *POSSIBLY INCORRECT WITH Hz/rad/deg UNITS*
+%     f = f0 + SW*t/tau;                          %frequency (Hz, or cycles s-1)
+%     f_s = f0_s + SW_s*t/tau;                    %frequency (rad s-1)
+%     phase = f0*t+SW/2/tau*t.^2;                 %phase (cycles, or Hz*s)
+%     phase_s = f0_s*t + SW_s/2/tau*t.^2;         %phase (rad)
 
-figure(1)
+% numerical expressions
+    f = linspace(-SW/2,SW/2,N);       % frequency (Hz, or cycles s-1)
+    f_s = f*360;                      % frequency (deg s-1)
+    phase = cumsum(f)*dt;             % phase (cycles, or Hz*s)
+    phase_s = cumsum(f_s)*dt;         % phase (deg) 
+    phase_s360 = mod(phase_s,360);    % phase (deg, mod 360)
+
+    
+    
+% Exponential phase ramping
+elseif EXPramp == 1;
+    
+%analytical expression for exponential growth *POSSIBLY INCORRECT WITH Hz/rad/deg UNITS*
+%     f = SW.^(t/(tau*(1-linearPct))) - 1 + f0;
+%     phase = (tau*(1-linearPct)/log(SW))*(SW.^(t/(tau*(1-linearPct)))-1)-t*(1-f0);
+    
+% numerical log-spaced points
+    f = logspace(0,log10(SW),N)-1-SW/2;       % frequency (Hz, or cycles s-1)
+    f_s = f*360;                              % frequency (deg s-1)
+    phase = cumsum(f)*dt;                     % phase (cycles, or Hz*s)
+    phase_s = cumsum(f_s)*dt;                 % phase (deg)
+    phase_s360 = mod(phase_s,360);            % phase (deg, mod 360)
+end
+
+dlmwrite('CHIRP_Phase.dat',phase_s360');
+
 t = linspace(0,tau,N);
-plot(t,phase,'-k')
+figure(1)
+subplot(1,2,1)
+plot(t,f_s,'-k')
+xlabel('time [s]')
+ylabel('frequency [s-1]')
+subplot(1,2,2)
+plot(t,phase_s360,'-k')
 xlabel('time [s]')
 ylabel('phase [deg]')
 ylim([0 360])
@@ -53,28 +92,32 @@ ylim([0 360])
 
 tamp = linspace(0,tau,N);
 
+% CALCULATION OF AMPLITUDE %
+amp = amplitude; 
+
 % WURST shaping
 if WURSTshape == 1
-    w_amp = amplitude*(1-(cos(pi*tamp/tau)).^40);
-    dlmwrite('CHIRP_wAmp.dat',w_amp');
-    figure(2)
-    plot(tamp,w_amp,'-k')
-    xlabel('time [s]')
-    ylabel('amplitude [dB]')
-    ylim([0 amplitude+1])
-
+    amp = amplitude*(1-(cos(pi*tamp/tau)).^40);
+    
 % Linear shaping
 elseif LINEARshape == 1
     lshapeLeft = linspace(0,1,round(length(tamp)*linearPct));
     lshapeRight = linspace(1,0,round(length(tamp)*linearPct));
     lshape = [lshapeLeft,ones(1,length(tamp)-2*length(lshapeLeft)),lshapeRight];
-    l_amp = amplitude*lshape;
-    dlmwrite('CHIRP_lAmp.dat',l_amp');
-    figure(2)
-    plot(tamp,l_amp,'-k')
-    xlabel('time [s]')
-    ylabel('amplitude [dB]')
-    ylim([0 amplitude+1])
-
+    amp = amplitude*lshape; 
 end
 
+
+dlmwrite('CHIRP_Amp.dat',amp');
+    figure(2)
+    plot(tamp,amp,'-k')
+    xlabel('time [s]')
+    ylabel('amplitude [pwr]')
+    ylim([0 amplitude+1])
+
+        
+    figure(3)
+    plot(tamp,amp.*phase_s360/360,'-b')
+    xlabel('time [s]')
+    ylabel('phase * amplitude [dB]')
+    ylim([0 amplitude+1])
