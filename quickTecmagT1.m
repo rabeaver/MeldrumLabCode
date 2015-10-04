@@ -4,20 +4,20 @@ close all
 
 %%
 
-filename = '150mMGdH2O_T1IR_BURP__tE400u_10Sep2015.tnt';
-filedir = 'C:\users\jnking01\desktop\messyprocfolder\';
+filename = '400mMCu_T1IR_BURP_18Sept2015.tnt';
+filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/ExcelDataSets_CHIRP/400mMCu/';
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 400; %us
+tEcho = 700; %us
 
 nEchoes = 8;
-nPts = 40;
+nPts = 76;
 nPtsBlank = 2;
 nT1Pts = 21;
 T1min = 0.1; %ms
-T1max = 4; %ms
+T1max = 8; %ms
 T1guess = 0; %ms 
 
 T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
