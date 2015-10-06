@@ -9,12 +9,12 @@ close all
 % tic
 
 dt = 100e-9;             % time per point in waveform (s) [Scout limit is 20ns]
-tau = 0.001497;            % pulse length (s)
-sliceheight = 0.350;     % mm
+tau = 0.001197;            % pulse length (s)
+sliceheight = 0.100;     % mm
 
 G = 6.59;               %T m-1, B0 field gradient
 offset = 0;             %mm, frequency offset (if applicable)
-amplitude = 55;         %pwr, for Tecmag
+amplitude = 10;         %pwr, for Tecmag
 % NOTE: positive offset moves to the left in the FT spectrum (negative
 % position)
 
