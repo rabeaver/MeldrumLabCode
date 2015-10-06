@@ -8,22 +8,23 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.001197; % CHIRP Pulse Length (s)
-sliceheight = 0.100; %mm
+Pchirp = 0.001497; % CHIRP Pulse Length (s)
+pw     = 6e-6; %hard pulse length
+sliceheight = 0.350; %mm
 
-nPts = 76; % # of acqu points
+nPts = 152; % # of acqu points
+omitPts = 0; %the number of points that are zeros from the spectrometer
 nEchoes = 64; % Echoes
-tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+omitEchoes = 4; %numbner of echoes to remove from data
+tD = 4e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700; %us
-omitEchoPts = 0; %the number of points that are zeros from the spectrometer
-% nnn = 1; %expt number (for 2D CHIRP expts)
 
 zf = 1;                             % levels of zero filling
 apodize = 0;                        %Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
-deltaMax = 2.4e-3; % lil deltamax time in s
-deltaMin = deltaMax-2*Pchirp; % calculates the minimum value of delta from the chirp
+deltaMax = 3e-3; % lil deltamax time in s
+deltaMin = deltaMax-2*Pchirp-pw/2; % calculates the minimum value of delta from the chirp
 DELTA = 2e-3; % Big delta time in s
 
 % ===================================
@@ -37,7 +38,7 @@ BWchirp = sliceheight*G*gamma*1000; % CHIRP bandwidth (Hz)
 
 T = tD;                             % Sample time
 Fs = 1/T;                           % Sampling frequency 
-L = (nPts-omitEchoPts)*(2^zf);      % Length of signal
+L = (nPts-omitPts)*(2^zf);      % Length of signal
 NFFT = 2^nextpow2(L);               % Next power of 2 from length of y
 
 echoVec = tE:tE:(nEchoes*tE);
@@ -47,7 +48,7 @@ z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
 datadir = 'C:\Users\NMRLab\Desktop\CHIRP\T2D\';
-datafile = 'Chirp_10db_SSET2D_2.4d_2D_glycerol_2048Sc_5Oct2015';
+datafile = 'CHIRP_glycerol_T2D_3msd_2msD_350um_12pwr_2utD_1024sc_6Oct2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -55,13 +56,13 @@ datafile = 'Chirp_10db_SSET2D_2.4d_2D_glycerol_2048Sc_5Oct2015';
 % CHIRPdat = spec(1,:);
 % spec = spec2(nnn, :);
 CHIRPdat = reshape(spec, nPts, nEchoes);
-CHIRPdat = CHIRPdat(1:end-omitEchoPts,:);
+CHIRPdat = CHIRPdat(1:end-omitPts,omitEchoes+1:end);
 
 %%
 
-pVec = 1:1:(nPts-omitEchoPts);
-filt = exp(-(pVec-(nPts-omitEchoPts)/2).^2/((nPts-omitEchoPts)/apofac)^2);
-filt = repmat(filt',1,nEchoes);
+pVec = 1:1:(nPts-omitPts);
+filt = exp(-(pVec-(nPts-omitPts)/2).^2/((nPts-omitPts)/apofac)^2);
+filt = repmat(filt',1,nEchoes-omitEchoes);
 
 if apodize == 1
     CHIRPdat = CHIRPdat .* filt;
@@ -95,14 +96,14 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'offChirp_5db_SSET2D_2.4d_2D_glycerol_5Oct2015';
+noCHIRPfile = 'noCHIRP_glycerol_T2D_3msd_2msD_350um_12pwr_2utD_1024sc_6Oct2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
 % No CHIRP raw data and fft profiles
 % data = spec2(2,:);
 noCHIRPdat = reshape(data, nPts, nEchoes);
-noCHIRPdat = noCHIRPdat(1:end-omitEchoPts,:);
+noCHIRPdat = noCHIRPdat(1:end-omitPts,omitEchoes+1:end);
 if apodize == 1
     noCHIRPdat = noCHIRPdat .* filt;
 end
@@ -150,7 +151,7 @@ set(gca,'Fontsize',12,'linewidth',2)
 
 %% Coil Sensitivity Correction
 
-for k = 1:nEchoes
+for k = 1:nEchoes-omitEchoes
     pcorr(:,k) = abs(CPprofiles(:,1));
 end
 
@@ -168,22 +169,22 @@ T1T2profcorr = T1T2profiles./pcorr;
 close all
 
 figure(8)
-plot(abs(T1T2profiles(:,3)))
+plot(abs(T1T2profiles(:,1)))
 
 t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
 
 figure(7)
 subplot(2,1,1)
-plot(abs(T1T2profcorr(:,2)))
+plot(abs(T1T2profcorr(:,1)))
 xlim([0 NFFT])
-ylim([0 1.1])
+ylim([0 2])
 subplot(2,1,2)
-plot(t1_fig7,abs(T1T2profcorr(:,2)))
+plot(t1_fig7,abs(T1T2profcorr(:,1)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
-ylim([0 1.1])
+ylim([0 2])
 set(gca,'XDir','reverse')
 xlabel('CHIRPtime (s)')
 
@@ -191,17 +192,16 @@ xlabel('CHIRPtime (s)')
 
 %% Data Range and Inversion
 
-% manually select indices for data range and inversion (zero point)
-minind= 86;
-maxind = 172;
-% firstinvertedind = 110; %commented out for t2d
-% this is where I'm starting to put in some diffusion code. 
+% manually select indices for data range and inversion
+minind= 268;
+maxind = 293;
 
-tAxist2d =diff(t1_fig7); % gives the distance between each time point based on the time figure above
-tDift2d = abs(round((deltaMax-deltaMin)/tAxist2d(1))); % makes into an integer based on the time domainabove
+% tAxist2d = diff(t1_fig7); % gives the distance between each time point based on the time figure above
+% tDift2d  = abs(round((deltaMax-deltaMin)/tAxist2d(1))); % makes into an integer based on the time domainabove
 
 T2Ddat = abs(T1T2profcorr(minind:maxind,:)); %crops data set according to above indices
-deltaSteps = linspace(deltaMin,deltaMax,tDift2d); % calculates the delta steps based on the above chosen indices
+% deltaSteps = linspace(deltaMin,deltaMax,tDift2d); % calculates the delta steps based on the above chosen indices
+deltaSteps = t1_fig7(minind:maxind);
 
 yD = log(T2Ddat./T2Ddat(1))';
 xD = -gammaRad^2*G^2.*deltaSteps.^2.*(DELTA + (2/3)*deltaSteps);
