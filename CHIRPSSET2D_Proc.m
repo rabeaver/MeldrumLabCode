@@ -8,7 +8,7 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.001997; % CHIRP Pulse Length (s)
+Pchirp = 0.001497; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
 
 nPts = 76; % # of acqu points
@@ -22,9 +22,9 @@ zf = 1;                             % levels of zero filling
 apodize = 0;                        %Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
-deltaMax = 4e-3; % lil deltamax time in s
-deltaMin = deltaMax-2*Pchirp; % calculates the minimum value of delta from the chirp
-DELTA = 2e-3; % Big delta time in s
+deltaMax = 3e-3; % lil deltamax time in s
+deltaMin = 0; %deltaMax-2*Pchirp; % calculates the minimum value of delta from the chirp
+DELTA = 1e-3; % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
@@ -46,8 +46,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\NMRLab\Desktop\CHIRP\T2D\';
-datafile = 'CHIRP_glycerol_T2D_4msd_2msD_2mCHIRP_350um_55pwr_1024sc_32stepPC_2Oct2015';
+datadir = '~/Desktop/T2D/';
+datafile = 'CHIRP_glycerol_T2D_3msd_1msD_1497uCHIRP_350um_55pwr_8192sc_2Oct2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -95,7 +95,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_glycerol_T2D_4msd_4msD_1024sc_32stepPC_2Oct2015';
+noCHIRPfile = 'noCHIRP_glycerol_T2D_3msd_1msD_1497uCHIRP_350um_55pwr_8192sc_2Oct2015';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -177,13 +177,13 @@ figure(7)
 subplot(2,1,1)
 plot(abs(T1T2profcorr(:,2)))
 xlim([0 NFFT])
-ylim([0 1.1])
+% ylim([0 1.1])
 subplot(2,1,2)
 plot(t1_fig7,abs(T1T2profcorr(:,2)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
-ylim([0 1.1])
+% ylim([0 1.1])
 set(gca,'XDir','reverse')
 xlabel('CHIRPtime (s)')
 
@@ -192,8 +192,8 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 86;
-maxind = 172;
+minind= 52;
+maxind = 195;
 % firstinvertedind = 110; %commented out for t2d
 % this is where I'm starting to put in some diffusion code. 
 
@@ -217,7 +217,7 @@ plot(xD(1:T2Dsize),(yD(1,:)))
 % pulse
 
 %% CF tool
-a = 1;
+a = 3;
 b = T2Dsize;
 
 cftool(xD(a:b),yD(1,a:b))
