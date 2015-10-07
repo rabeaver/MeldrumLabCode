@@ -42,17 +42,14 @@ data2d = sum(real(data),1);
 data2d = reshape(data2d,nEchoes, nT1Pts);
 data2d = data2d';
 
-% Plot of data
 surf(data2d); shading flat
 
-% Save data in specified directory with the same filename and ".dat"
-% extension
 save(strcat(filedir,filename,'.dat'), 'data2d', '-ascii')
 
 %% 1D Fits
 
-%T1 (A*(1-2*exp(-x/T1))
-cftool(T1vector, data2d(1,:)./max(data2d(1,:)))
+%T1
+cftool(T1vector, data2d(1,./max(dataIntRe))
 
-%T2 (A*exp(-x/T2))
-cftool(echoVector, data2d(:,end)./max(data2d(:,end)))
+%T2
+cftool(echoVector, data2d(:,end)./max(data2d))

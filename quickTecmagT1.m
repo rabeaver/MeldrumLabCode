@@ -47,13 +47,3 @@ figure(1)
 hold on
 scatter(T1vector,dataIntRe);
 plot(T1vector,ypred);
-
-%% Make 2D data set for T1SRT2
-
-data2d = sum(real(data),1);
-data2d = reshape(data2d,nEchoes, nT1Pts);
-data2d = data2d';
-
-surf(data2d); shading flat
-
-save('Double_Gly_15mMGdH2O_T1IRBURP_29Sep2015.dat', 'data2d', '-ascii')
