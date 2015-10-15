@@ -4,10 +4,10 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Double_15mM_Glycerol/';
-datafile = 'CHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_29Sept2015.out';
-T2lims = [1e-4 1e0];
-T1lims = [1e-8 1e-4];
+datadir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/15mMGd/';
+datafile = 'Inverted_FISTA6000_400x400_15mM_T1IRBURP.out';
+T2lims = [1e-4 1e-1];
+T1lims = [1e-4 1e-1];
 contourLevel = 0.50;
 
 %load the data and remove 0 values (replace with NaN)
@@ -23,7 +23,7 @@ T2axis = logspace(log10(T2lims(1)),log10(T2lims(2)),nPts);
 %this part requires the extrema2.m and extrema.m functions, available from
 %the mathworks file exchange. Finds the indices of the various peaks.
 [xymax,smax,~,~] = extrema2(data);
-[T2ind,T1ind] = ind2sub([nPts,nPts],smax);
+[T1ind,T2ind] = ind2sub([nPts,nPts],smax);
 
 % cm = colormap(gray);
 
@@ -56,7 +56,7 @@ for n = 1:length(T2ind);
 % n = 5;
     
 
-    [c.n{n},~] = contour(T2axis,T1axis,data./data(T2ind(n),T1ind(n)),[contourLevel,contourLevel]);
+    [c.n{n},~] = contour(T2axis,T1axis,data./data(T1ind(n),T2ind(n)),[contourLevel,contourLevel]);
 end
 
 for n = 1:length(T2ind);
@@ -65,9 +65,9 @@ for n = 1:length(T2ind);
 end
 
 %%
-    ll = [305, 496,  557, 681, 296,  49,  79, 311]; %how to automate ll and mm?
-    mm = [407, 644, 707, 703, 375, 181, 104, 596];
-    lastPt = 2;
+    ll = [33, 72,  18, 14, 296,  49,  79, 311]; %how to automate ll and mm?
+    mm = [153, 184, 128, 168, 375, 181, 104, 596];
+    lastPt = 1;
 
   
 close all     
@@ -79,8 +79,8 @@ for n = 1:lastPt;
 %     ylim(Dlims)
 %     ylabel('D [m^2 s^{-1}]')
 %     xlabel('T_2 [s]'
-    T1(n,:) =[ min(c.n{n}(2,ll(n):mm(n))) T2axis(T1ind(n)) max(c.n{n}(2,ll(n):mm(n)))]*1e3;
-    T2(n,:) = [ min(c.n{n}(1,ll(n):mm(n))) T1axis(T2ind(n)) max(c.n{n}(1,ll(n):mm(n)))]*1e3;
+    T1(n,:) =[ min(c.n{n}(2,ll(n):mm(n))) T1axis(T1ind(n)) max(c.n{n}(2,ll(n):mm(n)))]*1e3;
+    T2(n,:) = [ min(c.n{n}(1,ll(n):mm(n))) T2axis(T2ind(n)) max(c.n{n}(1,ll(n):mm(n)))]*1e3;
 end
 
 T1(:,4) = T1(:,3)-T1(:,2);
@@ -99,7 +99,7 @@ view([0,90])
 hold on
 
 for n = 1:lastPt;
-    plot3(c.n{n}(1,ll(n):mm(n)),c.n{n}(2,ll(n):mm(n)),5e-4*ones(1,mm(n)-ll(n)+1),'-r','LineWidth',3); 
+    plot3(c.n{n}(1,ll(n):mm(n)),c.n{n}(2,ll(n):mm(n)),5e4*ones(1,mm(n)-ll(n)+1),'-r','LineWidth',3); 
     text(min(c.n{n}(1,ll(n):mm(n))), max(c.n{n}(2,ll(n):mm(n))),1,int2str(n));
 end
 set(gca,'XScale','log','YScale','log')
