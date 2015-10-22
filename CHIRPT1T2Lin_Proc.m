@@ -8,14 +8,14 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.2; % CHIRP Pulse Length (s)
+Pchirp = 0.040; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
 PreCPMGdelay = 40e-6; %s
 
-nPts = 76; % # of acqu points
-nEchoes = 64; % Echoes
+nPts = 40; % # of acqu points
+nEchoes = 8; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700; %us
+tE = 400; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
 % nnn = 1; %expt number (for 2D CHIRP expts)
 
@@ -42,8 +42,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\vjlee\Desktop\';
-datafile = 'CHIRPlin_mortar_200ms_256scans_100nsWave_3dB_30Sep2015';
+datadir = '/Users/jaredking/Documents/Chemistry/Research/Raw Data/150mMGd/';
+datafile = 'CHIRP_20dB_T1T2_1200us_350um_150mMGdH2O_2048_nP40_10Sept2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -91,7 +91,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRPlin_mortar_200ms_256scans_100nsWave_3dB_30Sep2015';
+noCHIRPfile = 'noCHIRP_20dB_T1T2_1200us_350um_150mMGdH2O_2048_nP40_10Sept2015';
 
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
@@ -165,18 +165,18 @@ T1T2profcorr = T1T2profiles./pcorr;
 close all
 
 figure(8)
-plot(abs(T1T2profiles(:,3)))
+plot(abs(T1T2profiles(:,1)))
 
 t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
 
 figure(7)
 subplot(2,1,1)
-plot(abs(T1T2profcorr(:,3)))
+plot(abs(T1T2profcorr(:,1)))
 xlim([0 NFFT])
 ylim([0 1.1])
 subplot(2,1,2)
-plot(t1_fig7,abs(T1T2profcorr(:,3)))
+plot(t1_fig7,abs(T1T2profcorr(:,1)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
@@ -189,9 +189,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 50;
-maxind = 223;
-firstinvertedind = 200;
+minind= 22;
+maxind = 100;
+firstinvertedind = 90;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -238,6 +238,7 @@ close all
 
 T1T2data = T1T2data(:,1:end);
 T1T2data2 = flipud(T1T2data);
+data2d = T1T2data2;
 save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii')
 size(T1T2data)
 1e6*abs(t1(1)-t1(end)) %#ok<NOPTS>
