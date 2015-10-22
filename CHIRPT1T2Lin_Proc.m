@@ -8,12 +8,12 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.040; % CHIRP Pulse Length (s)
+Pchirp = 0.015; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
 PreCPMGdelay = 40e-6; %s
 
 nPts = 40; % # of acqu points
-nEchoes = 8; % Echoes
+nEchoes = 16; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 400; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
@@ -42,8 +42,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research/Raw Data/150mMGd/';
-datafile = 'CHIRP_20dB_T1T2_1200us_350um_150mMGdH2O_2048_nP40_10Sept2015';
+datadir = 'C:/Users/jaredking/Desktop';
+datafile = 'CHIRP_15mMGd_15mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_16Oct2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -91,7 +91,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_20dB_T1T2_1200us_350um_150mMGdH2O_2048_nP40_10Sept2015';
+noCHIRPfile = 'noCHIRP_15mMGd_15mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_16Oct2015';
 
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
