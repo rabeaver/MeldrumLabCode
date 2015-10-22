@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'Double_Gly_15mMGdH2O_T1IRBURP_29Sep2015';
-filedir = 'C:\users\jnking01\desktop\';
+filename = '150mMGdH2O_T1IR_BURP__tE400u_10Sep2015';
+filedir = '/Users/jaredking/Documents/Chemistry/Research/Raw Data/150mMGd/';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -14,18 +14,19 @@ fileloc = strcat(filedir,filename,'.tnt');
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 
 % Input experiment parameters
-tEcho = 700; %us
-echoVector = (tEcho:tEcho:nEchoes*tEcho); % T2 vector
+tEcho = 400; %us
 
-nEchoes = 64;
-nPts = 76;
+nEchoes = 8;
+nPts = 40;
 nPtsBlank = 2;
 nT1Pts = 21;
 T1min = 0.1; %ms
-T1max = 40; %ms
+T1max = 1.2; %ms
+echoVector = (tEcho:tEcho:nEchoes*tEcho); % T2 vector
+
 
 % Specify lin or log spaced points
-linORlog = 1; % 0 for linearly space and 1 for log spaced
+linORlog = 0; % 0 for linearly space and 1 for log spaced
 
 % Make T1vector
 if linORlog == 0
@@ -52,7 +53,7 @@ save(strcat(filedir,filename,'.dat'), 'data2d', '-ascii')
 %% 1D Fits
 
 %T1 (A*(1-2*exp(-x/T1))
-cftool(T1vector, data2d(1,:)./max(data2d(1,:)))
+cftool(T1vector, data2d(:,1)./max(data2d(:,1)));
 
 %T2 (A*exp(-x/T2))
-cftool(echoVector, data2d(:,end)./max(data2d(:,end)))
+cftool(echoVector/10^3, data2d(end,:)'./max(data2d(end,:)))
