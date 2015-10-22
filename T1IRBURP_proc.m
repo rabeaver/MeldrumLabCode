@@ -4,23 +4,23 @@ close all
 
 %%
 
-filename = 'Double_Gly_15mMGdH2O_T1IRBURP_29Sep2015';
-filedir = 'C:\users\jnking01\desktop\';
+filename = 'Glycerol_T1IR_BURP_21_2D_14Oct2015';
+filedir = 'C:\users\tkmeldrum\desktop\CHIRP\';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 700; %us
-echoVector = (tEcho:tEcho:nEchoes*tEcho);
+
 
 nEchoes = 64;
 nPts = 76;
 nPtsBlank = 2;
 nT1Pts = 21;
-T1min = 0.1; %ms
-T1max = 40; %ms
-
-linORlog = 1; % 0 for linearly space and 1 for log spaced
+T1min = 0.05; %ms
+T1max = 60; %ms
+echoVector = (tEcho:tEcho:nEchoes*tEcho);
+linORlog = 0; % 0 for linearly space and 1 for log spaced
 
 if linORlog == 0
     T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1 points

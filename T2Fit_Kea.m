@@ -13,7 +13,7 @@ close all
 % dataIm = load('/Users/jaredking/Documents/Research Files and Data/Spatial Resolution/CPMG/FreshYellow_11Jun/1120_820Series/1000um/1/echoData2D-Im.dat');
 
 
-parfilestem = sprintf('%s', 'C:\Users\vjlee\Desktop\2\acqu');
+parfilestem = sprintf('%s', 'C:\Users\tkmeldrum\Desktop\Bead Pack\1500uMGd_BEADPACK_50u\1\acqu');
 
 params.acqTime = readpar_Kea(strcat(parfilestem,'.par'),'acqTime');
 params.bandwidth = readpar_Kea(strcat(parfilestem,'.par'),'bandwidth');
@@ -28,7 +28,7 @@ params.nrEchoes = readpar_Kea(strcat(parfilestem,'.par'),'nrEchoes');
 params.echoTime = readpar_Kea(strcat(parfilestem,'.par'),'echoTime');
 
 % New Data files
-file = sprintf('%s', 'C:\Users\vjlee\Desktop\2\data2.csv');
+file = sprintf('%s', 'C:\Users\tkmeldrum\Desktop\Bead Pack\1500uMGd_BEADPACK_50u\1\data2.csv');
 FTdata = load(file);
 
 %%
@@ -93,12 +93,10 @@ maxVal = max(maxVal);
 sumData = sumData/maxVal;
 
 %% Summed Data Monofit
-
-guess = [.9;.65];
+echoVector = (1:params.nrEchoes)*params.echoTime*1e-3; %ms
+guess = [1;10];
 for i=1:10
-    %                                                       Be sure to change
-    %                                                       the echotime
-    [beta,Resids,J,covB] = nlinfit((1:params.nrEchoes)'*45e-3,sumData(:,1),@t2monofit_simple,guess);
+    [beta,Resids,J,covB] = nlinfit(echoVector',sumData,@t2monofit_simple,guess);
 
     % Confidence Interval and Margin of Error (+/-)
     CI=nlparci(beta,Resids,'jacobian',J);
@@ -108,12 +106,10 @@ for i=1:10
 end
 
 %% Summed Data BiFit
-echoVector = (1:params.nrEchoes)*45e-3;
+% echoVector = (1:params.nrEchoes)*params.echoTime*1e-3; %ms
 
 guess = [.5;.04;.4;3.07];
 for i=1:10
-    %                                                       Be sure to change
-    %                                                       the echotime
     [beta,Resids,J,covB] = nlinfit(echoVector',sumData,@t2bifit_simple,guess);
 
     % Confidence Interval and Margin of Error (+/-)
