@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = '150mMGdH2O_T1IR_BURP__tE400u_10Sep2015';
-filedir = '/Users/jaredking/Documents/Chemistry/Research/Raw Data/150mMGd/';
+filename = 'Glycerol_T1IR_BURP_21_2D_14Oct2015';
+filedir = 'C:\users\tkmeldrum\desktop\CHIRP\';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -20,10 +20,9 @@ nEchoes = 8;
 nPts = 40;
 nPtsBlank = 2;
 nT1Pts = 21;
-T1min = 0.1; %ms
-T1max = 1.2; %ms
+T1min = 0.05; %ms
+T1max = 60; %ms
 echoVector = (tEcho:tEcho:nEchoes*tEcho); % T2 vector
-
 
 % Specify lin or log spaced points
 linORlog = 0; % 0 for linearly space and 1 for log spaced
