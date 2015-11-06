@@ -7,13 +7,13 @@ close all
 % Input filename, - .tnt
 filename = 'Glycerol_T1IR_BURP_9Sep2015';
 filedir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Glycerol/';
-
 fileloc = strcat(filedir,filename,'.tnt');
 
 % Read file
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 
 % Input experiment parameters
+
 tEcho = 700; %us
 nEchoes = 64;
 
@@ -26,8 +26,9 @@ nT1Pts = 51;
 T1min = 0.1; %ms
 T1max = 60; %ms
 
+
 % Specify lin or log spaced points
-linORlog = 1; % 0 for linearly space and 1 for log spaced
+linORlog = 0; % 0 for linearly space and 1 for log spaced
 
 % Make T1vector
 if linORlog == 0
@@ -61,7 +62,7 @@ save(strcat(filedir,filename,'.dat'), 'data2d', '-ascii')
 %% 1D Fits
 
 %T1 (A*(1-2*exp(-x/T1))
-cftool(T1vector, data2d(1,:)./max(data2d(1,:)))
+cftool(T1vector, data2d(:,1)./max(data2d(:,1)));
 
 %T2 (A*exp(-x/T2))
-cftool(echoVector, data2d(:,end)./max(data2d(:,end)))
+cftool(echoVector/10^3, data2d(end,:)'./max(data2d(end,:)))

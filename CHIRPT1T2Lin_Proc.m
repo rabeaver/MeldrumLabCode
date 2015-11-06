@@ -9,13 +9,14 @@ close all
 % ===================================
 
 Pchirp = 0.06; % CHIRP Pulse Length (s)
+
 sliceheight = 0.350; %mm
 PreCPMGdelay = 40e-6; %s
 
-nPts = 76; % # of acqu points
-nEchoes = 64; % Echoes
+nPts = 40; % # of acqu points
+nEchoes = 16; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700; %us
+tE = 400; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
 % nnn = 1; %expt number (for 2D CHIRP expts)
 
@@ -182,18 +183,18 @@ T1T2profcorr = T1T2profiles./pcorr;
 close all
 
 figure(8)
-plot(abs(T1T2profiles(:,3)))
+plot(abs(T1T2profiles(:,1)))
 
 t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
 
 figure(7)
 subplot(2,1,1)
-plot(abs(T1T2profcorr(:,3)))
+plot(abs(T1T2profcorr(:,1)))
 xlim([0 NFFT])
 ylim([0 1.1])
 subplot(2,1,2)
-plot(t1_fig7,abs(T1T2profcorr(:,3)))
+plot(t1_fig7,abs(T1T2profcorr(:,1)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
@@ -206,9 +207,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 50;
-maxind = 223;
-firstinvertedind = 200;
+minind= 22;
+maxind = 100;
+firstinvertedind = 90;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -255,6 +256,7 @@ close all
 
 T1T2data = T1T2data(:,1:end);
 T1T2data2 = flipud(T1T2data);
+data2d = T1T2data2;
 save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii')
 size(T1T2data)
 1e6*abs(t1(1)-t1(end)) %#ok<NOPTS>

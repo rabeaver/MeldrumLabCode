@@ -8,11 +8,11 @@ clc
 % and echoes per depth
 % addpath('C:\Users\TMeldrum\Dropbox\Coding\Matlab Processing\Scripts\')
 
-% cd('C:\Users\TMeldrum\Dropbox\Data from MobileMOUSE\rubber\t2\3\')
-datafilestem = 'data';
+cd('C:\Users\tkmeldrum\Desktop\Bead Pack\1500uMGd_BEADPACK_50u\1\')
+datafilestem = 'data2';
 acqufilestem = 'acqu';
 omit_points = 0;
-auto_phasing = 1;
+auto_phasing = 0;
 
 params.numberProfiles = readpar_Kea(strcat(acqufilestem,'.par'),'nrExp');
 params.finalDepth = readpar_Kea(strcat(acqufilestem,'.par'),'finalDepth');
