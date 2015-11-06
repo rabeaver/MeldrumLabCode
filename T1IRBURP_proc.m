@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'Double_Gly_15mMGdH2O_T1IRBURP_29Sep2015';
-filedir = 'C:\users\jnking01\desktop\';
+filename = 'Glycerol_T1IR_BURP_9Sep2015';
+filedir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Glycerol/';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -15,14 +15,16 @@ fileloc = strcat(filedir,filename,'.tnt');
 
 % Input experiment parameters
 tEcho = 700; %us
+nEchoes = 64;
+
 echoVector = (tEcho:tEcho:nEchoes*tEcho); % T2 vector
 
-nEchoes = 64;
+
 nPts = 76;
-nPtsBlank = 2;
-nT1Pts = 21;
+nPtsBlank = 0;
+nT1Pts = 51;
 T1min = 0.1; %ms
-T1max = 40; %ms
+T1max = 60; %ms
 
 % Specify lin or log spaced points
 linORlog = 1; % 0 for linearly space and 1 for log spaced
@@ -33,6 +35,13 @@ if linORlog == 0
 else
     T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 end
+%% SNR calc
+[~,Spoint] = max(real(spec2(21,:)));
+S = abs(real(spec2(:,Spoint)));
+N = abs(real(spec2(:,Spoint+nPts/2)));
+
+SNR = snr(S,N)
+
 
 %% Make 2D data set for T1IRT2 ILT
 

@@ -8,7 +8,7 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.2; % CHIRP Pulse Length (s)
+Pchirp = 0.06; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
 PreCPMGdelay = 40e-6; %s
 
@@ -42,8 +42,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = 'C:\Users\vjlee\Desktop\';
-datafile = 'CHIRPlin_mortar_200ms_256scans_100nsWave_3dB_30Sep2015';
+datadir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Double_15mM_Glycerol/';
+datafile = 'CHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_29Sept2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -53,6 +53,23 @@ datafile = 'CHIRPlin_mortar_200ms_256scans_100nsWave_3dB_30Sep2015';
 CHIRPdat = reshape(spec, nPts, nEchoes);
 CHIRPdat = CHIRPdat(1:end-omitEchoPts,:);
 
+%% SNR calc (two sections)
+
+data = abs(CHIRPdat);
+[~,Spoint] = max(data(:,1));
+%
+
+figure
+plot(data(Spoint,:));
+
+skip = 0;
+%%
+close all
+S = data(Spoint,skip+1:end);
+N = data(1,skip+1:end);
+
+
+SNR = snr(S,N)
 %%
 
 pVec = 1:1:(nPts-omitEchoPts);
@@ -91,7 +108,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRPlin_mortar_200ms_256scans_100nsWave_3dB_30Sep2015';
+noCHIRPfile = 'noCHIRP_Glycerol_40mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_22Oct2015';
 
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
