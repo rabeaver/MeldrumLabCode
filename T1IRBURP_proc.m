@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'Glycerol_T1IR_BURP_9Sep2015';
-filedir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Glycerol/';
+filename = 'GlycerolBIG_T1IR_BURP_21_2D_256scans_6Nov2015_result';
+filedir = '/Users/tyler/Desktop/CHIRP_Manuscript/6Nov2015Data/';
 fileloc = strcat(filedir,filename,'.tnt');
 
 % Read file
@@ -15,14 +15,14 @@ fileloc = strcat(filedir,filename,'.tnt');
 % Input experiment parameters
 
 tEcho = 700; %us
-nEchoes = 64;
+nEchoes = 128;
 
 echoVector = (tEcho:tEcho:nEchoes*tEcho); % T2 vector
 
 
 nPts = 76;
-nPtsBlank = 0;
-nT1Pts = 51;
+nPtsBlank = 2;
+nT1Pts = 21;
 T1min = 0.1; %ms
 T1max = 60; %ms
 
@@ -37,13 +37,16 @@ else
     T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 end
 %% SNR calc
-[~,Spoint] = max(real(spec2(21,:)));
-S = abs(real(spec2(:,Spoint)));
-N = abs(real(spec2(:,Spoint+nPts/2)));
+[~,Spoint] = max(abs(real(spec2(21,:))));
+S = (real(spec2(nT1Pts,Spoint-12:Spoint+12)));
+N = (real(spec2(nT1Pts,Spoint-nPts/2:Spoint-nPts/2+24)));
 
 SNR = snr(S,N)
 
-
+figure
+hold on
+plot(S)
+plot(N)
 %% Make 2D data set for T1IRT2 ILT
 
 data = reshape(spec2',nPts,nEchoes,nT1Pts);
