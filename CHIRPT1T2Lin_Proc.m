@@ -19,6 +19,8 @@ tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no
 tE = 700; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
 % nnn = 1; %expt number (for 2D CHIRP expts)
+noisePoints = 10; %number of points at beginning and end of each acqu period for noise
+omitPts = 4; %blank spectrometer points to skip
 
 zf = 1;                             % levels of zero filling
 apodize = 0;                        %Gaussian apodization on (1) or off (0)?
@@ -34,10 +36,10 @@ BWchirp = sliceheight*G*gamma*1000; % CHIRP bandwidth (Hz)
 
 T = tD;                             % Sample time
 Fs = 1/T;                           % Sampling frequency 
-L = (nPts-omitEchoPts)*(2^zf);      % Length of signal
+L = (nPts-omitPts-omitEchoPts)*(2^zf);      % Length of signal
 NFFT = 2^nextpow2(L);               % Next power of 2 from length of y
 
-echoVec = tE:tE:(nEchoes*tE);
+echoVec = (omitEchoPts+1)*tE:tE:(nEchoes*tE);
 t = (-(L-1)/2:L/2)*T;               % Time vector
 f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
@@ -47,31 +49,26 @@ datadir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/22Oct2015_1024scanProc
 datafile = 'CHIRP_15mMGd_15mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_16Oct2015';
 
 % Import CHIRP data
-[~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
+[ap , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
 
 % CHIRPdat = spec(1,:);
 % spec = spec2(nnn, :);
 CHIRPdat = reshape(spec, nPts, nEchoes);
-CHIRPdat = CHIRPdat(1:end-omitEchoPts,:);
+CHIRPdat = CHIRPdat(1:(end-omitPts),omitEchoPts+1:end);
 
 %% SNR calc (two sections)
-
-data = abs(CHIRPdat);
-[~,Spoint] = max(data(:,1));
-%
-
-figure
-plot(data(Spoint,:));
-
-skip = 0;
-%%
-close all
-S = data(Spoint,skip+1:end);
-N = data(1,skip+1:end);
+n1 = CHIRPdat(1:noisePoints,:);
+n2 = CHIRPdat(nPts-noisePoints-omitPts:end,:);
+n = cat(1,n1,n2);
+n = reshape(n,1,(2*noisePoints+1)*(nEchoes-omitEchoPts));
+s = reshape(CHIRPdat,1,(nPts-omitPts)*(nEchoes-omitEchoPts));
 
 
-SNR = snr(S,N)
-SNR2 = max(abs(S))/rms(N)
+S = max(abs(s));
+N = rms(n);
+
+
+SNR = S/N
 %%
 
 pVec = 1:1:(nPts-omitEchoPts);

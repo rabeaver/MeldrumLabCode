@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = '15mMGdH2O_T1IRLong_17Oct2015';
-filedir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/22Oct2015_1024scanProcessing/';
+filename = '15mMGdH2O_BigSample_T1IRLong_11Nov2015_result';
+filedir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/11Nov2015_BigGdWater_512Scans/';
 fileloc = strcat(filedir,filename,'.tnt');
 
 % Read file
@@ -23,10 +23,9 @@ echoVector = (tEcho:tEcho:nEchoes*tEcho); % T2 vector
 nPts = 76;
 nPtsBlank = 4;
 nT1Pts = 21;
-noisePts = 10; %number of points at front and back of each aqu period to use as noise
-T1min = 0; %ms
-T1max = 15000; %ms
-
+T1min = 0.05; %ms
+T1max = 24.95; %ms
+noisePoints = 10; %number of points to use for noise at beginning and end of each acqu period
 
 
 % Specify lin or log spaced points
@@ -38,22 +37,29 @@ if linORlog == 0
 else
     T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 end
+
 %% SNR calc
 data = reshape(spec2,nT1Pts,nPts,nEchoes);
 data = data(:,1:nPts-nPtsBlank,:);
-N1 = data(:,1:noisePts,:);
-N2 = data(:,nPts-noisePts-nPtsBlank:end,:);
-dataN = cat(2,N1,N2);
-noiseData = reshape(dataN,nT1Pts,(noisePts*2+1)*nEchoes);
-%%
-S = max(abs(spec2(1,:)));
-N = rms(noiseData(1,:));
+n1 = data(:,1:noisePoints,:);
+n2 = data(:,nPts-nPtsBlank-noisePoints:end,:);
+ndata = cat(2,n1,n2);
+ndata = reshape(ndata,nT1Pts,(2*noisePoints+1)*nEchoes);
+sdata = reshape(data,nT1Pts,(nPts-nPtsBlank)*nEchoes);
 
+% data = reshape(data,nT1Pts,(nPts-nPtsBlank)*nEchoes);
 
-SNR = snr(S,N)
-SNR2 = S/N
+%
+S = max(abs(sdata(end,:)));
+N = rms(ndata(end,:));
 
+% SNR = snr(S,N)
+SNR = S/N
 
+% figure
+% hold on
+% plot(S)
+% plot(N)
 %% Make 2D data set for T1IRT2 ILT
 
 data = reshape(spec2',nPts,nEchoes,nT1Pts);
