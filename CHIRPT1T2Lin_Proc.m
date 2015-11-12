@@ -13,10 +13,10 @@ Pchirp = 0.06; % CHIRP Pulse Length (s)
 sliceheight = 0.350; %mm
 PreCPMGdelay = 40e-6; %s
 
-nPts = 40; % # of acqu points
+nPts = 76; % # of acqu points
 nEchoes = 16; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 400; %us
+tE = 700; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
 % nnn = 1; %expt number (for 2D CHIRP expts)
 
@@ -43,8 +43,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Double_15mM_Glycerol/';
-datafile = 'CHIRP_DOUBLE_15mM_Gly_40mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_29Sept2015';
+datadir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/22Oct2015_1024scanProcessing/';
+datafile = 'CHIRP_15mMGd_15mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_16Oct2015';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -71,6 +71,7 @@ N = data(1,skip+1:end);
 
 
 SNR = snr(S,N)
+SNR2 = max(abs(S))/rms(N)
 %%
 
 pVec = 1:1:(nPts-omitEchoPts);
