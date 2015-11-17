@@ -5,8 +5,9 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = '15mMGdH2O_BigSample_T1IRLong_11Nov2015_result';
-filedir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/11Nov2015_BigGdWater_512Scans/';
+filename = 'GlycerolBIG_T1IR_BURP_21_2D_256scans_6Nov2015_result';
+filedir = '/Users/tyler/Dropbox/Manuscripts/CHIRP_Manuscript/Data/Glycerol/BigGlycerol/T1IR_256scans/';
+
 fileloc = strcat(filedir,filename,'.tnt');
 
 % Read file
@@ -15,18 +16,17 @@ fileloc = strcat(filedir,filename,'.tnt');
 % Input experiment parameters
 
 tEcho = 700; %us
-nEchoes = 16;
-
-echoVector = (tEcho:tEcho:nEchoes*tEcho); % T2 vector
-
-
+nEchoes = 128;
 nPts = 76;
 nPtsBlank = 4;
+omitEchoes = 8; 
 nT1Pts = 21;
-T1min = 0.05; %ms
-T1max = 24.95; %ms
+T1min = 0.056; %ms
+T1max = 59.956; %ms
 noisePoints = 10; %number of points to use for noise at beginning and end of each acqu period
 
+
+echoVector = ((1+omitEchoes)*tEcho:tEcho:nEchoes*tEcho); % T2 vector
 
 % Specify lin or log spaced points
 linORlog = 0; % 0 for linearly space and 1 for log spaced
@@ -40,12 +40,12 @@ end
 
 %% SNR calc
 data = reshape(spec2,nT1Pts,nPts,nEchoes);
-data = data(:,1:nPts-nPtsBlank,:);
+data = data(:,1:nPts-nPtsBlank,omitEchoes+1:end);
 n1 = data(:,1:noisePoints,:);
 n2 = data(:,nPts-nPtsBlank-noisePoints:end,:);
 ndata = cat(2,n1,n2);
-ndata = reshape(ndata,nT1Pts,(2*noisePoints+1)*nEchoes);
-sdata = reshape(data,nT1Pts,(nPts-nPtsBlank)*nEchoes);
+ndata = reshape(ndata,nT1Pts,(2*noisePoints+1)*(nEchoes-omitEchoes));
+sdata = reshape(data,nT1Pts,(nPts-nPtsBlank)*(nEchoes-omitEchoes));
 
 % data = reshape(data,nT1Pts,(nPts-nPtsBlank)*nEchoes);
 
@@ -55,21 +55,21 @@ N = rms(ndata(end,:));
 
 % SNR = snr(S,N)
 SNR = S/N
-
+% 
 % figure
 % hold on
 % plot(S)
 % plot(N)
 %% Make 2D data set for T1IRT2 ILT
 
-data = reshape(spec2',nPts,nEchoes,nT1Pts);
-data = data(1:(nPts-nPtsBlank),:,:);
-data2d = sum(real(data),1);
-data2d = reshape(data2d,nEchoes, nT1Pts);
+% data = reshape(spec2',nPts,nEchoes,nT1Pts);
+% data = data(1:(nPts-nPtsBlank),:,:);
+data2d = sum(real(data),2);
+data2d = reshape(data2d,nT1Pts,nEchoes-omitEchoes);
 data2d = data2d';
 
 % Plot of data
-surf(data2d); shading flat
+surf(T1vector,echoVector,data2d); shading flat
 
 % Save data in specified directory with the same filename and ".dat"
 % extension
