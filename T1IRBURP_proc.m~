@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'GlycerolBIG_T1IR_BURP_21_2D_1024scans_6Nov2015_result';
-filedir = '/Users/tyler/Dropbox/Manuscripts/CHIRP_Manuscript/Data/Glycerol/BigGlycerol/T1IR_1024scans/';
+filename = '15mMGdH2O_BigSample_T1IRLong_11Nov2015_result';
+filedir = '/Users/tyler/Dropbox/Manuscripts/CHIRP_Manuscript/Data/15mMGd/BigGdWater/512scans/';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -16,15 +16,15 @@ fileloc = strcat(filedir,filename,'.tnt');
 % Input experiment parameters
 
 tEcho = 700; %us
-nEchoes = 128;
+nEchoes = 16;
 nPts = 76;
 nPtsBlank = 4;
-omitEchoes = 4; 
+omitEchoes = 0; 
 nT1Pts = 21;
 T1min = 0.056; %ms
-T1max = 59.956; %ms
+T1max = 24.956; %ms
 noisePoints = 10; %number of points to use for noise at beginning and end of each acqu period
-noiseNumber = nT1Pts; %T1 point to use for SNR calc
+
 
 echoVector = ((1+omitEchoes)*tEcho:tEcho:nEchoes*tEcho); % T2 vector
 
@@ -41,12 +41,12 @@ end
 %% SNR calc
 data = reshape(spec2,nT1Pts,nPts,nEchoes);
 data = data(:,1:nPts-nPtsBlank,omitEchoes+1:end);
-n1 = data(noiseNumber,1:noisePoints,:);
-n2 = data(noiseNumber,nPts-nPtsBlank-noisePoints:end,:);
+n1 = data(1,1:noisePoints,:);
+n2 = data(1,nPts-nPtsBlank-noisePoints:end,:);
 ndata = cat(2,n1,n2);
 ndata = reshape(ndata,1,(2*noisePoints+1)*(nEchoes-omitEchoes));
-sdata = data(noiseNumber,:,:);
-sdata = reshape(sdata,1,(nPts-nPtsBlank)*(nEchoes-omitEchoes));
+sdata = data(1,:
+sdata = reshape(data,nT1Pts,(nPts-nPtsBlank)*(nEchoes-omitEchoes));
 
 % data = reshape(data,nT1Pts,(nPts-nPtsBlank)*nEchoes);
 
@@ -56,12 +56,11 @@ N = rms(ndata(end,:));
 
 % SNR = snr(S,N)
 SNR = S/N
-SNR_perRtScan = SNR/sqrt(nT1Pts*ap.ns)
 % 
-figure
-hold on
-plot(abs(sdata))
-plot(abs(ndata))
+% figure
+% hold on
+% plot(S)
+% plot(N)
 %% Make 2D data set for T1IRT2 ILT
 
 % data = reshape(spec2',nPts,nEchoes,nT1Pts);

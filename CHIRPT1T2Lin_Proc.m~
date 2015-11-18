@@ -8,9 +8,9 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-datadir = '/Users/tyler/Dropbox/Manuscripts/CHIRP_Manuscript/Data/15mMGd/BigGdWater/512scans/';
+datadir = '/Users/tyler/Dropbox/Manuscripts/CHIRP_Manuscript/Data/15mMGd/BigGdWater/1024scans/';
 datafile = 'CHIRP_15mMGd_BigSample_15mspw_sliceheight350um_tD8u_76pts_512scans_100nsWave_11Nov2015_result';
-noCHIRPfile = 'noCHIRP_15mMGd_BigSample_15mspw_sliceheight350um_tD8u_76pts_512scans_100nsWave_11Nov2015_result';
+noCHIRPfile = 'noCHIRP_15mMGd_15mspw_sliceheight350um_tD8u_76pts_1024scans_100nsWave_17Nov2015_result';
 
 Pchirp = 0.015; % CHIRP Pulse Length (s)
 
