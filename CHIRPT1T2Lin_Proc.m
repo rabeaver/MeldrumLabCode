@@ -9,8 +9,8 @@ close all
 % ===================================
 
 datadir = '/Users/tyler/Dropbox/Manuscripts/CHIRP_Manuscript/Data/15mMGd/BigGdWater/512scans/';
-datafile = 'CHIRP_15mMGd_BigSample_15mspw_sliceheight350um_tD8u_76pts_512scans_100nsWave_11Nov2015_result';
-noCHIRPfile = 'noCHIRP_15mMGd_BigSample_15mspw_sliceheight350um_tD8u_76pts_512scans_100nsWave_11Nov2015_result';
+datafile = 'CHIRP_15mMGd_15mspw_sliceheight350um_tD8u_76pts_512scans_100nsWave_18Nov2015_result';
+noCHIRPfile = 'noCHIRP_15mMGd_15mspw_sliceheight350um_tD8u_76pts_512scans_100nsWave_18Nov2015_result';
 
 Pchirp = 0.015; % CHIRP Pulse Length (s)
 
@@ -72,6 +72,7 @@ S = max(abs(s));
 N = rms(n);
 
 SNR = S/N
+SNR_perRtScans = SNR/sqrt(2*ap.ns)
 %%
 pVec = 1:1:(nPts-omitEchoes);
 filt = exp(-(pVec-(nPts-omitEchoes)/2).^2/((nPts-omitEchoes)/apofac)^2);
@@ -200,9 +201,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 69;
-maxind = 205;
-firstinvertedind = 160;
+minind= 50;
+maxind = 223;
+firstinvertedind = 200;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');

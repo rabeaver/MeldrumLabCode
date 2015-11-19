@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'GlycerolBIG_T1IR_BURP_21_2D_1024scans_6Nov2015_result';
-filedir = '/Users/tyler/Dropbox/Manuscripts/CHIRP_Manuscript/Data/Glycerol/BigGlycerol/T1IR_1024scans/';
+filename = 'Gd_Trad_256_19Nov2015_result';
+filedir = '/Users/tyler/Dropbox/Data/CHIRP/BigSamples_19Nov2015/';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -16,13 +16,13 @@ fileloc = strcat(filedir,filename,'.tnt');
 % Input experiment parameters
 
 tEcho = 700; %us
-nEchoes = 128;
+nEchoes = 16;
 nPts = 76;
 nPtsBlank = 4;
-omitEchoes = 4; 
+omitEchoes = 0; 
 nT1Pts = 21;
 T1min = 0.056; %ms
-T1max = 59.956; %ms
+T1max = 24.956; %ms
 noisePoints = 10; %number of points to use for noise at beginning and end of each acqu period
 noiseNumber = nT1Pts; %T1 point to use for SNR calc
 
@@ -64,25 +64,24 @@ plot(abs(sdata))
 plot(abs(ndata))
 %% Make 2D data set for T1IRT2 ILT
 
-% data = reshape(spec2',nPts,nEchoes,nT1Pts);
-% data = data(1:(nPts-nPtsBlank),:,:);
-data2d = sum(abs(data),2);
-
-
-data2d = reshape(data2d,nT1Pts,nEchoes-omitEchoes);
+data = reshape(spec2',nPts,nEchoes,nT1Pts);
+data = data(1:(nPts-nPtsBlank),:,:);
+data2d = sum(real(data),1);
+data2d = reshape(data2d,nEchoes-omitEchoes,nT1Pts);
 data2d = data2d';
-[~,I] = min(data2d(1,:));
-data2d(:,1:I-1) = -data2d(:,1:I-1);
+
+% [~,I] = min(data2d(1,:));
+% data2d(:,1:I-1) = -data2d(:,1:I-1);
 
 % Plot of data
-surf(T1vector,echoVector,data2d); shading flat
+surf(echoVector,T1vector,data2d); shading flat
 
 
 % Save data in specified directory with the same filename and ".dat"
 % extension
 save(strcat(filedir,filename,'.dat'), 'data2d', '-ascii')
 
-%% 1D Fits
+ %% 1D Fits
 
 %T1 (A*(1-2*exp(-x/T1))
 cftool(T1vector, data2d(:,1)./max(data2d(:,1)));
