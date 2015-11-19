@@ -71,12 +71,8 @@ data2d = sum(real(data),1);
 data2d = reshape(data2d,nEchoes-omitEchoes,nT1Pts);
 data2d = data2d';
 
-% [~,I] = min(data2d(1,:));
-% data2d(:,1:I-1) = -data2d(:,1:I-1);
-
 % Plot of data
 surf(echoVector,T1vector,data2d); shading flat
-
 
 % Save data in specified directory with the same filename and ".dat"
 % extension
