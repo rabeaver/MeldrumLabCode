@@ -3,14 +3,14 @@ clc
 close all
 
 %%
-filename = 'MolecSieve4A_CPMG_4_30Oct2015.tnt';
-filedir = 'C:\CommonData\CHIRP\T2D\';
+filename = 'Glycerol_CPMG_1024scans_12srep_result.tnt';
+filedir = '/Users/tyler/Dropbox/Data/SNRCheck/';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 300; %us
 nEchoes = 128;
-nPts = 42;
+nPts = 76;
 nPtsBlank = 0;
 
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
@@ -21,12 +21,17 @@ dataInt = sum(data,1);
 dataIntRe = real(dataInt)./max(real(dataInt));
 dataIntIm = imag(dataInt)./max(real(dataInt));
 
-guess = [1 15e-3];% 0.6 6e-03];
-beta = nlinfit(echoVector,dataIntRe, @t2monofit_simple, guess);
-ypred = t2monofit_simple(beta,echoVector);
+% SNR calc
+useEcho = 1;
+Spoint = (useEcho+0.5)*nPts;
+% [~,Spoint] = max(abs(real(spec)));
+S = abs(real(spec(Spoint-nPts/2:Spoint+nPts/2)));
+N = abs(imag(spec(Spoint-nPts/2:Spoint+nPts/2)));
 
-figure(1)
+figure
 hold on
-plot(echoVector,dataIntRe);
-plot(echoVector,dataIntIm);
-plot(echoVector,ypred,'-r');
+plot(S)
+plot(N)
+
+%
+SNR = snr(S,N)
