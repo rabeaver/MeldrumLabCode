@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'Double_Gly_15mMGdH2O_T1IRBURP_29Sep2015';
-filedir = 'C:\users\jnking01\desktop\';
+filename = '15mMGdH2O_BigSample_T1IRLong_11Nov2015';
+filedir = 'C:\CommonData\CHIRP\';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -15,14 +15,14 @@ fileloc = strcat(filedir,filename,'.tnt');
 
 % Input experiment parameters
 tEcho = 700; %us
-echoVector = (tEcho:tEcho:nEchoes*tEcho); % T2 vector
 
-nEchoes = 64;
+nEchoes = 8;
+echoVector = (tEcho:tEcho:nEchoes*tEcho); % T2 vector
 nPts = 76;
 nPtsBlank = 2;
-nT1Pts = 21;
+nT1Pts = 11;
 T1min = 0.1; %ms
-T1max = 40; %ms
+T1max = 1000; %ms
 
 % Specify lin or log spaced points
 linORlog = 1; % 0 for linearly space and 1 for log spaced
@@ -52,7 +52,8 @@ save(strcat(filedir,filename,'.dat'), 'data2d', '-ascii')
 %% 1D Fits
 
 %T1 (A*(1-2*exp(-x/T1))
-cftool(T1vector, data2d(1,:)./max(data2d(1,:)))
+cftool(T1vector, data2d(:,1)./abs(max(data2d(:,1))))
 
+%%
 %T2 (A*exp(-x/T2))
 cftool(echoVector, data2d(:,end)./max(data2d(:,end)))
