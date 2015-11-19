@@ -2,13 +2,13 @@ clear
 clc
 close all
 
-%
+%%
 filename = 'Glycerol_CPMG_1024scans_12srep_result.tnt';
 filedir = '/Users/tyler/Dropbox/Data/SNRCheck/';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 700; %us
+tEcho = 300; %us
 nEchoes = 128;
 nPts = 76;
 nPtsBlank = 0;

@@ -11,7 +11,7 @@ flipAngle = 0.5; %give as fraction of 2pi. So a 90 deg flip is 0.25, 180 is 0.5,
 
 %%
 
-nPts = 256;
+nPts = 500;
 pulseTimeRes = pulseLength/nPts; %s
 pulseTime = pulseTimeRes:pulseTimeRes:pulseLength;
 
@@ -40,4 +40,3 @@ plot(pulseTime,p)
 
 dlmwrite('BURP_amp.dat', p);
 dlmwrite('BURP_phase.dat', phase);
->>>>>>> c5fa3e49e6665278836dfc87b8f95037f2fdf623

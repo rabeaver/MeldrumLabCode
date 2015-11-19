@@ -28,6 +28,7 @@ noiseNumber = nT1Pts; %T1 point to use for SNR calc
 
 echoVector = ((1+omitEchoes)*tEcho:tEcho:nEchoes*tEcho); % T2 vector
 
+
 % Specify lin or log spaced points
 linORlog = 0; % 0 for linearly space and 1 for log spaced
 
@@ -84,7 +85,9 @@ save(strcat(filedir,filename,'.dat'), 'data2d', '-ascii')
  %% 1D Fits
 
 %T1 (A*(1-2*exp(-x/T1))
-cftool(T1vector, data2d(:,1)./max(data2d(:,1)));
+cftool(T1vector, data2d(:,1)./abs(max(data2d(:,1))))
 
+
+%%
 %T2 (A*exp(-x/T2))
 cftool(echoVector/10^3, data2d(end,:)'./max(data2d(end,:)))

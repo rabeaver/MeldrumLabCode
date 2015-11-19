@@ -2,30 +2,30 @@ clear
 clc
 close all
 
-%%
+%
 % CHIRP params
 % ===================================
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.001497; % CHIRP Pulse Length (s)
+Pchirp = 0.000397; % CHIRP Pulse Length (s)
 pw     = 6e-6; %hard pulse length
 sliceheight = 0.350; %mm
 
-nPts = 152; % # of acqu points
+nPts = 42; % # of acqu points
 omitPts = 0; %the number of points that are zeros from the spectrometer
 nEchoes = 64; % Echoes
-omitEchoes = 4; %numbner of echoes to remove from data
-tD = 4e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700; %us
+omitEchoes = 2; %numner of echoes to remove from data
+tD = 5e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 300; %us
 
 zf = 1;                             % levels of zero filling
 apodize = 0;                        %Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
-deltaMax = 3e-3; % lil deltamax time in s
-deltaMin = deltaMax-2*Pchirp-pw/2; % calculates the minimum value of delta from the chirp
-DELTA = 2e-3; % Big delta time in s
+deltaMax = 0.8e-3; % lil deltamax time in s
+% deltaMin = deltaMax-2*Pchirp-pw/2; % calculates the minimum value of delta from the chirp
+DELTA = 0.5e-3; % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
@@ -46,10 +46,10 @@ t = (-(L-1)/2:L/2)*T;               % Time vector
 f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
-%%
+%
 
-datadir = '~/Desktop/T2D/';
-datafile = 'CHIRP_glycerol_T2D_3msd_1msD_1497uCHIRP_350um_55pwr_8192sc_2Oct2015';
+datadir = 'C:\CommonData\CHIRP\T2D\';
+datafile = 'CHIRP_GdWaterSieves_T2D_800usd_500usD_397usCHIRP_350um_32pwr_4096sc_31Oct2015_result';
 
 
 % Import CHIRP data
@@ -60,7 +60,7 @@ datafile = 'CHIRP_glycerol_T2D_3msd_1msD_1497uCHIRP_350um_55pwr_8192sc_2Oct2015'
 CHIRPdat = reshape(spec, nPts, nEchoes);
 CHIRPdat = CHIRPdat(1:end-omitPts,omitEchoes+1:end);
 
-%%
+%
 
 pVec = 1:1:(nPts-omitPts);
 filt = exp(-(pVec-(nPts-omitPts)/2).^2/((nPts-omitPts)/apofac)^2);
@@ -72,7 +72,7 @@ end
 
 CHIRPdat = padarray(CHIRPdat, size(CHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
 
-T1T2profiles = fftshift(fft(CHIRPdat,NFFT)/L, 1); % Performs FFT algorithm
+T2Dprofiles = fftshift(fft(CHIRPdat,NFFT)/L, 1); % Performs FFT algorithm
 
 figure(1)
 subplot(1,2,1)
@@ -82,24 +82,24 @@ xlabel('time [us]')
 
 subplot(1,2,2)
 hold on
-plot(z,2*abs(T1T2profiles(:,1)),'LineWidth',1.5);
+plot(z,2*abs(T2Dprofiles(:,1)),'LineWidth',1.5);
 xlabel('real space [um]')
 title('Plot of first T1T2 FFT Profile and Echo')
 
 hold off
 figure(2)
 hold on
-surf(abs(T1T2profiles));
+surf(abs(T2Dprofiles));
 shading flat;
 title('Surface plot of T1T2 FFT Profiles')
 hold off
 
 
-%% No CHIRP load section
-close all
+% No CHIRP load section
+% close all
 
 
-noCHIRPfile = 'noCHIRP_glycerol_T2D_3msd_1msD_1497uCHIRP_350um_55pwr_8192sc_2Oct2015';
+noCHIRPfile = 'noCHIRP_GdWaterSieves_T2D_800usd_500usD_4096sc_31Oct2015_result';
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
@@ -116,8 +116,8 @@ noCHIRPdat = padarray(noCHIRPdat, size(noCHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad
 
 CPprofiles = fftshift(fft(noCHIRPdat,NFFT)/L,1);
 
-%% Plot first T1-T2 profile and coil profile
-
+% Plot first T1-T2 profile and coil profile
+% 
 figure(3)
 subplot(1,2,1)
 hold on
@@ -138,27 +138,27 @@ title('Surface plot of T1T2 FFT Profiles')
 hold off
 
 
-%% Plot first T1T2 profile and coil profile
+% Plot first T1T2 profile and coil profile
 
-close all
+% close all
 
 figure(5)
 hold on
 plot(z,abs(CPprofiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','k')
-plot(z,abs(T1T2profiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','r')
+plot(z,abs(T2Dprofiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','r')
 hold off
 
 xlabel('{\it z} (um)','fontsize',12)
 title('T1-T2 & coil profiles')
 set(gca,'Fontsize',12,'linewidth',2)
 
-%% Coil Sensitivity Correction
+% Coil Sensitivity Correction
 
 for k = 1:nEchoes-omitEchoes
     pcorr(:,k) = abs(CPprofiles(:,1));
 end
 
-T1T2profcorr = T1T2profiles./pcorr;
+T2Dprofcorr = T2Dprofiles./pcorr;
 
 % figure(6)
 % pcolor(abs(T1T2profcorr)); 
@@ -168,26 +168,28 @@ T1T2profcorr = T1T2profiles./pcorr;
 % caxis([0 1])
 % title('Coil sensitivity corrected T1-T2 profiles')
 
-%% Find Optimal data range with these figures
-close all
+% Find Optimal data range with these figures
+% close all
 
 figure(8)
-plot(abs(T1T2profiles(:,1)))
+plot(abs(T2Dprofiles(:,1)))
 
+% t1_fig7 = linspace(deltaMax,0,NFFT);
 t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
-
+%%
+close all
 figure(7)
 subplot(2,1,1)
-plot(abs(T1T2profcorr(:,1)))
+plot(abs(T2Dprofcorr(:,1:8)))
 xlim([0 NFFT])
-% ylim([0 1.1])
+ylim([0 2])
 subplot(2,1,2)
-plot(t1_fig7,abs(T1T2profcorr(:,1)))
+plot(t1_fig7,abs(T2Dprofcorr(:,1:8)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
-% ylim([0 1.1])
+ylim([0 2])
 set(gca,'XDir','reverse')
 xlabel('CHIRPtime (s)')
 
@@ -196,18 +198,16 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 
-minind= 52;
-maxind = 195;
-% firstinvertedind = 110; %commented out for t2d
+minind= 58;
+maxind = 84;
 % this is where I'm starting to put in some diffusion code. 
 
 
 % tAxist2d = diff(t1_fig7); % gives the distance between each time point based on the time figure above
 % tDift2d  = abs(round((deltaMax-deltaMin)/tAxist2d(1))); % makes into an integer based on the time domainabove
 
-T2Ddat = abs(T1T2profcorr(minind:maxind,:)); %crops data set according to above indices
-% deltaSteps = linspace(deltaMin,deltaMax,tDift2d); % calculates the delta steps based on the above chosen indices
-deltaSteps = t1_fig7(minind:maxind);
+T2Ddat = abs(T2Dprofcorr(minind:maxind,:)); %crops data set according to above indices
+deltaSteps = 2*t1_fig7(minind:maxind); %added a factor of 2 to account for how the refocusing makes the actual little-delta diffusion time range from 0 to the full delta time. (30 Oct 2015 TKM)
 
 yD = log(T2Ddat./T2Ddat(1))';
 xD = -gammaRad^2*G^2.*deltaSteps.^2.*(DELTA + (2/3)*deltaSteps);
@@ -215,89 +215,41 @@ xD = -gammaRad^2*G^2.*deltaSteps.^2.*(DELTA + (2/3)*deltaSteps);
 T2Dsize = size(T2Ddat,1); % cuts down delta points to math those selected for the indices,assuming that the 
 %first point is the first part of the chirp
 
-figure
+figure(9)
 plot(xD(1:T2Dsize),(yD(1,:))) 
+
 
 % time axis are set depending on evenly spaced time points and assuming
 % that the FIRST POINT taken for the indices is the 1st point of the chirp
 % pulse
 
 %% CF tool
-a = 3;
+a = 1;
 b = T2Dsize;
 
 cftool(xD(a:b),yD(1,a:b))
 
-%% continue T1T2 script
-% automatically select indices
-% minind=find(f>-BWchirp/2,1,'first');
-% maxind=find(f<BWchirp/2,1,'last');
-% [~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
-
-T1T2profiles2=zeros((maxind-minind+1),nEchoes);
-T1T2profiles2(1:firstinvertedind-minind+1,:) = (abs(T1T2profcorr(minind:firstinvertedind,:)));
-T1T2profiles2(firstinvertedind-minind+2:end,:) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,:)));
-
-% T1T2data=T1T2profiles2;
-T1T2data=T1T2profiles2/max(max(T1T2profiles2));
-t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
-
-%plot first T1 column
-figure
-scatter(t1*1000,T1T2data(:,1),'linewidth',2)
-xlabel('{\it t}_1 (ms)','fontsize',30)
-title('T1-T2, first T1 column')
-set(gca,'Fontsize',30,'linewidth',2)
-% xlim([0 1000*Pchirp])
-% ylim([-1.1 1.1])
-
 
 %% surf of all T1-T2 Profiles
 
-figure
-surf(echoVec(:,1:end)*1000,t1*1000,T1T2data(:,1:end)); 
-shading flat;
+figure(10)
+surf(echoVec(omitEchoes+1:end)/1000,deltaSteps*1e6,T2Ddat);
+shading flat
+% xlabel('echo time [ms]')
+% ylabel('delta [us]')
 colormap('jet');
 % shading interp;
 colorbar 
-ylabel('{\it t}_1 (ms)'); 
-xlabel('{\it t}_2 (ms)');
-title('T1-T2 data')
+xlabel('{\it T}_2 (ms)'); 
+ylabel('{\it delta} (us)');
+title('D-T2 data')
 
-%% T1 fit in cftool
-echoNr = 1;
-cftool(t1,T1T2data(:,echoNr));
 
 %% Save data, display ILT Data params
 close all
 
-T1T2data = T1T2data(:,1:end);
-T1T2data2 = flipud(T1T2data);
-save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii')
-size(T1T2data)
-1e6*abs(t1(1)-t1(end))
-1e6*[min(t1), max(t1)]
-
-%% T1Test
-% For comparing your data to the data what you expect
-
-close all
-
-T1_1 = 0.0125; % T1 (s)
-T1_2 = 0.0125;
-w1 = 1; % Weights
-w2 = 0;
-
-t1new = linspace(max(t1), 0, length(t1)); % Simulated T1 Axis
-
-% Make T1 Data
-T1data1 = 1-2.*exp(-t1new./T1_1);
-T1data2 = 1-2.*exp(-t1new./T1_2);
-
-T1dat = w1.*T1data1 + w2.*T1data2;
-
-figure()
-hold on
-plot(t1new, T1dat, '-r')
-plot(t1, T1T2data(:,1), '*b')
-hold off
+T2Ddat2 = flipud(T2Ddat);
+save(strcat(datadir,datafile, '.dat'), 'T2Ddat2', '-ascii')
+size(T2Ddat)
+1e6*abs(deltaSteps(1)-deltaSteps(end))
+1e6*[min(deltaSteps), max(deltaSteps)]
