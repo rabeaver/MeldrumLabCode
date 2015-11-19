@@ -8,9 +8,10 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-datadir = '/Users/tyler/Dropbox/Manuscripts/CHIRP_Manuscript/Data/15mMGd/BigGdWater/512scans/';
-datafile = 'CHIRP_15mMGd_15mspw_sliceheight350um_tD8u_76pts_512scans_100nsWave_18Nov2015_result';
-noCHIRPfile = 'noCHIRP_15mMGd_15mspw_sliceheight350um_tD8u_76pts_512scans_100nsWave_18Nov2015_result';
+datadir = 'C:\Users\tkmeldrum\Desktop\BigSamples_19Nov2015\';
+datafile = 'Gd_CHIRP_256_19Nov2015_result';
+noCHIRPfile = 'Gd_noCHIRP_256_19Nov2015_result';
+filenameExt = '';
 
 Pchirp = 0.015; % CHIRP Pulse Length (s)
 
@@ -188,22 +189,22 @@ figure(7)
 subplot(2,1,1)
 plot(abs(T1T2profcorr(:,1)))
 xlim([0 NFFT])
-ylim([0 1.1])
+ylim([0 1.2])
 subplot(2,1,2)
 plot(t1_fig7,abs(T1T2profcorr(:,1)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
-ylim([0 1.1])
+ylim([0 1.2])
 set(gca,'XDir','reverse')
 xlabel('CHIRPtime (s)')
 
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 50;
-maxind = 223;
-firstinvertedind = 200;
+minind= 88;
+maxind = 214;
+firstinvertedind = 192;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
@@ -241,9 +242,6 @@ ylabel('{\it t}_1 (ms)');
 xlabel('{\it t}_2 (ms)');
 title('T1-T2 data')
 
-%% T1 fit in cftool
-echoNr = 1;
-cftool(t1,T1T2data(:,echoNr));
 
 %% Save data, display ILT Data params
 close all
@@ -251,10 +249,17 @@ close all
 T1T2data = T1T2data(:,1:end);
 T1T2data2 = flipud(T1T2data);
 data2d = T1T2data2;
-save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii')
-size(T1T2data)
-1e6*abs(t1(1)-t1(end)) %#ok<NOPTS>
-1e6*[min(t1), max(t1)] %#ok<NOPTS>
+save(strcat(datadir,datafile,filenameExt, '.dat'), 'T1T2data2', '-ascii');
+% size(T1T2data);
+% 1e6*abs(t1(1)-t1(end)); %#ok<NOPTS>
+% 1e6*[min(t1), max(t1)]; %#ok<NOPTS>
+
+%UF Points [Min, Max, Inv; min(echoVec), max(echoVec), InvTime(min) [us], InvTime(max) [us], #echoes, #T1 points]
+sprintf('%d %d %d; %.0f %.0f %.0f %.0f; %d %d',minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
+
+%% T1 fit in cftool
+echoNr = 1;
+cftool(t1,T1T2data(:,echoNr));
 
 %% T1Test
 % For comparing your data to the data what you expect

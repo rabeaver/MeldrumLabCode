@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'Gd_Trad_256_19Nov2015_result';
-filedir = '/Users/tyler/Dropbox/Data/CHIRP/BigSamples_19Nov2015/';
+filename = 'Gly_Trad_1024_19Nov2015_result';
+filedir = 'C:\Users\tkmeldrum\Desktop\BigSamples_19Nov2015\';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -16,13 +16,13 @@ fileloc = strcat(filedir,filename,'.tnt');
 % Input experiment parameters
 
 tEcho = 700; %us
-nEchoes = 16;
+nEchoes = 128;
 nPts = 76;
 nPtsBlank = 4;
-omitEchoes = 0; 
+omitEchoes = 4; 
 nT1Pts = 21;
 T1min = 0.056; %ms
-T1max = 24.956; %ms
+T1max = 59.956; %ms
 noisePoints = 10; %number of points to use for noise at beginning and end of each acqu period
 noiseNumber = nT1Pts; %T1 point to use for SNR calc
 
@@ -59,19 +59,21 @@ N = rms(ndata(end,:));
 SNR = S/N
 SNR_perRtScan = SNR/sqrt(nT1Pts*ap.ns)
 % 
-figure
+figure(1)
 hold on
 plot(abs(sdata))
 plot(abs(ndata))
+hold off
 %% Make 2D data set for T1IRT2 ILT
 
 data = reshape(spec2',nPts,nEchoes,nT1Pts);
-data = data(1:(nPts-nPtsBlank),:,:);
+data = data(1:(nPts-nPtsBlank),(1+omitEchoes):end,:);
 data2d = sum(real(data),1);
 data2d = reshape(data2d,nEchoes-omitEchoes,nT1Pts);
 data2d = data2d';
 
 % Plot of data
+figure(2)
 surf(echoVector,T1vector,data2d); shading flat
 
 % Save data in specified directory with the same filename and ".dat"
