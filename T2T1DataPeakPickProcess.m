@@ -4,8 +4,8 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/15mMGd/';
-datafile = 'Inverted_FISTA6000_400x400_15mM_T1IRBURP.out';
+datadir = '/Users/tyler/Dropbox/Data/CHIRP/BigSamples_19Nov2015/out files/';
+datafile = 'Double_CHIRP_1024_19Nov2015_result_8192.out';
 T2lims = [1e-4 1e-1];
 T1lims = [1e-4 1e-1];
 contourLevel = 0.50;
@@ -19,15 +19,9 @@ nPts = size(data,1);
 T1axis = logspace(log10(T1lims(1)),log10(T1lims(2)),nPts);
 T2axis = logspace(log10(T2lims(1)),log10(T2lims(2)),nPts);
 
+%%plot the T2D data
 
-%this part requires the extrema2.m and extrema.m functions, available from
-%the mathworks file exchange. Finds the indices of the various peaks.
-[xymax,smax,~,~] = extrema2(data);
-[T1ind,T2ind] = ind2sub([nPts,nPts],smax);
-
-% cm = colormap(gray);
-
-% %plot the T2D data
+% regular T1-T2 plot
 figure(1)
 surf(T2axis,T1axis,data)
 colormap(flipud(gray));
@@ -39,6 +33,73 @@ ylabel('\itT\rm_1 [s]')
 xlabel('\itT\rm_2 [s]')
 view([0,90])
 
+% plot with indices for peak selection. Click on four points to make a box
+% around the peak of interest. Go clockwise from the upper left corner.
+figure(2)
+surf(data)
+colormap(flipud(gray));
+shading flat
+set(gca,'FontSize',18)
+ylabel('\itT\rm_1 indices')
+xlabel('\itT\rm_2 indices')
+view([0,90])
+
+[x1,y1] = ginput(4);
+
+x = [round(min(x1)) round(max(x1))];
+y = [round(min(y1)) round(max(y1))];
+
+%add the box around the selected peak
+figure(2)
+line([x(1) x(2)],[y(2) y(2)])
+line([x(2) x(2)],[y(2) y(1)])
+line([x(2) x(1)],[y(1) y(1)])
+line([x(1) x(1)],[y(1) y(2)])
+
+
+datazoom = data(y(1):y(2),x(1):x(2));
+%zoom in around peak of interest with T1 and T2 axes
+T1zoom = T1axis(y(1):y(2));
+T2zoom = T2axis(x(1):x(2));
+figure(3)
+surf(T2zoom,T1zoom,datazoom)
+colormap(flipud(gray));
+shading flat
+set(gca,'Xscale','log','Yscale','log','FontSize',18)
+ylim([min(T1zoom) max(T1zoom)]);
+xlim([min(T2zoom) max(T2zoom)]);
+ylabel('\itT\rm_1 [s]')
+xlabel('\itT\rm_2 [s]')
+view([0,90])
+
+% make a zoomed in version with indices around the peak of interest
+figure(4)
+surf(datazoom)
+colormap(flipud(gray));
+shading flat
+set(gca,'FontSize',18)
+ylabel('\itT\rm_1 indices')
+xlabel('\itT\rm_2 indices')
+view([0,90])
+
+
+%this part requires the extrema2.m and extrema.m functions, available from
+%the mathworks file exchange. Finds the indices of the various peaks.
+[xymax,smax,~,~] = extrema2(datazoom);
+[T1ind,T2ind] = ind2sub([length(T1zoom),length(T2zoom)],smax);
+figure(5)
+[c,~] = contour(T2zoom,T1zoom,datazoom./datazoom(T1ind,T2ind),[contourLevel,contourLevel]);
+
+
+figure(3)
+hold on
+plot3(c(1,2:size(c,2)),c(2,2:size(c,2)),5e4*ones(1,size(c,2)-1),'-r','LineWidth',3); 
+
+
+T1 =[ min(c(2,2:size(c,2))) T1zoom(T1ind) max(c(2,2:size(c,2)))]*1e3;
+T2 = [ min(c(1,2:size(c,2))) T2zoom(T2ind) max(c(1,2:size(c,2)))]*1e3;
+T1(:,4) = T1(:,3)-T1(:,2)
+T2(:,4) = T2(:,3)-T2(:,2)
 
 %for each peak present in the sample, make a contour line showing the 50%
 %level. This countour is stored as "c", with some points designating the
@@ -60,16 +121,15 @@ for n = 1:length(T2ind);
 end
 
 for n = 1:length(T2ind);
-    figure(n)
+    figure(n+1)
     plot(c.n{n}(1,:))
 end
 
 %%
-    ll = [33, 72,  18, 14, 296,  49,  79, 311]; %how to automate ll and mm?
-    mm = [153, 184, 128, 168, 375, 181, 104, 596];
-    lastPt = 1;
+ll = [33,   2,  315,  2, 576,  49,  79, 311]; %how to automate ll and mm?
+mm = [155, 33,  461, 10, 746, 181, 104, 596];
+lastPt = 2;
 
-  
 close all     
 for n = 1:lastPt; 
 %     figure(length(T2ind)+n+1)
