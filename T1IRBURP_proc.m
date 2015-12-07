@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'Gly_Trad_1024_19Nov2015_result';
-filedir = 'C:\Users\tkmeldrum\Desktop\BigSamples_19Nov2015\';
+filename = 'Double_Trad_256_19Nov2015_result';
+filedir = '/Users/tyler/Dropbox/Data/CHIRP/Dec2015/BigSamples_19Nov2015/';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -16,13 +16,13 @@ fileloc = strcat(filedir,filename,'.tnt');
 % Input experiment parameters
 
 tEcho = 700; %us
-nEchoes = 128;
+nEchoes = 64;
 nPts = 76;
 nPtsBlank = 4;
-omitEchoes = 4; 
+omitEchoes = 0; 
 nT1Pts = 21;
 T1min = 0.056; %ms
-T1max = 59.956; %ms
+T1max = 39.956; %ms
 noisePoints = 10; %number of points to use for noise at beginning and end of each acqu period
 noiseNumber = nT1Pts; %T1 point to use for SNR calc
 
