@@ -8,18 +8,18 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-datadir = 'C:\Users\tkmeldrum\Desktop\BigSamples_19Nov2015\';
-datafile = 'Gd_CHIRP_256_19Nov2015_result';
-noCHIRPfile = 'Gd_noCHIRP_256_19Nov2015_result';
-filenameExt = '';
+datadir = '/Users/tyler/Dropbox/Data/CHIRP/BigSamples_19Nov2015/';
+datafile = 'Double_CHIRP_1024_19Nov2015_result';
+noCHIRPfile = 'Double_noCHIRP_8192_19Nov2015_result';
+filenameExt = '_8192';
 
-Pchirp = 0.015; % CHIRP Pulse Length (s)
+Pchirp = 0.04; % CHIRP Pulse Length (s)
 
 sliceheight = 0.350; %mm
 PreCPMGdelay = 40e-6; %s
 
 nPts = 76; % # of acqu points
-nEchoes = 16; % Echoes
+nEchoes = 64; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700; %us
 omitEchoes = 0; %the number of echoes to skip
@@ -187,24 +187,24 @@ t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
 figure(7)
 subplot(2,1,1)
-plot(abs(T1T2profcorr(:,1)))
+plot(abs(T1T2profcorr(:,3)))
 xlim([0 NFFT])
-ylim([0 1.2])
+ylim([0 1.05])
 subplot(2,1,2)
-plot(t1_fig7,abs(T1T2profcorr(:,1)))
+plot(t1_fig7,abs(T1T2profcorr(:,3)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
-ylim([0 1.2])
+ylim([0 1.05])
 set(gca,'XDir','reverse')
 xlabel('CHIRPtime (s)')
 
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 88;
-maxind = 214;
-firstinvertedind = 192;
+minind= 44;
+maxind = 222;
+firstinvertedind = 188;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
