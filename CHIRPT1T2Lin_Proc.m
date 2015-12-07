@@ -8,21 +8,23 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-datadir = '/Users/tyler/Dropbox/Data/CHIRP/BigSamples_19Nov2015/';
-datafile = 'Double_CHIRP_1024_19Nov2015_result';
-noCHIRPfile = 'Double_noCHIRP_8192_19Nov2015_result';
-filenameExt = '_8192';
 
-Pchirp = 0.04; % CHIRP Pulse Length (s)
+datadir = '/Users/tyler/Dropbox/Data/CHIRP/Dec2015/ConcentricSamples_01Dec2015/';
+datafile = 'Glycerol_CHIRP_1024_07Dec2015_result';
+noCHIRPfile = 'Glycerol_noCHIRP_1024_07Dec2015_result';
+filenameExt = '';
+
+Pchirp = 0.06; % CHIRP Pulse Length (s)
+
 
 sliceheight = 0.350; %mm
 PreCPMGdelay = 40e-6; %s
 
 nPts = 76; % # of acqu points
-nEchoes = 64; % Echoes
+nEchoes = 128; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700; %us
-omitEchoes = 0; %the number of echoes to skip
+omitEchoes = 4; %the number of echoes to skip
 noisePoints = 10; %number of points at beginning and end of each acqu period for noise
 omitPts = 4; %blank spectrometer points to skip
 
@@ -255,33 +257,33 @@ save(strcat(datadir,datafile,filenameExt, '.dat'), 'T1T2data2', '-ascii');
 % 1e6*[min(t1), max(t1)]; %#ok<NOPTS>
 
 %UF Points [Min, Max, Inv; min(echoVec), max(echoVec), InvTime(min) [us], InvTime(max) [us], #echoes, #T1 points]
-sprintf('%d %d %d; %.0f %.0f %.0f %.0f; %d %d',minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
+sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
 
 %% T1 fit in cftool
-echoNr = 1;
-cftool(t1,T1T2data(:,echoNr));
-
-%% T1Test
-% For comparing your data to the data what you expect
-
-close all
-
-T1_1 = 0.0125; % T1 (s)
-T1_2 = 0.0125;
-w1 = 1; % Weights
-w2 = 0;
-
-t1new = linspace(max(t1), 0, length(t1)); % Simulated T1 Axis
-
-% Make T1 Data
-T1data1 = 1-2.*exp(-t1new./T1_1);
-T1data2 = 1-2.*exp(-t1new./T1_2);
-
-T1dat = w1.*T1data1 + w2.*T1data2;
-
-figure()
-hold on
-plot(t1new, T1dat, '-r')
-plot(t1, T1T2data(:,1), '*b')
-hold off
+% echoNr = 1;
+% cftool(t1,T1T2data(:,echoNr));
+% 
+% %% T1Test
+% % For comparing your data to the data what you expect
+% 
+% close all
+% 
+% T1_1 = 0.0125; % T1 (s)
+% T1_2 = 0.0125;
+% w1 = 1; % Weights
+% w2 = 0;
+% 
+% t1new = linspace(max(t1), 0, length(t1)); % Simulated T1 Axis
+% 
+% % Make T1 Data
+% T1data1 = 1-2.*exp(-t1new./T1_1);
+% T1data2 = 1-2.*exp(-t1new./T1_2);
+% 
+% T1dat = w1.*T1data1 + w2.*T1data2;
+% 
+% figure()
+% hold on
+% plot(t1new, T1dat, '-r')
+% plot(t1, T1T2data(:,1), '*b')
+% hold off
 

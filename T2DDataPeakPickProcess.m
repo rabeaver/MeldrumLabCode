@@ -4,10 +4,10 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = '/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Glycerol/';
-datafile = 'Glycerol_T1IR_BURP_10Sep2015.out';
-T2lims = [1e-3 1e-1];
-T1lims = [1e-3 1e-1];
+datadir = '/Users/tyler/Dropbox/Data/CHIRP/BigSamples_19Nov2015/out files/';
+datafile = 'Double_CHIRP_256_19Nov2015_result.out';
+T2lims = [1e-4 1e-1];
+T1lims = [1e-4 1e-1];
 contourLevel = 0.50;
 
 %load the data and remove 0 values (replace with NaN)
@@ -65,9 +65,9 @@ for n = 1:length(T2ind);
 end
 
 %%
-    ll = [2,   142,  2, 681, 296,  49,  79, 311]; %how to automate ll and mm?
-    mm = [60, 172, 38, 703, 375, 181, 104, 596];
-    lastPt = 3;
+    ll = [2,   2,  424,  84, 378,  49,  79, 311]; %how to automate ll and mm?
+    mm = [38, 44,  555, 111, 456, 181, 104, 596];
+    lastPt = 5;
 
   
 close all     

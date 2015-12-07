@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'Double_Trad_1024_19Nov2015_result';
-filedir = '/Users/tyler/Dropbox/Data/CHIRP/BigSamples_19Nov2015/';
+filename = 'Double_Trad_256_19Nov2015_result';
+filedir = '/Users/tyler/Dropbox/Data/CHIRP/Dec2015/BigSamples_19Nov2015/';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
