@@ -10,15 +10,15 @@ close all
 
 
 datadir = 'C:\CommonData\CHIRP\ConcentricSamples_01Dec2015\';
-datafile = 'Double_CHIRP_8192_250PCD_08Dec2015_result';
-noCHIRPfile = 'Double_noCHIRP_8192_250PCD_08Dec2015_result';
+datafile = 'Double_CHIRP_8192_40PCD_08Dec2015_result';
+noCHIRPfile = 'Double_noCHIRP_8192_40PCD_08Dec2015_result';
 filenameExt = '';
 
 Pchirp = 0.04; % CHIRP Pulse Length (s)
 
 
 sliceheight = 0.350; %mm
-PreCPMGdelay = 250e-6; %s
+PreCPMGdelay = 40e-6; %s
 
 nPts = 76; % # of acqu points
 nEchoes = 64; % Echoes
@@ -206,22 +206,20 @@ xlabel('CHIRPtime (s)')
 % manually select indices for data range and inversion (zero point)
 minind= 40;
 maxind = 222;
-firstinvertedind = 207;
-
-% automatically select indices
-% minind=find(f>-BWchirp/2,1,'first');
-% maxind=find(f<BWchirp/2,1,'last');
-% [~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
-T1T2profiles2(1:firstinvertedind-minind+1,:) = (abs(T1T2profcorr(minind:firstinvertedind,:)));
-T1T2profiles2(firstinvertedind-minind+2:end,:) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,:)));
+
+for ii = 1:nEchoes-omitEchoes;
+    [~,firstinvertedind] = min(abs(T1T2profcorr(minind:maxind,ii)));
+    firstinvertedind = firstinvertedind+minind-1;
+    T1T2profiles2(1:firstinvertedind-minind+1,ii) = (abs(T1T2profcorr(minind:firstinvertedind,ii)));
+    T1T2profiles2(firstinvertedind-minind+2:end,ii) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,ii)));
+end
+
 
 % T1T2data=T1T2profiles2;
 T1T2data=T1T2profiles2/max(max(abs(T1T2profiles2)));
 t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
-
-% t1log = logspace(log10((Pchirp*BWchirp/2-f(minind))/BWchirp),log10((Pchirp*BWchirp/2-f(maxind))/BWchirp),(maxind-minind+1));
 
 %plot first T1 column
 figure

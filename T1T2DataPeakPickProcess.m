@@ -5,7 +5,7 @@ close all
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
 datadir = 'Z:\PLEASEPROCESS\out files\';
-datafile = 'Glycerol_Trad_1024_03Dec2015_result.out';
+datafile = 'Double_CHIRP_256_250PCD_08Dec2015_result.out';
 T2lims = [1e-4 1e-1];
 T1lims = [1e-4 1e-1];
 contourLevel = 0.50;
