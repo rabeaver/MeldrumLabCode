@@ -10,8 +10,8 @@ close all
 
 
 datadir = '/Users/tyler/Dropbox/Data/CHIRP/Dec2015/ConcentricSamples_01Dec2015/';
-datafile = 'Glycerol_CHIRP_1024_07Dec2015_result';
-noCHIRPfile = 'Glycerol_noCHIRP_1024_07Dec2015_result';
+datafile = 'Glycerol_CHIRP_256_07Dec2015_result';
+noCHIRPfile = 'Glycerol_noCHIRP_256_07Dec2015_result';
 filenameExt = '';
 
 Pchirp = 0.06; % CHIRP Pulse Length (s)
@@ -204,9 +204,9 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 44;
-maxind = 222;
-firstinvertedind = 188;
+minind= 126;
+maxind = 207;
+firstinvertedind = 186;
 
 % automatically select indices
 % minind=find(f>-BWchirp/2,1,'first');
