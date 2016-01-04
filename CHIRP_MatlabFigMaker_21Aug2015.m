@@ -3,11 +3,11 @@ clc
 close all
 
 sampleCt = 3;
-viewlim = [1e-3 1e-1];
+viewlim = [1e-4 1e-1];
 %%
 % Glycerol
-data = load('/Users/tyler/Desktop/CHIRP_Manuscript/Raw Data/Glycerol/Glycerol_T1IR_BURP_10Sep2015.out');
-lowlim = 1e-3;
+data = load('/Users/tyler/Dropbox/Data/CHIRP/Dec2015/BigSamples_19Nov2015/out files/Gd_Trad_1024_19Nov2015_result.out');
+lowlim = 1e-4;
 hilim = 1e-1;
 
 xaxis = logspace(log10(lowlim), log10(hilim), size(data,1));
@@ -18,14 +18,14 @@ subplot(sampleCt,2,1)
 grid on
 surf(xaxis,yaxis,data./sum(sum(data)))
 set(gca,'XScale','log','YScale','log','TickLabelInterpreter', 'latex','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
-% colormap('gray')
+colormap('gray')
 colormap(flipud(colormap))
 shading flat
 view([0 90])
 line([lowlim hilim],[lowlim hilim],[max(max(data)) max(max(data))],'LineWidth',2,'Color','red','LineStyle','--')
 xlabel({'$\it{T}\rm{_2 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
 ylabel({'$\it{T}\rm{_1 [s]}$'},'FontUnits','points','interpreter','latex','FontSize',9,'FontName','Times')
-title('Glycerol, noCHIRP','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
+title('Glycerol, Traditional','FontUnits','points','FontWeight','normal','FontSize',9,'FontName','Times')
 colorbar
 xlim(viewlim)
 ylim(viewlim)

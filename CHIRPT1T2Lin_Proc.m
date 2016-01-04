@@ -8,18 +8,20 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-datadir = 'C:\Users\tkmeldrum\Desktop\BigSamples_19Nov2015\';
-datafile = 'Gd_CHIRP_256_19Nov2015_result';
-noCHIRPfile = 'Gd_noCHIRP_256_19Nov2015_result';
+
+datadir = 'C:\CommonData\CHIRP\ConcentricSamples_01Dec2015\';
+datafile = 'Double_CHIRP_8192_40PCD_08Dec2015_result';
+noCHIRPfile = 'Double_noCHIRP_8192_40PCD_08Dec2015_result';
 filenameExt = '';
 
-Pchirp = 0.015; % CHIRP Pulse Length (s)
+Pchirp = 0.04; % CHIRP Pulse Length (s)
+
 
 sliceheight = 0.350; %mm
 PreCPMGdelay = 40e-6; %s
 
 nPts = 76; % # of acqu points
-nEchoes = 16; % Echoes
+nEchoes = 64; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700; %us
 omitEchoes = 0; %the number of echoes to skip
@@ -189,37 +191,35 @@ figure(7)
 subplot(2,1,1)
 plot(abs(T1T2profcorr(:,1)))
 xlim([0 NFFT])
-ylim([0 1.2])
+ylim([0 1.05])
 subplot(2,1,2)
 plot(t1_fig7,abs(T1T2profcorr(:,1)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
-ylim([0 1.2])
+ylim([0 1.05])
 set(gca,'XDir','reverse')
 xlabel('CHIRPtime (s)')
 
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 88;
-maxind = 214;
-firstinvertedind = 192;
-
-% automatically select indices
-% minind=find(f>-BWchirp/2,1,'first');
-% maxind=find(f<BWchirp/2,1,'last');
-% [~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
+minind= 40;
+maxind = 222;
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
-T1T2profiles2(1:firstinvertedind-minind+1,:) = (abs(T1T2profcorr(minind:firstinvertedind,:)));
-T1T2profiles2(firstinvertedind-minind+2:end,:) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,:)));
+
+for ii = 1:nEchoes-omitEchoes;
+    [~,firstinvertedind] = min(abs(T1T2profcorr(minind:maxind,ii)));
+    firstinvertedind = firstinvertedind+minind-1;
+    T1T2profiles2(1:firstinvertedind-minind+1,ii) = (abs(T1T2profcorr(minind:firstinvertedind,ii)));
+    T1T2profiles2(firstinvertedind-minind+2:end,ii) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,ii)));
+end
+
 
 % T1T2data=T1T2profiles2;
 T1T2data=T1T2profiles2/max(max(abs(T1T2profiles2)));
 t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
-
-% t1log = logspace(log10((Pchirp*BWchirp/2-f(minind))/BWchirp),log10((Pchirp*BWchirp/2-f(maxind))/BWchirp),(maxind-minind+1));
 
 %plot first T1 column
 figure
@@ -255,33 +255,37 @@ save(strcat(datadir,datafile,filenameExt, '.dat'), 'T1T2data2', '-ascii');
 % 1e6*[min(t1), max(t1)]; %#ok<NOPTS>
 
 %UF Points [Min, Max, Inv; min(echoVec), max(echoVec), InvTime(min) [us], InvTime(max) [us], #echoes, #T1 points]
-sprintf('%d %d %d; %.0f %.0f %.0f %.0f; %d %d',minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
+% sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
+
+fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
+fprintf(fileID,'%s: %f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d\n',datafile, SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1));
+fclose(fileID);
 
 %% T1 fit in cftool
-echoNr = 1;
-cftool(t1,T1T2data(:,echoNr));
-
-%% T1Test
-% For comparing your data to the data what you expect
-
-close all
-
-T1_1 = 0.0125; % T1 (s)
-T1_2 = 0.0125;
-w1 = 1; % Weights
-w2 = 0;
-
-t1new = linspace(max(t1), 0, length(t1)); % Simulated T1 Axis
-
-% Make T1 Data
-T1data1 = 1-2.*exp(-t1new./T1_1);
-T1data2 = 1-2.*exp(-t1new./T1_2);
-
-T1dat = w1.*T1data1 + w2.*T1data2;
-
-figure()
-hold on
-plot(t1new, T1dat, '-r')
-plot(t1, T1T2data(:,1), '*b')
-hold off
+% echoNr = 1;
+% cftool(t1,T1T2data(:,echoNr));
+% 
+% %% T1Test
+% % For comparing your data to the data what you expect
+% 
+% close all
+% 
+% T1_1 = 0.0125; % T1 (s)
+% T1_2 = 0.0125;
+% w1 = 1; % Weights
+% w2 = 0;
+% 
+% t1new = linspace(max(t1), 0, length(t1)); % Simulated T1 Axis
+% 
+% % Make T1 Data
+% T1data1 = 1-2.*exp(-t1new./T1_1);
+% T1data2 = 1-2.*exp(-t1new./T1_2);
+% 
+% T1dat = w1.*T1data1 + w2.*T1data2;
+% 
+% figure()
+% hold on
+% plot(t1new, T1dat, '-r')
+% plot(t1, T1T2data(:,1), '*b')
+% hold off
 
