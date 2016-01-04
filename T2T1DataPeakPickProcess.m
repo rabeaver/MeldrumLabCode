@@ -4,7 +4,7 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = '/Users/tyler/Dropbox/Data/CHIRP/BigSamples_19Nov2015/out files/';
+datadir = 'C:\Users\tkmeldrum\Desktop\PLEASEPROCESS\out files\';
 datafile = 'Double_CHIRP_1024_19Nov2015_result_8192.out';
 T2lims = [1e-4 1e-1];
 T1lims = [1e-4 1e-1];
