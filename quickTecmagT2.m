@@ -3,14 +3,14 @@ clc
 close all
 
 %%
-filename = 'Glycerol_CPMG_1024scans_12srep_result.tnt';
-filedir = '/Users/tyler/Dropbox/Data/SNRCheck/';
+filename = '15mMGd_SilicaBeads_CPMG_07Jan2016.tnt';
+filedir = 'C:\CommonData\BeadPack\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 300; %us
+tEcho = 180; %us
 nEchoes = 128;
-nPts = 76;
+nPts = 24;
 nPtsBlank = 0;
 
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
@@ -21,17 +21,12 @@ dataInt = sum(data,1);
 dataIntRe = real(dataInt)./max(real(dataInt));
 dataIntIm = imag(dataInt)./max(real(dataInt));
 
-% SNR calc
-useEcho = 1;
-Spoint = (useEcho+0.5)*nPts;
-% [~,Spoint] = max(abs(real(spec)));
-S = abs(real(spec(Spoint-nPts/2:Spoint+nPts/2)));
-N = abs(imag(spec(Spoint-nPts/2:Spoint+nPts/2)));
+guess = [1 15e-3];% 0.6 6e-03];
+beta = nlinfit(echoVector,dataIntRe, @t2monofit_simple, guess);
+ypred = t2monofit_simple(beta,echoVector);
 
-figure
+figure(1)
 hold on
-plot(S)
-plot(N)
-
-%
-SNR = snr(S,N)
+plot(echoVector,dataIntRe);
+plot(echoVector,dataIntIm);
+plot(echoVector,ypred,'-r');
