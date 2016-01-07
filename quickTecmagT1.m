@@ -4,30 +4,31 @@ close all
 
 %%
 
-filename = 'ShellSol_T1IR_BURP_29Oct2015.tnt';
-filedir = 'C:\CommonData\CHIRP\T2D\';
+filename = '15mMGd_SilicaBeads_IRCPMG_07Jan2016.tnt';
+filedir = 'C:\CommonData\BeadPack\';
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 150; %us
+tEcho = 180; %us
 
-nEchoes = 16;
-nPts = 69;
-nPtsBlank = 2;
+nEchoes = 128;
+nPts = 24;
+nPtsBlank = 0;
 nT1Pts = 21;
-T1min = 48.453; %ms
-T1max = 5000.0000; %ms
-T1guess = 1000.0000; %ms 
+T1min = 0.05; %ms
+T1max = 24.950; %ms
+T1guess = 0.40; %ms 
 
-% T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
+T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 
-T1vector = logspace(log10(T1min),log10(T1max),nT1Pts)'; % Logspace T1sat
+% T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 
 data = reshape(spec2',nPts,nEchoes,nT1Pts);
 data = data(1:(nPts-nPtsBlank),:,:);
 dataInt = sum(sum(data,1),2);
+dataInt = dataInt./max(dataInt);
 dataInt = reshape(dataInt,1,nT1Pts);
 dataIntRe = real(dataInt);
 dataIntIm = imag(dataInt);
@@ -37,9 +38,9 @@ dataIntIm = imag(dataInt);
 cftool(T1vector, dataIntRe./max(dataIntRe))
 
 %%
-guesses = [1, max(dataIntRe), T1guess];
-[beta, Resids, J] = nlinfit(T1vector,dataIntRe,@T1_recovery,guesses);
-ypred = T1_recovery(beta,T1vector);
+% guesses = [1, max(dataIntRe), T1guess];
+[beta, Resids, J] = nlinfit(T1vector,dataIntRe,@inversionRecoverySimple,T1guess);
+ypred = inversionRecoverySimple(beta,T1vector);
 CI = nlparci(beta, Resids, 'jacobian', J);
 
 

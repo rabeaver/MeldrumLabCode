@@ -9,24 +9,24 @@ close all
 % ===================================
 
 
-datadir = 'C:\CommonData\CHIRP\ConcentricSamples_01Dec2015\';
-datafile = 'Double_CHIRP_8192_40PCD_08Dec2015_result';
-noCHIRPfile = 'Double_noCHIRP_8192_40PCD_08Dec2015_result';
+datadir = 'C:\CommonData\BeadPack\';
+datafile = '15mMGd_SilicaBeads_CHIRP_07Jan2016_2';
+noCHIRPfile = '15mMGd_SilicaBeads_noCHIRP_07Jan2016_2';
 filenameExt = '';
 
-Pchirp = 0.04; % CHIRP Pulse Length (s)
+Pchirp = 0.01; % CHIRP Pulse Length (s)
 
 
 sliceheight = 0.350; %mm
-PreCPMGdelay = 40e-6; %s
+PreCPMGdelay = 250e-6; %s
 
-nPts = 76; % # of acqu points
-nEchoes = 64; % Echoes
-tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700; %us
+nPts = 48; % # of acqu points
+nEchoes = 128; % Echoes
+tD = 4e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 280; %us
 omitEchoes = 0; %the number of echoes to skip
-noisePoints = 10; %number of points at beginning and end of each acqu period for noise
-omitPts = 4; %blank spectrometer points to skip
+noisePoints = 4; %number of points at beginning and end of each acqu period for noise
+omitPts = 0; %blank spectrometer points to skip
 
 zf = 1;                             % levels of zero filling
 apodize = 0;                        %Gaussian apodization on (1) or off (0)?
@@ -204,8 +204,8 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 40;
-maxind = 222;
+minind= 54;
+maxind = 87;
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 
@@ -260,32 +260,4 @@ save(strcat(datadir,datafile,filenameExt, '.dat'), 'T1T2data2', '-ascii');
 fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
 fprintf(fileID,'%s: %f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d\n',datafile, SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1));
 fclose(fileID);
-
-%% T1 fit in cftool
-% echoNr = 1;
-% cftool(t1,T1T2data(:,echoNr));
-% 
-% %% T1Test
-% % For comparing your data to the data what you expect
-% 
-% close all
-% 
-% T1_1 = 0.0125; % T1 (s)
-% T1_2 = 0.0125;
-% w1 = 1; % Weights
-% w2 = 0;
-% 
-% t1new = linspace(max(t1), 0, length(t1)); % Simulated T1 Axis
-% 
-% % Make T1 Data
-% T1data1 = 1-2.*exp(-t1new./T1_1);
-% T1data2 = 1-2.*exp(-t1new./T1_2);
-% 
-% T1dat = w1.*T1data1 + w2.*T1data2;
-% 
-% figure()
-% hold on
-% plot(t1new, T1dat, '-r')
-% plot(t1, T1T2data(:,1), '*b')
-% hold off
 
