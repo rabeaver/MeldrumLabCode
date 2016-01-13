@@ -4,38 +4,38 @@ close all
 
 %%
 
-filename = '15mMGd_SilicaBeads_IRCPMG_07Jan2016.tnt';
-filedir = 'C:\CommonData\BeadPack\';
+filename = 'EtGlyLarge_T1IR_13Jan2016.tnt';
+filedir = 'C:\CommonData\EthyleneGlycol\';
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 180; %us
+tEcho = 150; %us
 
-nEchoes = 128;
-nPts = 24;
-nPtsBlank = 0;
-nT1Pts = 21;
-T1min = 0.05; %ms
-T1max = 24.950; %ms
+nEchoes = 16;
+nPts = 70;
+nPtsBlank = 4;
+nT1Pts = 11;
+T1min = 0.5; %ms
+T1max = 500; %ms
 T1guess = 0.40; %ms 
 
-T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
+% T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 
-% T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
+T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 
 data = reshape(spec2',nPts,nEchoes,nT1Pts);
 data = data(1:(nPts-nPtsBlank),:,:);
 dataInt = sum(sum(data,1),2);
-dataInt = dataInt./max(dataInt);
 dataInt = reshape(dataInt,1,nT1Pts);
+dataInt = dataInt./-dataInt(1);
 dataIntRe = real(dataInt);
 dataIntIm = imag(dataInt);
 
 
 %% cftool
-cftool(T1vector, dataIntRe./max(dataIntRe))
+cftool(T1vector, dataIntRe)
 
 %%
 % guesses = [1, max(dataIntRe), T1guess];
