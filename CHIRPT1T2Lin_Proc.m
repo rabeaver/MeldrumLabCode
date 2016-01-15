@@ -52,7 +52,7 @@ z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
 % Import CHIRP data
-[ap , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
+[ap , spec] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
 
 % CHIRPdat = spec(1,:);
 % spec = spec2(nnn, :);
@@ -112,7 +112,7 @@ hold off
 %% No CHIRP load section
 close all
 
-[~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
+[~,spec] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
 % No CHIRP raw data and fft profiles

@@ -12,13 +12,13 @@ fileloc = strcat(filedir,filename);
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 150; %us
 
-nEchoes = 16;
+nEchoes = 32;
 nPts = 70;
 nPtsBlank = 4;
-nT1Pts = 11;
-T1min = 0.5; %ms
-T1max = 500; %ms
-T1guess = 0.40; %ms 
+nT1Pts = 21;
+T1min = 0.2; %ms
+T1max = 1400; %ms
+T1guess = 280; %ms 
 
 % T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;

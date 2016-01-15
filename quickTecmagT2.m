@@ -3,15 +3,15 @@ clc
 close all
 
 %%
-filename = '15mMGd_SilicaBeads_CPMG_07Jan2016.tnt';
-filedir = 'C:\CommonData\BeadPack\';
+filename = 'EtGlyLarge_CPMG_tE700_13Jan2016.tnt';
+filedir = 'C:\CommonData\EthyleneGlycol\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 180; %us
+tEcho = 700; %us
 nEchoes = 128;
-nPts = 24;
-nPtsBlank = 0;
+nPts = 78;
+nPtsBlank = 4;
 
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 
