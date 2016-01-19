@@ -3,14 +3,14 @@ clc
 close all
 
 %%
-filename = 'EtGlyLarge_CPMG_tE700_13Jan2016.tnt';
-filedir = 'C:\CommonData\EthyleneGlycol\';
+filename = '4ASieves_CPMG_tE700_18Jan2016.tnt';
+filedir = 'C:\CommonData\DIWaterSieves\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 700; %us
-nEchoes = 128;
-nPts = 78;
+nEchoes = 16;
+nPts = 76;
 nPtsBlank = 4;
 
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;

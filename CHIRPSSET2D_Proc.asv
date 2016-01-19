@@ -9,21 +9,21 @@ close all
 % ===================================
 %
 
-datadir = 'C:\CommonData\EthyleneGlycol\';
-datafile = 'EtGlyLarge_chirpSTE_19Jan2016_2';
-noCHIRPfile = 'EtGlyLarge_nochirpSTE_19Jan2016';
+datadir = 'C:\CommonData\DIWaterSieves\';
+datafile = 'EtGlyLarge_chirpSTE_19Jan2016_1';
+noCHIRPfile = 'EtGlyLarge_chirpSTE_19Jan2016_1';
 
-Pchirp = 0.000496;                    % CHIRP Pulse Length (s)
+Pchirp = 0.000477;                    % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
-sliceheight = 0.250;                % mm
+sliceheight = 0.350;                % mm
 
 nPts = 76;                          % # of acqu points
 omitPts = 4;                        % the number of points that are zeros from the spectrometer
-nEchoes = 128;                      % Echoes
-omitEchoes = 2;                     % numner of echoes to remove from data
+nEchoes = 16;                      % Echoes
+omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 8e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700;                           % us
-preCHIRPdelay = 1e-6;              % s
+preCHIRPdelay = 20e-6;              % s
 noisePoints = 10;                   % number of points for measuring noise
 
 zf = 1;                             % levels of zero filling
@@ -31,7 +31,7 @@ apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
 delta = 1e-3;                    % little delta time (s)
-DELTA = 3e-3; % Big delta time in s
+DELTA = 5e-3; % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
@@ -179,7 +179,7 @@ plot(abs(T2Dprofiles(:,1)))
 t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 deltaFig = 2*Pchirp*(BWchirp/2-f)/BWchirp + deltaMin; % expression for delta(effective), maybe
 
-ylimits = [0 2];
+ylimits = [0 0.6];
 deltaEff = delta - t1_fig7 - preCHIRPdelay;
 deltaEff = fliplr(deltaEff);
 
@@ -208,8 +208,8 @@ xlabel('effective delta (s)')
 %% Data Range and Inversion
 
 
-minind= 101;
-maxind = 150;
+minind= 168;
+maxind = 223;
 % this is where I'm starting to put in some diffusion code. 
 
 T2Ddat = abs(T2Dprofcorr(minind:maxind,:)); %crops data set according to above indices

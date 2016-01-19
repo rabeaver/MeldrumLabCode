@@ -3,18 +3,18 @@ clc
 close all
 
 %% User parameters
-filename = 'EtGlyLarge_STEr_14Jan2016.tnt';
-filedir = 'C:\CommonData\EthyleneGlycol\';
+filename = '1.5mMGdBeadPack_STE_refoc180_18Jan2016.tnt';
+filedir = 'C:\CommonData\1.5mMGdBeadPack\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 280; %us
-nEchoes = 128;
-nPts = 50;
+tEcho = 700; %us
+nEchoes = 16;
+nPts = 76;
 nPtsBlank = 0;
-DELTA = 1e-3; %s
-deltamin = 100e-6; %s
-deltamax = 2600e-6; %s
+DELTA = 2e-3; %s
+deltamin = 20e-6; %s
+deltamax = 2000e-6; %s
 refocused_delta = 1; % if there are 180 pulses in the delta periods, set to 1 to adjust the delta time
 GM = 280; %MHz m-1
 
@@ -42,10 +42,11 @@ dataIntRe = real(dataInt);
 dataIntIm = imag(dataInt);
 
 s1 = log10(dataIntRe./max(dataIntRe));
+s1a = log10(abs(dataInt)./max(abs(dataInt)));
 s_x = -gamma^2*G^2.*delta.^2.*(DELTA+delta./3)*1e-9;
 
 %% Fit and give D
-[p,S] = polyfit(s_x,s1,1);
+[p,S] = polyfit(s_x,s1a,1);
 D = p(1)*1e-9 %output value of D in m2/s
 
 figure(1)
