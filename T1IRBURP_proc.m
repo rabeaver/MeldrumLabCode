@@ -1,28 +1,31 @@
 clear
 clc
-close all
+close all  
 
 %%
 
 % Input filename, - .tnt
-filename = 'Glycerol_T1IR_BURP_21_2D_14Oct2015';
-filedir = 'C:\users\tkmeldrum\desktop\CHIRP\';
-
+filename = 'GlycerolBIG_T1IR_BURP_21_2D_32scans_6Nov2015_result';
+filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/7Nov15/';
 fileloc = strcat(filedir,filename,'.tnt');
 
 % Read file
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 
 % Input experiment parameters
-tEcho = 400; %us
 
-nEchoes = 8;
-nPts = 40;
+tEcho = 700; %us
+nEchoes = 128;
+
+echoVector = (tEcho:tEcho:nEchoes*tEcho); % T2 vector
+
+
+nPts = 76;
 nPtsBlank = 2;
 nT1Pts = 21;
-T1min = 0.05; %ms
+T1min = 0.1; %ms
 T1max = 60; %ms
-echoVector = (tEcho:tEcho:nEchoes*tEcho); % T2 vector
+
 
 % Specify lin or log spaced points
 linORlog = 0; % 0 for linearly space and 1 for log spaced
@@ -33,7 +36,28 @@ if linORlog == 0
 else
     T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 end
+%% SNR calc
 
+% Read Noise
+filename = 'glycerol_T1IR_BURP_Noisecollect_32scans';
+fileloc = strcat(filedir,filename,'.tnt');
+
+% Read file
+[ap,specN,spec,spec3,spec4] = readTecmag4d(fileloc);
+
+
+[~,Spoint] = max(abs(real(spec2(21,:))));
+Spoint = Spoint + 16*nPts;
+S = (real(spec2(nT1Pts,Spoint-nPts/2:Spoint+nPts/2)));
+N = (imag(spec2(nT1Pts,Spoint-nPts/2:Spoint+nPts/2)));
+% N = (real(specN(Spoint-nPts/2:Spoint+nPts/2)))';
+
+SNR = snr(S,N)
+
+figure
+hold on
+plot(S)
+plot(N)
 %% Make 2D data set for T1IRT2 ILT
 
 data = reshape(spec2',nPts,nEchoes,nT1Pts);

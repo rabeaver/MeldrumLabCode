@@ -3,15 +3,33 @@ clc
 close all
 
 %%
-filename = 'Glycerol_CPMG_5.tnt';
-filedir = 'C:\Users\NMRLab\Desktop\CHIRP\';
+filename = 'Glycerol_CPMG_1024scans.tnt';
+filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/7Nov15/CPMG_Check/';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 700; %us
 nEchoes = 128;
 nPts = 76;
-nPtsBlank = 4;
+nPtsBlank = 2;
+
+%% SNR calc
+
+
+[~,Spoint] = max(real(spec2));
+Spoint = Spoint + 3.5*nPts;
+S = (real(spec(Spoint-nPts/2:Spoint+nPts/2)));
+N = (imag(spec(Spoint-nPts/2:Spoint+nPts/2)));
+% N = (real(specN(Spoint-nPts/2:Spoint+nPts/2)))';
+
+SNR = snr(S,N)
+
+figure
+hold on
+plot(S)
+plot(N)
+
+%%
 
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 

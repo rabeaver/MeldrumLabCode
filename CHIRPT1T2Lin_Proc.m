@@ -8,14 +8,15 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.040; % CHIRP Pulse Length (s)
+Pchirp = 0.06; % CHIRP Pulse Length (s)
+
 sliceheight = 0.350; %mm
 PreCPMGdelay = 40e-6; %s
 
-nPts = 40; % # of acqu points
-nEchoes = 8; % Echoes
+nPts = 76; % # of acqu points
+nEchoes = 128; % Echoes
 tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 400; %us
+tE = 700; %us
 omitEchoPts = 0; %the number of points that are zeros from the spectrometer
 % nnn = 1; %expt number (for 2D CHIRP expts)
 
@@ -42,8 +43,8 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research/Raw Data/150mMGd/';
-datafile = 'CHIRP_20dB_T1T2_1200us_350um_150mMGdH2O_2048_nP40_10Sept2015';
+datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/7Nov15/';
+datafile = 'CHIRP_GlycerolBIG_60mspw_sliceheight350um_tD8u_76pts_32scans_100nsWave_7Nov2015_result';
 
 % Import CHIRP data
 [~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
@@ -53,6 +54,23 @@ datafile = 'CHIRP_20dB_T1T2_1200us_350um_150mMGdH2O_2048_nP40_10Sept2015';
 CHIRPdat = reshape(spec, nPts, nEchoes);
 CHIRPdat = CHIRPdat(1:end-omitEchoPts,:);
 
+%% SNR calc (two sections)
+
+data = abs(CHIRPdat);
+[~,Spoint] = max(data(:,1));
+%
+
+figure
+plot(data(Spoint,:));
+%%
+close all
+
+skip = 3;
+S = data(Spoint,skip+1:end);
+N = data(1,skip+1:end);
+
+
+SNR = snr(S,N)
 %%
 
 pVec = 1:1:(nPts-omitEchoPts);
@@ -91,7 +109,7 @@ hold off
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_20dB_T1T2_1200us_350um_150mMGdH2O_2048_nP40_10Sept2015';
+noCHIRPfile = 'noCHIRP_GlycerolBIG_60mspw_sliceheight350um_tD8u_76pts_32scans_100nsWave_7Nov2015_result';
 
 [~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
