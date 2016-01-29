@@ -4,10 +4,8 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-
-datadir = '/Users/tyler/Dropbox/Data/CHIRP/Dec2015/ConcentricSamples_01Dec2015/out files/';
-datafile = 'Double_CHIRP_1024_01Dec2015_result.out';
-
+datadir = 'Z:\PLEASEPROCESS\out files\';
+datafile = 'Double_CHIRP_256_250PCD_08Dec2015_result.out';
 T2lims = [1e-4 1e-1];
 T1lims = [1e-4 1e-1];
 contourLevel = 0.50;

@@ -2,6 +2,7 @@ clear
 clc
 close all
 
+%%
 data = load('/Users/tyler/Desktop/6Feb2015/T2_D/5/dataRe.dat');
 
 figure(1)

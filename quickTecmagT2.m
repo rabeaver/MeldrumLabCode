@@ -3,13 +3,13 @@ clc
 close all
 
 %%
-filename = 'Glycerol_CPMG_1024scans.tnt';
-filedir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/7Nov15/CPMG_Check/';
+filename = '4ASieves_CPMG_tE700_18Jan2016.tnt';
+filedir = 'C:\CommonData\DIWaterSieves\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 700; %us
-nEchoes = 128;
+nEchoes = 16;
 nPts = 76;
 nPtsBlank = 2;
 

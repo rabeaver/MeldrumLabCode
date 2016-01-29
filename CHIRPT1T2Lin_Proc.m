@@ -8,17 +8,24 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-Pchirp = 0.06; % CHIRP Pulse Length (s)
+datadir = 'C:\CommonData\BeadPack\';
+datafile = '15mMGd_SilicaBeads_CHIRP_07Jan2016_2';
+noCHIRPfile = '15mMGd_SilicaBeads_noCHIRP_07Jan2016_2';
+filenameExt = '';
+
+Pchirp = 0.01; % CHIRP Pulse Length (s)
 
 sliceheight = 0.350; %mm
-PreCPMGdelay = 40e-6; %s
+PreCPMGdelay = 250e-6; %s
 
-nPts = 76; % # of acqu points
+
+nPts = 48; % # of acqu points
 nEchoes = 128; % Echoes
-tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700; %us
-omitEchoPts = 0; %the number of points that are zeros from the spectrometer
-% nnn = 1; %expt number (for 2D CHIRP expts)
+tD = 4e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 280; %us
+omitEchoes = 0; %the number of echoes to skip
+noisePoints = 4; %number of points at beginning and end of each acqu period for noise
+omitPts = 0; %blank spectrometer points to skip
 
 zf = 1;                             % levels of zero filling
 apodize = 0;                        %Gaussian apodization on (1) or off (0)?
@@ -34,47 +41,43 @@ BWchirp = sliceheight*G*gamma*1000; % CHIRP bandwidth (Hz)
 
 T = tD;                             % Sample time
 Fs = 1/T;                           % Sampling frequency 
-L = (nPts-omitEchoPts)*(2^zf);      % Length of signal
+L = (nPts-omitPts)*(2^zf);      % Length of signal
 NFFT = 2^nextpow2(L);               % Next power of 2 from length of y
 
-echoVec = tE:tE:(nEchoes*tE);
+echoVec = (omitEchoes+1)*tE:tE:(nEchoes*tE);
 t = (-(L-1)/2:L/2)*T;               % Time vector
 f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
 
 %%
-datadir = '/Users/jaredking/Documents/Chemistry/Research/CHIRP/7Nov15/';
-datafile = 'CHIRP_GlycerolBIG_60mspw_sliceheight350um_tD8u_76pts_32scans_100nsWave_7Nov2015_result';
-
 % Import CHIRP data
-[~ , spec, spec2, ~] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
+[ap , spec] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
 
 % CHIRPdat = spec(1,:);
 % spec = spec2(nnn, :);
 CHIRPdat = reshape(spec, nPts, nEchoes);
-CHIRPdat = CHIRPdat(1:end-omitEchoPts,:);
+CHIRPdat = CHIRPdat(1:(end-omitPts),omitEchoes+1:end);
 
 %% SNR calc (two sections)
-
-data = abs(CHIRPdat);
-[~,Spoint] = max(data(:,1));
-%
+n1 = CHIRPdat(1:noisePoints,:);
+n2 = CHIRPdat(nPts-noisePoints-omitPts:end,:);
+n = cat(1,n1,n2);
+n = reshape(n,1,(2*noisePoints+1)*(nEchoes-omitEchoes));
+s = reshape(CHIRPdat,1,(nPts-omitPts)*(nEchoes-omitEchoes));
 
 figure
-plot(data(Spoint,:));
+hold on
+plot(abs(n))
+plot(abs(s))
+
+S = max(abs(s));
+N = rms(n);
+
+SNR = S/N
+SNR_perRtScans = SNR/sqrt(2*ap.ns)
 %%
-close all
-
-skip = 3;
-S = data(Spoint,skip+1:end);
-N = data(1,skip+1:end);
-
-
-SNR = snr(S,N)
-%%
-
-pVec = 1:1:(nPts-omitEchoPts);
-filt = exp(-(pVec-(nPts-omitEchoPts)/2).^2/((nPts-omitEchoPts)/apofac)^2);
+pVec = 1:1:(nPts-omitEchoes);
+filt = exp(-(pVec-(nPts-omitEchoes)/2).^2/((nPts-omitEchoes)/apofac)^2);
 filt = repmat(filt',1,nEchoes);
 
 if apodize == 1
@@ -105,25 +108,21 @@ shading flat;
 title('Surface plot of T1T2 FFT Profiles')
 hold off
 
-
 %% No CHIRP load section
 close all
 
-noCHIRPfile = 'noCHIRP_GlycerolBIG_60mspw_sliceheight350um_tD8u_76pts_32scans_100nsWave_7Nov2015_result';
-
-[~,spec,spec2] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
+[~,spec] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
 % No CHIRP raw data and fft profiles
 % data = spec2(2,:);
 noCHIRPdat = reshape(data, nPts, nEchoes);
-noCHIRPdat = noCHIRPdat(1:end-omitEchoPts,:);
+noCHIRPdat = noCHIRPdat(1:(end-omitPts),omitEchoes+1:end);
 if apodize == 1
     noCHIRPdat = noCHIRPdat .* filt;
 end
 
 noCHIRPdat = padarray(noCHIRPdat, size(noCHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
-
 
 CPprofiles = fftshift(fft(noCHIRPdat,NFFT)/L,1);
 
@@ -165,7 +164,7 @@ set(gca,'Fontsize',12,'linewidth',2)
 
 %% Coil Sensitivity Correction
 
-for k = 1:nEchoes
+for k = 1:nEchoes-omitEchoes
     pcorr(:,k) = abs(CPprofiles(:,1));
 end
 
@@ -187,44 +186,39 @@ plot(abs(T1T2profiles(:,1)))
 
 t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
-
 figure(7)
 subplot(2,1,1)
 plot(abs(T1T2profcorr(:,1)))
 xlim([0 NFFT])
-ylim([0 1.1])
+ylim([0 1.05])
 subplot(2,1,2)
 plot(t1_fig7,abs(T1T2profcorr(:,1)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
-ylim([0 1.1])
+ylim([0 1.05])
 set(gca,'XDir','reverse')
 xlabel('CHIRPtime (s)')
-
-
 
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 22;
-maxind = 100;
-firstinvertedind = 90;
+minind= 54;
+maxind = 87;
 
-% automatically select indices
-% minind=find(f>-BWchirp/2,1,'first');
-% maxind=find(f<BWchirp/2,1,'last');
-% [~,firstinvertedind] = min(abs(T1T2profiles(minind:maxind,3)));
+T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 
-T1T2profiles2=zeros((maxind-minind+1),nEchoes);
-T1T2profiles2(1:firstinvertedind-minind+1,:) = (abs(T1T2profcorr(minind:firstinvertedind,:)));
-T1T2profiles2(firstinvertedind-minind+2:end,:) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,:)));
+for ii = 1:nEchoes-omitEchoes;
+    [~,firstinvertedind] = min(abs(T1T2profcorr(minind:maxind,ii)));
+    firstinvertedind = firstinvertedind+minind-1;
+    T1T2profiles2(1:firstinvertedind-minind+1,ii) = (abs(T1T2profcorr(minind:firstinvertedind,ii)));
+    T1T2profiles2(firstinvertedind-minind+2:end,ii) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,ii)));
+end
+
 
 % T1T2data=T1T2profiles2;
 T1T2data=T1T2profiles2/max(max(abs(T1T2profiles2)));
 t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
-
-% t1log = logspace(log10((Pchirp*BWchirp/2-f(minind))/BWchirp),log10((Pchirp*BWchirp/2-f(maxind))/BWchirp),(maxind-minind+1));
 
 %plot first T1 column
 figure
@@ -247,9 +241,6 @@ ylabel('{\it t}_1 (ms)');
 xlabel('{\it t}_2 (ms)');
 title('T1-T2 data')
 
-%% T1 fit in cftool
-echoNr = 1;
-cftool(t1,T1T2data(:,echoNr));
 
 %% Save data, display ILT Data params
 close all
@@ -257,32 +248,15 @@ close all
 T1T2data = T1T2data(:,1:end);
 T1T2data2 = flipud(T1T2data);
 data2d = T1T2data2;
-save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii')
-size(T1T2data)
-1e6*abs(t1(1)-t1(end)) %#ok<NOPTS>
-1e6*[min(t1), max(t1)] %#ok<NOPTS>
+save(strcat(datadir,datafile,filenameExt, '.dat'), 'T1T2data2', '-ascii');
+% size(T1T2data);
+% 1e6*abs(t1(1)-t1(end)); %#ok<NOPTS>
+% 1e6*[min(t1), max(t1)]; %#ok<NOPTS>
 
-%% T1Test
-% For comparing your data to the data what you expect
+%UF Points [Min, Max, Inv; min(echoVec), max(echoVec), InvTime(min) [us], InvTime(max) [us], #echoes, #T1 points]
+% sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
 
-close all
-
-T1_1 = 0.0125; % T1 (s)
-T1_2 = 0.0125;
-w1 = 1; % Weights
-w2 = 0;
-
-t1new = linspace(max(t1), 0, length(t1)); % Simulated T1 Axis
-
-% Make T1 Data
-T1data1 = 1-2.*exp(-t1new./T1_1);
-T1data2 = 1-2.*exp(-t1new./T1_2);
-
-T1dat = w1.*T1data1 + w2.*T1data2;
-
-figure()
-hold on
-plot(t1new, T1dat, '-r')
-plot(t1, T1T2data(:,1), '*b')
-hold off
+fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
+fprintf(fileID,'%s: %f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d\n',datafile, SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1));
+fclose(fileID);
 

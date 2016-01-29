@@ -1,0 +1,39 @@
+Importing '.dat' data files to Prospa using the Command Line (CLI)
+
+Use the following commands:
+
+> import2dpar("ab","ascii","xyrc","complex","delimiter","tab")
+
+   import2dpar("ab","ascii","xyrc","complex","delimiter","tab") = null
+   
+> n = import2d("C:\users\(your username)\...\(rest of path)\...\filename.dat", width, height)
+> image(n)
+
+
+To correctly scale data:
+
+In 2D Plot >> Macros >> calibrate2D:
+
+For X-range enter: 	echotime(us) to echotime * nrEchoes
+For Y-range enter: 	deltaMin(us) and deltaMax(us) for T2D
+					T1min(ms) and T1max(ms) for T1T2
+
+Fitting the Data:
+
+In NNLS Macros >> Analyze2DPlotNew:
+	Under Experiment - Choose DT2(SGSTE-CPMG) or T1T2
+	Choose Time Units
+	Enter correct gradient for magnet and Big Delta (if applicable)
+	Under Output Parameters - Input ranges and smoothing guess with low number of steps
+	
+	Click Calculate next to Output Parameters
+	Adjust settings for clearer image/better range
+	
+	
+Export '.out' file from Prospa:
+
+> export2dpar("ab","ascii","xyrc","real","delimiter","tab")
+> m = getplotdata("2d")
+> cd C:\Users\(your username)\...\(restofpath)
+> export2d(m,"filename.out")
+
