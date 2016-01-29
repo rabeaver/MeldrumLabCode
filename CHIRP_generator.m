@@ -9,10 +9,12 @@ close all
 % tic
 
 dt = 100e-9;             % time per point in waveform (s) [Scout limit is 20ns]
-tau = 0.000496;            % pulse length (s)
+                                                         %[Kea limit is 2000ns]
+tau = 0.000496;          % pulse length (s) [Kea limit is 128ms]
 sliceheight = 0.250;     % mm
 
-G = 6.59;               %T m-1, B0 field gradient
+G = 6.59;               %T m-1, B0 field gradient [PM25 = 6.59]
+                        %                         [PM5 = 24?] U R HERE JNK
 offset = 0;             %mm, frequency offset (if applicable)
 amplitude = 30;         %pwr, for Tecmag
 % NOTE: positive offset moves to the left in the FT spectrum (negative
