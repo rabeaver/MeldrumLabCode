@@ -8,13 +8,13 @@ close all
 %%%%%%% User-defined parameters %%%%%%%
 % tic
 
-dt = 100e-9;             % time per point in waveform (s) [Scout limit is 20ns]
+dt = 2000e-9;             % time per point in waveform (s) [Scout limit is 20ns]
                                                          %[Kea limit is 2000ns]
-tau = 0.000496;          % pulse length (s) [Kea limit is 128ms]
+tau = 0.150;          % pulse length (s) [Kea limit is 128ms]
 sliceheight = 0.250;     % mm
 
 G = 6.59;               %T m-1, B0 field gradient [PM25 = 6.59]
-                        %                         [PM5 = 24?] U R HERE JNK
+                        %                         [PM5 = 23.87]
 offset = 0;             %mm, frequency offset (if applicable)
 amplitude = 30;         %pwr, for Tecmag
 % NOTE: positive offset moves to the left in the FT spectrum (negative
