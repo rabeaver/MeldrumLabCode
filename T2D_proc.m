@@ -3,19 +3,19 @@ clc
 close all
 
 %%
-datadir = 'C:\CommonData\DIWaterSieves\';
-datafile = '4ASieves_STE_refoc180_18Jan2016';
+datadir = 'C:\CommonData\EVOO\';
+datafile = 'EVOOLarge_TraditSTE_15mDEL_5Feb2016_result1';
 
 
 nPts = 76;                          % # of acqu points
 omitPts = 4;                        % the number of points that are zeros from the spectrometer
-nEchoes = 16;                      % Echoes
-omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 8e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700;                           % us
-deltaMin = 20e-6;                  % s
-deltaMax = 1500-6;                 % s
-DELTA = 5e-3;                      % s
+nEchoes = 256;                      % Echoes
+omitEchoes = 4;                     % numner of echoes to remove from data
+tD = 4e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 500;                           % us
+deltaMin = 100e-6;                  % s
+deltaMax = 1000e-6;                 % s
+DELTA = 15e-3;                      % s
 noisePoints = 4;                   % number of points for measuring noise
 noiseNumber = 1;                    % scan number to use for determining SNR
 G = 6.59;                           % T m-1, B0 field gradient
@@ -26,7 +26,7 @@ gamma = 42.576;                     % MHz T-1
 gammaRad = gamma*2*pi*1e6;          % rad s-1 T-1
 
 
-[ap , spec, spec2] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
+[ap , spec, spec2,spec3,spec4] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
 T2Ddat = reshape(spec2, ap.td(2), nPts, nEchoes);
 T2Ddat = T2Ddat(:,1:nPts-omitPts,omitEchoes+1:end);
 

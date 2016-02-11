@@ -3,14 +3,14 @@ clc
 close all
 
 %%
-filename = '4ASieves_CPMG_tE700_18Jan2016.tnt';
-filedir = 'C:\CommonData\DIWaterSieves\';
+filename = 'CPMG_EVOO_1000usTe_2sTrep_512Echoes.tnt';
+filedir = 'C:\CommonData\CPMGT2_standards\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 700; %us
-nEchoes = 16;
-nPts = 76;
+tEcho = 500; %us
+nEchoes = 512;
+nPts = 69;
 nPtsBlank = 4;
 
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;

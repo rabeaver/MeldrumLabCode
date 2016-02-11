@@ -4,8 +4,8 @@ close all
 
 %%
 
-filename = '4ASieves_IRT1_18Jan2016_2.tnt';
-filedir = 'C:\CommonData\DIWaterSieves\';
+filename = 'EVOOLarge_T1IR_29Jan2016.tnt';
+filedir = 'C:\CommonData\EVOO\';
 
 fileloc = strcat(filedir,filename);
 
@@ -17,8 +17,8 @@ nPts = 76;
 nPtsBlank = 4;
 nT1Pts = 11;
 T1min = 1; %ms
-T1max = 6500; %ms
-T1guess = 50; %ms 
+T1max = 500; %ms
+T1guess = 100; %ms 
 
 % T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;

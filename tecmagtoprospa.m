@@ -4,8 +4,8 @@ clear
 
 %% Load data
 if ispc == 1;
-    filedir = 'C:\Users\jnking01\Desktop\'; 
-    filename = 'C:\Users\jnking01\Desktop\MilkT2D_2.tnt';
+    filedir = 'C:\CommonData\EVOO\'; 
+    filename = 'EVOOLarge_TraditSTE_15mDEL_5Feb2016_result_result.tnt';
 elseif ismac == 1;
     filedir = '/Users/jaredking/Documents/Chemistry/Research_Files_and_Data/CHIRP/';
     filename = '/Users/jaredking/Documents/Chemistry/Research_Files_and_Data/CHIRP/GdH2O_DoubleSample_T1SatT2_8July2015.tnt';
@@ -18,15 +18,15 @@ cd(filedir)
 n1D = aq.td(1);
 n2D = aq.td(2);
 nPts = aq.ctd;
-nEchoes = 32;
-tEcho = 150e-6;     % echo time
-tD = 6e-6;
-ptsPer_tE = 67;% (tEcho/tD);
-ptsPerEcho = 67;
+nEchoes = 256;
+tEcho = 500e-6;     % echo time
+tD = 8e-6;
+ptsPer_tE = 76;% (tEcho/tD);
+ptsPerEcho = 76;
 
-dMin = 45e-6; %minimum delta time in s
-DELTA = 1e-3; %DELTA in s
-dStep = 27e-6; %step size between deltas in s
+dMin = 200e-6; %minimum delta time in s
+DELTA = 15e-3; %DELTA in s
+dStep = 90e-6; %step size between deltas in s
 
 G = 6.5998;         % T/m (Smallest gradient amplitude) (6.5998 PM25; 23.8626 PM5)
 
@@ -53,7 +53,7 @@ dISnew = reshape(dIS,2*nEchoes,n2D);
 dISnew = dISnew';
 
 
-save('GdH2O_T1SatT2_8July2015.dat','dISnew','-ascii','-tabs');
+save('EVOOLarge_STE_25Jan2016_d2.5ms_D4ms_256Echoes_result.dat','dISnew','-ascii','-tabs');
 fitData = real(dataInt)./max(real(dataInt));
 % fitData = real(dataIntSurf(:,1))./max(real(dataIntSurf(:,1)));
 
