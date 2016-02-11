@@ -8,10 +8,30 @@ filedir = 'C:\CommonData\CPMGT2_standards\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 500; %us
-nEchoes = 512;
-nPts = 69;
-nPtsBlank = 4;
+
+tEcho = 700; %us
+nEchoes = 16;
+nPts = 76;
+nPtsBlank = 2;
+
+%% SNR calc
+
+
+[~,Spoint] = max(real(spec2));
+Spoint = Spoint + 3.5*nPts;
+S = (real(spec(Spoint-nPts/2:Spoint+nPts/2)));
+N = (imag(spec(Spoint-nPts/2:Spoint+nPts/2)));
+% N = (real(specN(Spoint-nPts/2:Spoint+nPts/2)))';
+
+SNR = snr(S,N)
+
+figure
+hold on
+plot(S)
+plot(N)
+
+%%
+
 
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 

@@ -8,7 +8,6 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-
 datadir = 'C:\CommonData\BeadPack\';
 datafile = '15mMGd_SilicaBeads_CHIRP_07Jan2016_2';
 noCHIRPfile = '15mMGd_SilicaBeads_noCHIRP_07Jan2016_2';
@@ -16,9 +15,9 @@ filenameExt = '';
 
 Pchirp = 0.01; % CHIRP Pulse Length (s)
 
-
 sliceheight = 0.350; %mm
 PreCPMGdelay = 250e-6; %s
+
 
 nPts = 48; % # of acqu points
 nEchoes = 128; % Echoes
