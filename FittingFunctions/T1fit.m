@@ -1,4 +1,4 @@
-function [xfit,yfit,coeffs,resid] = T1_fit(xdata,ydata,guesses,CI)
+function [xfit,yfit,coeffs,resid,J,mse,ci,se] = T1fit(xdata,ydata,guesses,CI)
 
 % fitting routine and plotting
 [beta,resid,J,COVB,mse] = nlinfit(xdata,ydata,@T1_recovery,guesses);
@@ -8,12 +8,12 @@ function [xfit,yfit,coeffs,resid] = T1_fit(xdata,ydata,guesses,CI)
 % J is Jacobian, COVB is covariance matrix, mse is mean squared error
 
 alpha = 1 - CI/100;
-ci = nlparci(beta,resid,'jacobian',J,'alpha',alpha);
+[ci, se] = nlparci(beta,resid,'jacobian',J,'alpha',alpha);
 
 % [ypred,delta] = nlpredci(@T1_recovery,x_fit,beta,resid,J);
 
 xfit = 0:max(xdata)/1000:max(xdata);
-yfit = beta(1) + beta(2)*(1-exp(-xfit./beta(3)));
+yfit = T1_recovery(beta,xfit);
 
 % % S10/80
 % [ypred1080,delta1080] = nlpredci(@T1_recovery,[10;80],beta,resid,J,alpha);

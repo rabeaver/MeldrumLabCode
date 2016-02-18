@@ -10,7 +10,7 @@ clc
 % Scripts folder containing T1/T2 fitting routines
 % addpath('/Users/tyler/Dropbox/Coding/Matlab Processing/Scripts/')
 
-datadir = '/Users/tyler/Desktop/samplee/';
+datadir = '/Users/tyler/Desktop/';
 parfilestem = 'acqu';
 datafilestem = 'data';
 
@@ -45,11 +45,11 @@ y0_guess = 0;
 A_guess = 1;
 t1_guess = 20; %ms
 
-guesses = [A_guess;t1_guess]; %[y0_guess;A_guess;t1_guess];
+guesses = [y0_guess;A_guess;t1_guess];
 
 CI = 90; %desired confidence interval in percent
 
-[xfit,ypred,coeffs,residuals,coeffs_err] = T1fit_no_offset(t1TimeAxis(1:end),amplitude(1:end),guesses,CI);
+[xfit,ypred,coeffs,residuals,J,mse,ci,se] = T1fit(t1TimeAxis(1:end),amplitude(1:end),guesses,CI);
 
 figure
 subplot(2,1,1)
@@ -62,5 +62,6 @@ plot(t1TimeAxis,residuals,'-b')
 plot(t1TimeAxis,zeros(length(t1TimeAxis)),'-k')
 
 
-sprintf('A = %f +/- %f',coeffs(1),coeffs_err(1))
-sprintf('T2 = %f +/- %f',coeffs(2),coeffs_err(2))
+% sprintf('A = %f +/- %f',coeffs(1),coeffs_err(1))
+% sprintf('T2 = %f +/- %f',coeffs(3),ci(3))
+sprintf('T2 = %f +/- %f',coeffs(3),se(3))
