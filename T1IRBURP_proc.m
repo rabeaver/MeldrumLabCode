@@ -1,6 +1,6 @@
 clear
 clc
-close all
+close all  
 
 %%
 
@@ -38,6 +38,23 @@ if linORlog == 1
 else
     T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 end
+%% SNR calc
+
+% Read Noise
+filename = 'glycerol_T1IR_BURP_Noisecollect_32scans';
+fileloc = strcat(filedir,filename,'.tnt');
+
+% Read file
+[ap,specN,spec,spec3,spec4] = readTecmag4d(fileloc);
+
+
+[~,Spoint] = max(abs(real(spec2(21,:))));
+Spoint = Spoint + 16*nPts;
+S = (real(spec2(nT1Pts,Spoint-nPts/2:Spoint+nPts/2)));
+N = (imag(spec2(nT1Pts,Spoint-nPts/2:Spoint+nPts/2)));
+% N = (real(specN(Spoint-nPts/2:Spoint+nPts/2)))';
+
+SNR = snr(S,N)
 
 %% SNR calc
 data = reshape(spec2,nT1Pts,nPts,nEchoes);
@@ -64,6 +81,7 @@ hold on
 plot(abs(sdata))
 plot(abs(ndata))
 hold off
+
 %% Make 2D data set for T1IRT2 ILT
 
 data = reshape(spec2',nPts,nEchoes,nT1Pts);
