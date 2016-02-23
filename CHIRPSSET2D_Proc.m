@@ -9,17 +9,17 @@ close all
 % ===================================
 %
 
-datadir = 'C:\CommonData\EthyleneGLycol\';
-datafile = 'EtGlyLarge_chirpSTE_14Jan2016_4';
-noCHIRPfile = 'EtGlyLarge_CPMGref_14Jan2016';
+datadir = 'Z:\Data\BMF\T2D Chirp\Processing2_18_16\Hexadecane\';
+datafile = 'hexadecane_chirpSTE_350BW_2048_DELTA5m_Scans_16Feb2016_result';
+noCHIRPfile = 'hexadecane_chirpSTE_350BW_nochirp_2048_DELTA5m_Scans_16Feb2016_result';
 
-Pchirp = 0.0014;                    % CHIRP Pulse Length (s)
+Pchirp = 0.000496;                    % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
 sliceheight = 0.350;                % mm
 
 nPts = 76;                          % # of acqu points
 omitPts = 4;                        % the number of points that are zeros from the spectrometer
-nEchoes = 256;                      % Echoes
+nEchoes = 128;                      % Echoes
 omitEchoes = 2;                     % numner of echoes to remove from data
 tD = 8e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700;                           % us
@@ -30,8 +30,8 @@ zf = 1;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
-delta = 1500e-6;                    % little delta time (s)
-DELTA = 10e-3; % Big delta time in s
+delta = 1e-3;                    % little delta time (s)
+DELTA = 5e-3; % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
@@ -201,8 +201,8 @@ xlabel('delta(eff) (s)')
 %% Data Range and Inversion
 
 
-minind= 123;
-maxind = 201;
+minind= 44;
+maxind = 180;
 % this is where I'm starting to put in some diffusion code. 
 
 T2Ddat = abs(T2Dprofcorr(minind:maxind,:)); %crops data set according to above indices
