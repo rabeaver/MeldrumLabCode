@@ -9,9 +9,11 @@ close all
 % ===================================
 %
 
-datadir = 'C:\CommonData\Glycerol\';
-datafile = 'GlycerolLarge_chirpSTE_350BW_512Scans_09Feb2016_result';
-noCHIRPfile = 'GlycerolLarge_chirpSTE_350BW_nochirp_512Scans_09Feb2016_result';
+
+datadir = 'Z:\Data\BMF\T2D Chirp\Processing2_18_16\Hexadecane\';
+datafile = 'hexadecane_chirpSTE_350BW_2048_DELTA5m_Scans_16Feb2016_result';
+noCHIRPfile = 'hexadecane_chirpSTE_350BW_nochirp_2048_DELTA5m_Scans_16Feb2016_result';
+
 
 Pchirp = 0.000496;                    % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
