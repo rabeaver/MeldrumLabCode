@@ -3,16 +3,16 @@ clc
 close all
 
 %%
-filename = 'CPMG_EVOO_1000usTe_2sTrep_512Echoes.tnt';
-filedir = 'C:\CommonData\CPMGT2_standards\';
+filename = 'AcetoneLarge_CPMG_4Mar2016_3.tnt';
+filedir = 'C:\CommonData\Acetone\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 
-tEcho = 700; %us
-nEchoes = 16;
-nPts = 76;
-nPtsBlank = 2;
+tEcho = 400; %us
+nEchoes = 32;
+nPts = 42;
+nPtsBlank = 0;
 
 %% SNR calc
 

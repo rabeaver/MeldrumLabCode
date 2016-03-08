@@ -9,15 +9,15 @@ close all
 % tic
 
 
-dt = 100e-9;             % time per point in waveform (s) [Scout limit is 20ns]
-tau = 0.000496;            % pulse length (s)
-sliceheight = 0.350;     % mm
+dt = 40e-9;             % time per point in waveform (s) [Scout limit is 20ns]
+tau = 0.0002468;            % pulse length (s)
+sliceheight = 0.150;     % mm
 
 
 G = 6.59;               %T m-1, B0 field gradient [PM25 = 6.59]
                         %                         [PM5 = 23.87]
 offset = 0;             %mm, frequency offset (if applicable)
-amplitude = 60;         %pwr, for Tecmag
+amplitude = 70;         %pwr, for Tecmag
 % NOTE: positive offset moves to the left in the FT spectrum (negative
 % position)
 
@@ -28,7 +28,7 @@ EXPramp = 0;
 % shape for edges of amplitude profile
 WURSTshape = 0;
 LINEARshape = 1;
-linearPct = 0.05;       % percent of the front end and back end of the pulse
+linearPct = 0.01;       % percent of the front end and back end of the pulse
                         % that will be linearly ramped
 
 

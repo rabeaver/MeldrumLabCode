@@ -10,30 +10,31 @@ close all
 %
 
 
-datadir = 'Z:\Data\BMF\T2D Chirp\Processing2_18_16\Hexadecane\';
-datafile = 'hexadecane_chirpSTE_350BW_2048_DELTA5m_Scans_16Feb2016_result';
-noCHIRPfile = 'hexadecane_chirpSTE_350BW_nochirp_2048_DELTA5m_Scans_16Feb2016_result';
+datadir = 'C:\CommonData\Acetone\';
+datafile = 'AcetoneLarge_chirpSTE_4Mar2016_6_result';
+noCHIRPfile = 'AcetoneLarge_nochirpSTE_8Mar2016_1_result';
 
 
-Pchirp = 0.000496;                    % CHIRP Pulse Length (s)
+Pchirp = 246.8e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
-sliceheight = 0.350;                % mm
+sliceheight = 0.150;                % mm
+rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 76;                          % # of acqu points
+nPts = 20;                          % # of acqu points
 omitPts = 4;                        % the number of points that are zeros from the spectrometer
-nEchoes = 128;                      % Echoes
-omitEchoes = 4;                     % numner of echoes to remove from data
-tD = 8e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700;                           % us
-preCHIRPdelay = 1e-6;              % s
-noisePoints =4;                   % number of points for measuring noise
+nEchoes = 64;                      % Echoes
+omitEchoes = 0;                     % numner of echoes to remove from data
+tD = 16e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 400;                           % us
+preCHIRPdelay = 0.2e-6;             % s
+noisePoints = 2;                    % number of points for measuring noise
 
 zf = 1;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
-delta = 1e-3;                    % little delta time (s)
-DELTA = 20e-3; % Big delta time in s
+delta = 0.5e-3;                       % little delta time (s)
+DELTA = 0.5e-3;                       % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
@@ -47,9 +48,11 @@ BWchirp = sliceheight*G*gamma*1000; % CHIRP bandwidth (Hz)
 deltaMax = (delta+Pchirp)/2;        % little effective deltamax time in s
 deltaMin = (delta-Pchirp)/2;        % little effective deltamin time in s
 
+CHIRPtimeDelay = rampPct * Pchirp + preCHIRPdelay;
+
 T = tD;                             % Sample time
 Fs = 1/T;                           % Sampling frequency 
-L = (nPts-omitPts)*(2^zf);      % Length of signal
+L = (nPts-omitPts)*(2^zf);          % Length of signal
 NFFT = 2^nextpow2(L);               % Next power of 2 from length of y
 
 echoVec = tE*(omitEchoes+1):tE:(nEchoes*tE);
@@ -189,22 +192,29 @@ plot(abs(T2Dprofcorr(:,1)))
 xlim([0 NFFT])
 ylim(ylimits)
 xlabel('index')
+
 subplot(4,1,2)
 plot(1e6*t1_fig7,abs(T2Dprofcorr(:,1)))
 line(1e6*[0 0],[0 ylimits(2)])
 line(1e6*[Pchirp Pchirp],[0 ylimits(2)])
+line(1e6*[0+CHIRPtimeDelay 0+CHIRPtimeDelay],[0 ylimits(2)],'Color','r','LineStyle','--')
+line(1e6*[Pchirp-CHIRPtimeDelay Pchirp-CHIRPtimeDelay],[0 ylimits(2)],'Color','r','LineStyle','--')
 xlim(1e6*[min(t1_fig7), max(t1_fig7)]);
 ylim(ylimits)
 set(gca,'XDir','reverse')
 xlabel('CHIRP time (us)')
+
 subplot(4,1,3)
 plot(1e6*deltaEff,abs(T2Dprofcorr(:,1)))
 line(1e6*[0 0],[0 ylimits(2)])
 line(1e6*[delta delta],[0 ylimits(2)])
+line(1e6*[2*CHIRPtimeDelay 2*CHIRPtimeDelay],[0 ylimits(2)],'Color','r','LineStyle','--')
+line(1e6*[delta-2*CHIRPtimeDelay delta-2*CHIRPtimeDelay ],[0 ylimits(2)],'Color','r','LineStyle','--')
 xlim(1e6*[min(deltaEff), max(deltaEff)]);
 ylim(ylimits)
 % set(gca,'XDir','reverse')
 xlabel('effective delta (us)')
+
 subplot(4,1,4)
 plot(z,abs(T2Dprofcorr(:,1)))
 line([-sliceheight*1e3/2 -sliceheight*1e3/2],[0 ylimits(2)])
@@ -215,8 +225,8 @@ ylim(ylimits)
 xlabel('z (um)')
 %% Data Range and Inversion
 
-minind= 110;
-maxind = 212;
+minind= 7;
+maxind = 26;
 % this is where I'm starting to put in some diffusion code. 
 
 T2Ddat = abs(T2Dprofcorr(minind:maxind,:)); %crops data set according to above indices

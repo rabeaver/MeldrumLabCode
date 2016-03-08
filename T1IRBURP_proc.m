@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'T1IRBURP_EthyleneGlycolMolecularSieves_22Feb2016_1024scans';
-filedir = 'C:\users\vjlee\Desktop\';
+filename = 'Hexadecane_exp500-2000ms_T1IR_1Mar2016_result';
+filedir = 'C:\CommonData\Hexadecane\';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -16,12 +16,12 @@ fileloc = strcat(filedir,filename,'.tnt');
 % Input experiment parameters
 
 tEcho = 700; %us
-nEchoes = 256;
+nEchoes = 128;
 nPts = 76;
 nPtsBlank = 4;
 omitEchoes = 0; 
-nT1Pts = 11;
-T1min = 0.1; %ms
+nT1Pts = 21;
+T1min = 500; %ms
 T1max = 2000; %ms
 noisePoints = 10; %number of points to use for noise at beginning and end of each acqu period
 noiseNumber = nT1Pts; %T1 point to use for SNR calc
@@ -41,7 +41,7 @@ end
 %% SNR calc
 
 % Read Noise
-filename = 'glycerol_T1IR_BURP_Noisecollect_32scans';
+% filename = 'glycerol_T1IR_BURP_Noisecollect_32scans';
 fileloc = strcat(filedir,filename,'.tnt');
 
 % Read file
