@@ -4,21 +4,21 @@ close all
 
 %%
 
-filename = 'AcetoneLarge_T1IR_4Mar2016_6.tnt';
-filedir = 'C:\CommonData\Acetone\';
+filename = 'DIWaterLarge_T1IR_10Mar2016_1.tnt';
+filedir = 'C:\CommonData\DIWater\';
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 150; %us
 
-nEchoes = 32;
-nPts = 64;
+nEchoes = 256;
+nPts = 78;
 nPtsBlank = 0;
-nT1Pts = 11;
-T1min = 100; %ms
-T1max = 1250; %ms
-T1guess = 100; %ms 
+nT1Pts = 21;
+T1min = 1; %ms
+T1max = 7500; %ms
+T1guess = 1500; %ms 
 
 % T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;

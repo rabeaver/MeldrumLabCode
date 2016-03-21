@@ -10,7 +10,7 @@ close all
 
 
 dt = 40e-9;             % time per point in waveform (s) [Scout limit is 20ns]
-tau = 0.0002468;            % pulse length (s)
+tau = 0.0002968;            % pulse length (s)
 sliceheight = 0.150;     % mm
 
 

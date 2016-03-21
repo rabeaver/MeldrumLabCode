@@ -3,7 +3,7 @@ clc
 close all
 
 %%
-filename = 'AcetoneLarge_CPMG_4Mar2016_3.tnt';
+filename = 'AcetoneLarge_CPMG_17Mar2016_1_result.tnt';
 filedir = 'C:\CommonData\Acetone\';
 fileloc = strcat(filedir,filename);
 
@@ -50,3 +50,4 @@ hold on
 plot(echoVector,dataIntRe);
 plot(echoVector,dataIntIm);
 plot(echoVector,ypred,'-r');
+xlabel('time/s')

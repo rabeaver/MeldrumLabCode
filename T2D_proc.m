@@ -4,15 +4,15 @@ close all
 
 %%
 datadir = 'C:\CommonData\EVOO\';
-datafile = 'EVOOLarge_TraditSTE_15mDEL_5Feb2016_result1';
+datafile = 'EVOOLarge_TraditSTE_15mDEL_14Mar2016';
 
 
-nPts = 76;                          % # of acqu points
+nPts = 30;                          % # of acqu points
 omitPts = 4;                        % the number of points that are zeros from the spectrometer
 nEchoes = 256;                      % Echoes
-omitEchoes = 4;                     % numner of echoes to remove from data
-tD = 4e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 500;                           % us
+omitEchoes = 2;                     % numner of echoes to remove from data
+tD = 20e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 700;                           % us
 deltaMin = 100e-6;                  % s
 deltaMax = 1000e-6;                 % s
 DELTA = 15e-3;                      % s
@@ -31,7 +31,7 @@ T2Ddat = reshape(spec2, ap.td(2), nPts, nEchoes);
 T2Ddat = T2Ddat(:,1:nPts-omitPts,omitEchoes+1:end);
 
 deltaVec = linspace(deltaMin,deltaMax,ap.td(2));
-xD = -gammaRad^2*G^2.*deltaVec.^2.*(DELTA+deltaVec/3)*1e-9;
+xD = -gammaRad^2*G^2.*deltaVec.^2.*(DELTA+2*deltaVec/3)*1e-9;
 
 echoVec = tE*(omitEchoes+1):tE:(nEchoes*tE);
 

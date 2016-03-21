@@ -6,7 +6,7 @@ clc
 close all
 
 %% load data, paramaters
-datadir = '/Users/tyler/Desktop/TOSEND_Genpurp_DELM_15Aug/1/';
+datadir = 'C:\Users\tkmeldrum\Desktop\3march_10sCure_DELM/1/';
 % datadir = '/Users/tyler/Desktop/TOSEND_Laromer_slide17_DELM_28Aug/2/';
 % datadir = '/Users/tyler/Desktop/TOSEND_Laromer_slide17_DELM_28Aug/1/';
 datafile = 'dataRe.dat';
@@ -50,8 +50,8 @@ xlabel('tau^2 [ms^2]')
 
 %% fit to line
 % choose indices for start and end range of the line in tau^2
-startind = 21;
-endind = 34;
+startind = 7;
+endind = 17;
 % genpurp: 21-34; laromer 1: 15-27; Laromer 2: 14-27
 
 

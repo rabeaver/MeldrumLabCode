@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'Hexadecane_exp500-2000ms_T1IR_1Mar2016_result';
-filedir = 'C:\CommonData\Hexadecane\';
+filename = 'T1IRBURP_degassedEthyleneGlycolMolecularSieves_19March2016_1024scans';
+filedir = 'C:\CommonData\EthyleneGlycolMolecularSieves\';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -16,21 +16,21 @@ fileloc = strcat(filedir,filename,'.tnt');
 % Input experiment parameters
 
 tEcho = 700; %us
-nEchoes = 128;
+nEchoes = 256;
 nPts = 76;
-nPtsBlank = 4;
+nPtsBlank = 1;
 omitEchoes = 0; 
-nT1Pts = 21;
-T1min = 500; %ms
+nT1Pts = 11;
+T1min = .100; %ms
 T1max = 2000; %ms
-noisePoints = 10; %number of points to use for noise at beginning and end of each acqu period
+noisePoints = 1; %number of points to use for noise at beginning and end of each acqu period
 noiseNumber = nT1Pts; %T1 point to use for SNR calc
 
 echoVector = ((1+omitEchoes)*tEcho:tEcho:nEchoes*tEcho); % T2 vector
 
 
 % Specify lin or log spaced points
-linORlog = 1; % 0 for linearly space and 1 for log spaced
+linORlog = 0; % 0 for linearly space and 1 for log spaced
 
 % Make T1vector
 if linORlog == 1
