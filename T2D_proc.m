@@ -3,8 +3,8 @@ clc
 close all
 
 %%
-datadir = 'C:\CommonData\EVOO\';
-datafile = 'EVOOLarge_TraditSTE_15mDEL_14Mar2016';
+datadir = '/Users/tyler/Google Drive/Data2016/Tecmag/Acetone/';
+datafile = 'AcetoneLarge_STE_31Mar2016_1';
 
 
 nPts = 30;                          % # of acqu points

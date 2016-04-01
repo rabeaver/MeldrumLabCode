@@ -36,6 +36,10 @@ apofac = 5;                         % Amount of Apodization
 delta = 0.6e-3;                       % little delta time (s)
 DELTA = 0.5e-3;                       % Big delta time in s
 
+%new code to account for fixed Td (total diffusion time)
+Td = 1700e-6; %s
+
+
 % ===================================
 % === END User-defined paramaters ===
 % ===================================
@@ -235,7 +239,13 @@ deltaSteps = deltaEff(minind:maxind);
 % deltaSteps = deltaFig(minind:maxind);
 
 yD = log(T2Ddat./T2Ddat(1))';
-xD = gammaRad^2*G^2.*deltaSteps.^2.*(DELTA + (2/3)*deltaSteps);
+% xD = gammaRad^2*G^2.*deltaSteps.^2.*(DELTA + (2/3)*deltaSteps);
+
+%new code to account for fixed Td (total diffusion time)
+DELTAVec = linspace(Td-2*min(deltaSteps),Td-2*max(deltaSteps),maxind-minind+1);
+DELTA = DELTAVec + deltaSteps;
+
+xD = gammaRad^2*G^2.*deltaSteps.^2.*(DELTA-deltaSteps/3);
 
 T2Dsize = size(T2Ddat,1); % cuts down delta points to math those selected for the indices,assuming that the 
 

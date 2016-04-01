@@ -4,7 +4,7 @@ close all
 
 %%
 datadir = '/Users/tyler/Google Drive/Data2016/Tecmag/Acetone/';
-datafile = 'AcetoneLarge_STE_30Mar2016_1_result';
+datafile = 'AcetoneLarge_STE_31Mar2016_1';
 
 
 nPts = 54;                          % # of acqu points
@@ -22,9 +22,6 @@ G = 6.59;                           % T m-1, B0 field gradient
 
 %new code to account for fixed Td (total diffusion time)
 Td = 1700e-6; %s
-
-
-
 
 gamma = 42.576;                     % MHz T-1
 gammaRad = gamma*2*pi*1e6;          % rad s-1 T-1
@@ -75,7 +72,7 @@ SNR_perRtScans = SNR/sqrt(2*ap.ns)
 %% Plot T2D data
 
 figure(1)
-surf(echoVec,deltaVec',data)
+surf(echoVec,xD',data)
 shading flat
 xlabel('T2 [s]')
 ylabel('delta [s]')
