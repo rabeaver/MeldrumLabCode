@@ -61,7 +61,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    spectrum_OUT = mxCreateDoubleMatrix(1,Xdim,mxREAL);
 	spectrum2 = mxGetPr(spectrum_OUT);
 	memcpy(spectrum2,spectrum,Xdim*sizeof(double));
-	compte_OUT = mxCreateScalarDouble(compte);
+	compte_OUT = mxCreateDoubleScalar(compte);
+    /* Replaced mxCreateScalarDouble with msCreateDoubleScalar on line above, TKM 31 Mar 2016. Compiles. */
 }
 
 int do_calculations(int Xdim, double *E, int *E_dim, int indice, double *spectrum, double *data, double *W)
@@ -102,7 +103,7 @@ int do_calculations(int Xdim, double *E, int *E_dim, int indice, double *spectru
 		
 		qrdecmp(E,E_dim,setp,oldsetp,u);
 		lineareqsolve(E,E_dim,setp,soln);
-		if(soln[indice] < 0) mexWarnMsgTxt("correction made for rounoff error.\n");
+		if(soln[indice] < 0) mexWarnMsgTxt("correction made for roundoff error.\n");
 /* only if soln[indice] < 0, find new indice */
 		while(soln[indice] < 0)
 	   {

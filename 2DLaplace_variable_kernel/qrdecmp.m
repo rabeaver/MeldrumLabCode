@@ -7,7 +7,7 @@ added = 1;
 removed = 1;
 u=zeros(1,tailleY);
 
-while setp(setlength)~=0 & oldsetp(setlength)~=0
+while setp(setlength)~=0 && oldsetp(setlength)~=0
     setlength = setlength + 1;
 end
 % find a zero to either setp or oldsetp

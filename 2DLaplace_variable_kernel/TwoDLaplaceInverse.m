@@ -524,10 +524,10 @@ set(handles.edit7,'string',sda);
 set(handles.edit8,'string',sdb);
 
 if (hr == 1) || ((hd == 1) && (gradvar == 0) && (delvar == 0))
-    [sta,nimportequoi] = size(timea);
+    sta = length(timea);
 end
 if (d2 == 1) && ((vr == 1) || ((vd == 1) && (gradvar == 0) && (delvar == 0)))
-    [stb,nimportequoi] = size(timeb);
+    stb = length(timeb);
 end
 
 % if (d1 == 1) && (T1T2dis == 1) && (dis == 0)
@@ -549,13 +549,13 @@ end
 % Check the validity of the data
 if (hr == 1) || ((gradvar == 0) && (delvar == 0))
 	if sta ~= sda
-		warndlg('error: chose the good data and time set', '!!Sorry!!');
+		warndlg('Error: Dimension mismatch.', 'Error');
 		return
 	end
 end
 if (d2 == 1) && ((vr == 1) || ((gradvar == 0) && (delvar == 0)))
     if stb ~= sdb
-        warndlg('error: chose the good data and time set', '!!Sorry!!');
+        warndlg('Error: Dimension mismatch.', 'Error');
 		return
     end
 end
@@ -602,7 +602,7 @@ if d2 == 1
     va = timea; 
     vb = timeb;
     axis([va(1),va(sda),vb(1),vb(sdb)]);
-	 shading interp;
+	 shading flat;
     if nfig == 1
        colorbar;            
     end
@@ -787,7 +787,7 @@ if d2 == 1
     va = timea;
     vb = timeb;
     axis([va(1),va(sda),vb(1),vb(sdb)]);
-    shading interp;
+    shading flat;
     if nfig == 1
        colorbar;            
     end
@@ -865,7 +865,7 @@ if d2 == 1
     va = timea;
     vb = timeb;
     axis([va(1),va(sda),vb(1),vb(sdb)]);
-    shading interp;
+    shading flat;
     if nfig == 1
        colorbar;            
     end
@@ -1025,7 +1025,7 @@ if d2 == 1
 		 caxis([0 1]);
 	 end
     shading interp;
-    set(gcf,'Renderer','zbuffer');
+%     %set(gcf,'Renderer','zbuffer');
     axis([taulh(1),taulh(sta(2)),taulv(1),taulv(stb(2))]);
 elseif d1 == 1
     plot(taulh,spectrum)
@@ -1121,7 +1121,7 @@ if trans == 1
         end
     end
 
-    spectrum = spectrum'
+    spectrum = spectrum';
     quelquechose = taulv;
     taulv = taulh;
     taulh = quelquechose;
@@ -1131,7 +1131,7 @@ end
 if nfig == 1 && d2 == 1
     fig=figure;
     axes('FontSize',12);
-    set(gcf,'Renderer','zbuffer');
+%     %set(gcf,'Renderer','zbuffer');
     set(fig,'DoubleBuffer','on');
     set(gca,'NextPlot','replace','Visible','off')
     surf(taulh,taulv',spectrum);
@@ -1189,8 +1189,8 @@ if nfig == 1 && videos == 1
 	 else
 		 caxis([0 1]);
 	 end
-	 shading interp;
-    set(gcf,'Renderer','zbuffer');
+	 shading flat;
+    %set(gcf,'Renderer','zbuffer');
     axis([taulh(1),taulh(sta(2)),taulv(1),taulv(stb(2)),min(min(spectrum)),max(max(spectrum))]);
     view([0 90]);
     set(gca,'visible','off');
@@ -1210,13 +1210,13 @@ end
 
 if nfig == 1 && videof == 1
     surf(taulh,taulv',spectrum)
-    set(gcf,'Renderer','zbuffer');
+    %set(gcf,'Renderer','zbuffer');
 	 if get(handles.checkbox9,'value')==0
 		 caxis('auto');
 	 else
 		 caxis([0 1]);
 	 end
-    shading interp;
+    shading flat;
     axis([taulh(1),taulh(sta(2)),taulv(1),taulv(stb(2)),min(min(spectrum)),max(max(spectrum))]);
     view([0 90]);
     set(gca,'visible','off');
@@ -1341,9 +1341,9 @@ for na = 1 : alphanb
 				else
 					caxis([0 1]);
 				end
-            shading interp;
+            shading flat;
             axis([taulh(1),taulh(sta(2)),taulv(1),taulv(stb(2))]);
-            set(gcf,'Renderer','zbuffer');
+            %set(gcf,'Renderer','zbuffer');
             colorbar;
         end
         if d1 == 1
@@ -1426,7 +1426,8 @@ if d2 == 1
     end
     if vd == 1
         V = (10^(V));
-        V = V * 1e-9;
+%         V = V * 1e-9;
+        V = V;
         set(handles.edit36,'string',V);
     end
 end

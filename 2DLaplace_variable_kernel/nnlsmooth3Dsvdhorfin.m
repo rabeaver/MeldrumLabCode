@@ -1,4 +1,4 @@
-function [spectrum, chisq, compte]=nnlsmooth3Dsvdhorfin(data, timea, timeb, taua, taub, spectrum, weighting, kernel1, kernel2);
+function [spectrum, chisq, compte]=nnlsmooth3Dsvdhorfin(data, timea, timeb, taua, taub, spectrum, weighting, kernel1, kernel2)
 
 % conditions to end the program
 repeat = 1;
@@ -6,8 +6,8 @@ fini = 0;
 
 % definition of the size of the data and the result X
 [tdatab,tdataa]=size(data);
-[nimportequoi,Xadim] = size(taua);
-[nimportequoi,Xbdim] = size(taub);
+[~,Xadim] = size(taua);
+[~,Xbdim] = size(taub);
 Xdim = Xadim*Xbdim;
 
 % step #1 of the L&H algorithm: initialization of the vectors
@@ -37,8 +37,8 @@ for a = 1 : Xbdim
 end
 
 % svd decomposition to reduce the size of the data
-[ua,sa,va] = svd(Ea,0);
-[ub,sb,vb] = svd(Eb,0);
+[ua,~,~] = svd(Ea,0);
+[ub,~,~] = svd(Eb,0);
 Ea = ua'*Ea;
 Eb = ub'*Eb;
 
@@ -70,7 +70,7 @@ end
 Es = E;
 conct = zeros(Xdim-2,1);
 datac = [data;conct];
-la = 1
+% la = 1;
 % including data into "systemmat" E
 E = [E datac];
 
@@ -81,16 +81,16 @@ chivector = zeros(tailledata,1);
 % (chivectro-dat)^2 = chisq;  same dimension than data
 answ = zeros(Xdim + tailledata -2,1);
 % answ = f-Ex, dimension Xdim + tailledata -2
-oldsetp = zeros(1,Xdim);
-setp = zeros(1,Xdim);
+%**oldsetp = zeros(1,Xdim);
+%**setp = zeros(1,Xdim);
 % set of P indices (at the beginning "empty")
-soln = zeros(1,Xdim);
+%**soln = zeros(1,Xdim);
 % soln: solution of the linear eq with the diagonalized systemmat
-W = zeros(Xdim,1);
+%**W = zeros(Xdim,1);
 % W = E'(f-Ex), same dimension as sepctrum (Xdim), needed for step #2
 % spectrum = zeros(1,Xdim); %distribution (result of the problem)
-setz = zeros(1,Xdim);
-setz = setz + 1; 
+%**setz = zeros(1,Xdim);
+%**setz = setz + 1; 
 % 1 indicates position filled, -1 indicates position empty
 
 
@@ -108,7 +108,7 @@ W = Es'*answ;
 % step #4 L&H
 % Find an index t in setz such that W(t) is the max of W
 % for the first step: no constraint
-[biggest,indice]=max(W);
+[~,indice]=max(W);
 [spectrum, compte] = TwoDLaplaceMainLoop(E, indice, spectrum, data, W);
 %  compte = 0;
 %  while fini == 0
@@ -220,7 +220,7 @@ W = Es'*answ;
 %     end
 %     
 % end
-compte
+% compte
 for i = 1 : tailledata
         chivector(i) = Es(i,:)*spectrum';
 end

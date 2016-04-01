@@ -3,22 +3,26 @@ clc
 close all
 
 %%
-datadir = 'C:\CommonData\EVOO\';
-datafile = 'EVOOLarge_TraditSTE_15mDEL_14Mar2016';
+datadir = '/Users/tyler/Google Drive/Data2016/Tecmag/Acetone/';
+datafile = 'AcetoneLarge_STE_30Mar2016_1_result';
 
 
-nPts = 30;                          % # of acqu points
+nPts = 54;                          % # of acqu points
 omitPts = 4;                        % the number of points that are zeros from the spectrometer
-nEchoes = 256;                      % Echoes
+nEchoes = 64;                      % Echoes
 omitEchoes = 2;                     % numner of echoes to remove from data
-tD = 20e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700;                           % us
-deltaMin = 100e-6;                  % s
-deltaMax = 1000e-6;                 % s
-DELTA = 15e-3;                      % s
+tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 400;                           % us
+deltaMin = 20e-6;                  % s
+deltaMax = 600e-6;                 % s
+DELTA = 0.5e-3;                      % s
 noisePoints = 4;                   % number of points for measuring noise
 noiseNumber = 1;                    % scan number to use for determining SNR
 G = 6.59;                           % T m-1, B0 field gradient
+
+%new code to account for fixed Td (total diffusion time)
+Td = 1700e-6; %s
+
 
 
 
@@ -31,9 +35,14 @@ T2Ddat = reshape(spec2, ap.td(2), nPts, nEchoes);
 T2Ddat = T2Ddat(:,1:nPts-omitPts,omitEchoes+1:end);
 
 deltaVec = linspace(deltaMin,deltaMax,ap.td(2));
-xD = -gammaRad^2*G^2.*deltaVec.^2.*(DELTA+2*deltaVec/3)*1e-9;
+%new code to account for fixed Td (total diffusion time)
+DELTAVec = linspace(Td-2*deltaMin,Td-2*deltaMax,ap.td(2));
+DELTA = DELTAVec + deltaVec;
 
-echoVec = tE*(omitEchoes+1):tE:(nEchoes*tE);
+xD = gammaRad^2*G^2.*deltaVec.^2.*(DELTA-deltaVec/3);
+% xD = gammaRad^2*G^2.*deltaVec.^2.*(DELTA+2*deltaVec/3);
+
+echoVec = (tE*(omitEchoes+1):tE:(nEchoes*tE))*1e-6;
 
 data = sum(real(T2Ddat),2);
 data = reshape(data,ap.td(2),(nEchoes-omitEchoes));
@@ -66,12 +75,15 @@ SNR_perRtScans = SNR/sqrt(2*ap.ns)
 %% Plot T2D data
 
 figure(1)
-surf(echoVec/1000,1000*deltaVec',data)
+surf(echoVec,deltaVec',data)
 shading flat
-xlabel('T2 [ms]')
-ylabel('delta [ms]')
+xlabel('T2 [s]')
+ylabel('delta [s]')
 
 save(strcat(datadir,datafile, '.dat'), 'data', '-ascii')
+% csvwrite(strcat(datadir,datafile, '.csv'), data)
+save(strcat(datadir,datafile, '_T2dim.dat'), 'echoVec', '-ascii')
+save(strcat(datadir,datafile, '_DDim.dat'), 'xD', '-ascii')
 
 %UF Points [Min, Max; min(echoVec), max(echoVec), delta(eff)(min) [us], delta(eff)(max) [us], #echoes, #D points]
 % sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
@@ -79,4 +91,5 @@ save(strcat(datadir,datafile, '.dat'), 'data', '-ascii')
 fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
 fprintf(fileID,'%s: %f; %.0f %.0f %.2f %.2f; %d %d\n',datafile, SNR, min(echoVec), max(echoVec), 1e6*min(deltaVec), 1e6*max(deltaVec), size(data,2), size(data,1));
 fclose(fileID);
+
 

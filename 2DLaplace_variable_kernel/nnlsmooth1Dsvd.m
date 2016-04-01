@@ -6,8 +6,8 @@ repeat = 1;
 fini = 0;
 
 % definition of the size of the data and the result
-[nimportequoi,tailledata] = size(data);
-[nimportequoi,Xdim] = size(tau);
+[~,tailledata] = size(data);
+[~,Xdim] = size(tau);
 
 % step #1 of the L&H algorithm: initialization of the vectors
 
@@ -17,7 +17,7 @@ fini = 0;
 % matrice of the exp(-time/tau). from Tailledata + 1 to tailledata+Xdim-2: includes the weighting
 
 systemmat = zeros(tailledata,Xdim);
-designmat = zeros(tailledata,Xdim);
+% designmat = zeros(tailledata,Xdim);
 
 kernel1=vectorize(strtrim(strrep(strrep(strrep(kernel1,'h','time'''),'D','(1/tau(a))'),'T','tau(a)')));
 func1=inline(kernel1,'a','time','tau');
@@ -26,15 +26,15 @@ for a = 1 : Xdim
     systemmat (:,a) = func1(a,time,tau);
 end
 
-ssyb = size(systemmat);
+% ssyb = size(systemmat);
 % svd decomposition to reduce the size of the data
 
-[u,s,v] = svd(systemmat,0);
+[u,~,~] = svd(systemmat,0);
 
 systemmat = u'*systemmat;
 data = u'*data';
 
-[nimportequoi,tailledata] = size(systemmat);
+[~,tailledata] = size(systemmat);
 conct = zeros(Xdim-2,Xdim);
 systemmat = [systemmat;conct];
 
@@ -52,7 +52,7 @@ datac = [data;conct];
 % including data into systemmat
 systemmat = [systemmat datac];
 
-ssya = size(systemmat)
+% ssya = size(systemmat)
 
 designmatT=designmat';      % tranpose of the matrix designmat for the step #2 of the L&H algorithm
 
@@ -62,12 +62,12 @@ chivector = zeros(tailledata,1);
 % (chivectro-dat)^2 = chisq;  same dimension than data
 answ = zeros(Xdim + tailledata -2,1);
 % answ = f-Ex, dimension Xdim + tailledata -2
-oldsetp = zeros(1,Xdim);
+% oldsetp = zeros(1,Xdim);
 setp = zeros(1,Xdim);
 % set of P indices (at the beginning "empty")
 soln = zeros(1,Xdim);
 % soln: solution of the linear eq with the diagonalized systemmat
-W = zeros(Xdim,1);
+% W = zeros(Xdim,1);
 % W = E'(f-Ex), same dimension as sepctrum (Xdim), needed for step #2
 % spectrum = zeros(1,Xdim); %distribution (result of the problem)
 setz = zeros(1,Xdim);
@@ -86,10 +86,10 @@ W = designmatT*answ;
 % step #4 L&H
 % Find an index t in setz such that W(t) is the max of W
 % for the first step: no constraint
-[biggest,indice]=max(W);
-compte = 0
+[~,indice]=max(W);
+compte = 0;
 while fini == 0
-    compte = compte + 1
+    compte = compte + 1;
     % step #5 of the L&H algorithm
     % move the index "indice" from the set setz to the set setp
     oldsetp = setp;
@@ -179,7 +179,7 @@ while fini == 0
     
     % step #4 of the L&H algorithm
     % find index of bigger number in W, whose index is still in setz
-    indice = 0;
+%     indice = 0;
     biggest = 0;
     indice = 0;
     for i = 1 : Xdim

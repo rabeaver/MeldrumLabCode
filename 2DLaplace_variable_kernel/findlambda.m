@@ -7,7 +7,7 @@ zeroindice=0;
 lambda=0;
 for i = 1 : Xdim
     if setp(i) ~= 0
-       sol = soln(setp(i));
+%        sol = soln(setp(i));
         
        if soln(setp(i))<0
             % run thought all indices in setp, 
@@ -19,7 +19,7 @@ for i = 1 : Xdim
                 zeroindice = setp(i);
             end
             if spectrum(setp(i))/(spectrum(setp(i))-soln(setp(i))) < lambda
-                la = 2;
+%                 la = 2;
                 lambda = spectrum(setp(i))/(spectrum(setp(i))-soln(setp(i)));
                 % successive loops compared to current lambda
                 zeroindice = setp(i);

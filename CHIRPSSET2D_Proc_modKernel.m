@@ -10,7 +10,7 @@ close all
 %
 
 
-datadir = 'C:\CommonData\Acetone\';
+datadir = '/Users/tyler/Google Drive/Data2016/Tecmag/Acetone/';
 datafile = 'AcetoneLarge_chirpSTE_short_18Mar2016_3_result';
 noCHIRPfile = 'AcetoneLarge_nochirpSTE_short_18Mar2016_3_result';
 
@@ -55,7 +55,7 @@ Fs = 1/T;                           % Sampling frequency
 L = (nPts-omitPts)*(2^zf);          % Length of signal
 NFFT = 2^nextpow2(L);               % Next power of 2 from length of y
 
-echoVec = tE*(omitEchoes+1):tE:(nEchoes*tE);
+echoVec = (tE*(omitEchoes+1):tE:(nEchoes*tE))*1e-6;
 t = (-(L-1)/2:L/2)*T;               % Time vector
 f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
@@ -108,7 +108,7 @@ xlabel('real space [um]')
 title('Plot of first T2-D FFT Profile and Echo')
 
 figure(2)
-surf(echoVec'/1000,z,abs(T2Dprofiles));
+surf(echoVec'*1000,z,abs(T2Dprofiles));
 shading flat;
 title('Surface plot of T2-D FFT Profiles')
 xlabel('T2 [ms]')
@@ -141,7 +141,7 @@ xlabel('real space [um]')
 title('Plot of first reference FFT Profile and Echo')
 
 figure(4)
-surf(echoVec'/1000,z,abs(CPprofiles));
+surf(echoVec'*1000,z,abs(CPprofiles));
 shading flat;
 title('Surface plot of reference FFT Profile')
 xlabel('T2 [ms]')
@@ -235,17 +235,17 @@ deltaSteps = deltaEff(minind:maxind);
 % deltaSteps = deltaFig(minind:maxind);
 
 yD = log(T2Ddat./T2Ddat(1))';
-xD = -gammaRad^2*G^2.*deltaSteps.^2.*(DELTA + (2/3)*deltaSteps);
+xD = gammaRad^2*G^2.*deltaSteps.^2.*(DELTA + (2/3)*deltaSteps);
 
 T2Dsize = size(T2Ddat,1); % cuts down delta points to math those selected for the indices,assuming that the 
 
 % fit to STE diffusion equation
-p = polyfit(xD(1:T2Dsize),(yD(1,:)),1);
+p = polyfit(-xD(1:T2Dsize),(yD(1,:)),1);
 
 figure(9)
 hold on
-scatter(xD(1:T2Dsize),(yD(1,:))) 
-plot(xD(1:T2Dsize),polyval(p,xD(1:T2Dsize)));
+scatter(-xD(1:T2Dsize),(yD(1,:))) 
+plot(-xD(1:T2Dsize),polyval(p,-xD(1:T2Dsize)));
 
 D = p(1)        % m^2 s^-1
 
@@ -253,7 +253,7 @@ D = p(1)        % m^2 s^-1
 %% surf of all T2-D Profiles
 
 figure(10)
-surf(echoVec/1000,deltaSteps*1e6,T2Ddat);
+surf(echoVec*1000,deltaSteps*1e6,T2Ddat);
 shading flat
 colormap('jet');
 colorbar 
@@ -266,10 +266,12 @@ close all
 
 % T2Dexp = flipud(T2Ddat);
 save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
+save(strcat(datadir,datafile, '_T2dim.dat'), 'echoVec', '-ascii')
+save(strcat(datadir,datafile, '_DDim.dat'), 'xD', '-ascii')
 
 %UF Points [Min, Max; min(echoVec), max(echoVec), delta(eff)(min) [us], delta(eff)(max) [us], #echoes, #D points]
 % sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
 dt = datestr(datetime('now','Format','dd MMMM yyyy HH:mm:ss'));
 fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
-fprintf(fileID,'%s %s: %f; %d %d; %.0f %.0f %.2f %.2f; %d %d\n',dt,datafile, SNR, minind, maxind, min(echoVec), max(echoVec), 1e6*min(deltaSteps), 1e6*max(deltaSteps), size(T2Ddat,2), size(T2Ddat,1));
+fprintf(fileID,'%s %s: %f; %d %d; %.0f %.0f %.2f %.2f; %d %d\n',dt,datafile, SNR, minind, maxind, min(echoVec*1e6), max(echoVec*1e6), 1e6*min(deltaSteps), 1e6*max(deltaSteps), size(T2Ddat,2), size(T2Ddat,1));
 fclose(fileID);

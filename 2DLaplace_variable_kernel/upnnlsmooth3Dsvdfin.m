@@ -27,12 +27,12 @@ Tamin = Tamm(1);
 Tamax = Tamm(2);
 Tbmin = Tbmm(1);
 Tbmax = Tbmm(2);
-taua = zeros(1,stepsa);
+% taua = zeros(1,stepsa);
 pasa = (log10(Tamax)-log10(Tamin))/(stepsa-1);
 taua = 10.^(log10(Tamin):pasa:log10(Tamax));
 
 if stepsb ~= 1
-    taub = zeros(1,stepsb);
+%     taub = zeros(1,stepsb);
     pasb = (log10(Tbmax)-log10(Tbmin))/(stepsb-1);
     taub = 10.^(log10(Tbmin):pasb:log10(Tbmax));
 else
@@ -41,8 +41,8 @@ end
 
 % constraint to avoid wrong data and time set
 [tailledatab,tailledataa] = size(data);
-[nimportequoi,ttimea] = size(timea);
-[nimportequoi,ttimeb] = size(timeb);
+ttimea = length(timea);
+ttimeb = length(timeb);
 if ttimea ~= tailledataa && ttimeb ~= tailledatab
     warndlg('error: the times and data matrices must have the same dimension');
     return
@@ -52,7 +52,7 @@ end
 
 % constraint on alpha
 pas = pasa; % Constraint applied on the dimension "a"
-pasdata = (log10(timea(1,ttimea))-log10(timea(1,1)))/(ttimea-1);
+pasdata = (log10(timea(ttimea))-log10(timea(1,1)))/(ttimea-1);
 constraint = 1/(sqrt(pasdata^2*pas^3*alpha));
 if constraint > 300
     warndlg('make alpha bigger');
@@ -61,12 +61,12 @@ end
 
 % initialisation for Uniform Penalty loop
 
-[nimportequoi,Xadim] = size(taua);
-[nimportequoi,Xbdim] = size(taub);
+[~,Xadim] = size(taua);
+[~,Xbdim] = size(taub);
 
-Xdim = Xadim*Xbdim;
-softcurvature = zeros(1,Xadim*Xbdim);
-softslope = zeros(1,Xadim*Xbdim);
+% Xdim = Xadim*Xbdim;
+% softcurvature = zeros(1,Xadim*Xbdim);
+% softslope = zeros(1,Xadim*Xbdim);
 spectrum = zeros(1,Xadim*Xbdim);
 beta = beta / (data(1))^2;
 
@@ -98,9 +98,9 @@ for uploop = 1 : Max
     compte = size(find(weighting < 1e-6));
     
 %     new size of the data after compression of the data but svd
-    tailledata = tailledataa*tailledatab
-    Xdim=Xadim*Xbdim
-    co=compte(2)
+    tailledata = tailledataa*tailledatab;
+%     Xdim=Xadim*Xbdim
+%     co=compte(2)
     % constraint on the number of weighting 
     if Xadim*Xbdim - compte(2) + tailledata - 2 < Xadim*Xbdim
         warndlg('need more data, more curvature constraint or fewer spectrum points');

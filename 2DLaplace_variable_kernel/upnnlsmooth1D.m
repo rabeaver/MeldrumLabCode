@@ -19,8 +19,8 @@ pas = (log10(Tamax)-log10(Tamin))/(steps-1);
 tau = 10.^(log10(Tamin):pas:log10(Tamax));
 
 % constraint
-[tailledata,nimportequoi] = size(data)
-[tailletime,nimportequoi] = size(time)
+[tailledata,~] = size(data);
+[tailletime,~] = size(time);
 
 if tailletime ~= tailledata
     warndlg('error: the time and data vectors must have the same length');
@@ -37,10 +37,10 @@ end
 % initialisation for Uniform Penalty loop
 time = time';
 data = data';
-[nimportequoi,Xdim] = size(tau);
+[~,Xdim] = size(tau);
 
-softcurvature = zeros(1,Xdim);
-softslope = zeros(1,Xdim);
+% softcurvature = zeros(1,Xdim);
+% softslope = zeros(1,Xdim);
 spectrum = zeros(1,Xdim);
 beta = beta / (data(1))^2;
 

@@ -8,7 +8,7 @@ setlength = ind(1)-1;
 tempans = zeros(1,setlength);       % initialise tempans
 tempans(setlength) = systemmat(setlength,Xdim1)/systemmat(setlength,setp(setlength));
 for i = setlength-1 :-1 : 1
-    som = 0;
+%     som = 0;
     som = sum(systemmat(i,setp(setlength:-1:i+1)).*tempans(setlength:-1:i+1));
     tempans(i) = (systemmat(i,Xdim1)-som)/systemmat(i,setp(i));    
 end
