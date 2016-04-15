@@ -3,19 +3,19 @@ clc
 close all
 
 %%
-datadir = '/Users/tyler/Google Drive/Data2016/Tecmag/Acetone/';
-datafile = 'AcetoneLarge_STE_31Mar2016_1';
+datadir = 'C:\CommonData\Glycerol\';
+datafile = 'GlycerolLarge_STE_newSeq_13Apr2016_1_result';
 
 
-nPts = 30;                          % # of acqu points
-omitPts = 4;                        % the number of points that are zeros from the spectrometer
-nEchoes = 256;                      % Echoes
+nPts = 54;                          % # of acqu points
+omitPts = 0;                        % the number of points that are zeros from the spectrometer
+nEchoes = 128;                      % Echoes
 omitEchoes = 2;                     % numner of echoes to remove from data
-tD = 20e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700;                           % us
-deltaMin = 100e-6;                  % s
-deltaMax = 1000e-6;                 % s
-DELTA = 15e-3;                      % s
+tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 400;                           % us
+deltaMin = 500e-6;                  % s
+deltaMax = 2500e-6;                 % s
+DELTA = 10e-3;                      % s
 noisePoints = 4;                   % number of points for measuring noise
 noiseNumber = 1;                    % scan number to use for determining SNR
 G = 6.59;                           % T m-1, B0 field gradient
@@ -36,6 +36,7 @@ xD = -gammaRad^2*G^2.*deltaVec.^2.*(DELTA+2*deltaVec/3)*1e-9;
 echoVec = tE*(omitEchoes+1):tE:(nEchoes*tE);
 
 data = sum(real(T2Ddat),2);
+% data = max(real(T2Ddat),[],2);
 data = reshape(data,ap.td(2),(nEchoes-omitEchoes));
 
 dataY = zeros(ap.td(2),nEchoes-omitEchoes);

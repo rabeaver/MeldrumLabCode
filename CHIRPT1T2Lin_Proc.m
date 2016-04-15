@@ -8,26 +8,26 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-datadir = 'C:\CommonData\BeadPack\';
-datafile = '15mMGd_SilicaBeads_CHIRP_07Jan2016_2';
-noCHIRPfile = '15mMGd_SilicaBeads_noCHIRP_07Jan2016_2';
+datadir = 'C:\CommonData\WaterMolecularSieves\';
+datafile = 'CHIRP_degassedWater_2.5spw_sliceheight350um_tD8u_76pts_256scans_300nsWave_7April2016';
+noCHIRPfile = 'noCHIRP_degassedWater_2.5spw_sliceheight350um_tD8u_76pts_256scans_300nsWave_7April2016';
 filenameExt = '';
 
-Pchirp = 0.01; % CHIRP Pulse Length (s)
+Pchirp = 2.5; % CHIRP Pulse Length (s)
 
 sliceheight = 0.350; %mm
-PreCPMGdelay = 250e-6; %s
+PreCPMGdelay = 300e-6; %s
 
 
-nPts = 48; % # of acqu points
-nEchoes = 128; % Echoes
-tD = 4e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 280; %us
+nPts = 76; % # of acqu points
+nEchoes = 32; % Echoes
+tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 700; %us
 omitEchoes = 0; %the number of echoes to skip
-noisePoints = 4; %number of points at beginning and end of each acqu period for noise
+noisePoints = 0; %number of points at beginning and end of each acqu period for noise
 omitPts = 0; %blank spectrometer points to skip
 
-zf = 1;                             % levels of zero filling
+zf = 0;                             % levels of zero filling
 apodize = 0;                        %Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 

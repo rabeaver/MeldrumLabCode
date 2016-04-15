@@ -3,16 +3,16 @@ clc
 close all
 
 %%
-filename = 'AcetoneLarge_CPMG_17Mar2016_1_result.tnt';
-filedir = 'C:\CommonData\Acetone\';
+filename = 'CPMG_degassedWaterMolecularSieves_700usTe_10sTrep_64Echoes.tnt';
+filedir = 'C:\CommonData\WaterMolecularSieves\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 
-tEcho = 400; %us
+tEcho = 700; %us
 nEchoes = 32;
-nPts = 42;
-nPtsBlank = 0;
+nPts = 76;
+nPtsBlank = 4;
 
 %% SNR calc
 

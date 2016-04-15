@@ -3,7 +3,7 @@ clc
 close all
 
 %%
-datadir = '/Users/tyler/Google Drive/Data2016/Tecmag/Acetone/';
+datadir = 'C:\CommonData\Acetone\';
 datafile = 'AcetoneLarge_STE_31Mar2016_1';
 
 

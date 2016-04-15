@@ -10,12 +10,12 @@ close all
 %
 
 
-datadir = 'C:\CommonData\Acetone\';
-datafile = 'AcetoneLarge_chirpSTE_short_18Mar2016_3_result';
-noCHIRPfile = 'AcetoneLarge_nochirpSTE_short_18Mar2016_3_result';
+datadir = 'C:\CommonData\Glycerol\';
+datafile = 'GlycerolLarge_chirpSTE_12Apr2016_1';
+noCHIRPfile = 'GlycerolLarge_nochirpSTE_12Apr2016_1';
 
 
-Pchirp = 296.8e-6;                  % CHIRP Pulse Length (s)
+Pchirp = 1246.8e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
 sliceheight = 0.150;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
@@ -23,7 +23,7 @@ rampPct = 0.01;                     % percent for the CHIRP power ramp to reach 
 nPts = 54;                          % # of acqu points
 omitPts = 4;                        % the number of points that are zeros from the spectrometer
 nEchoes = 64;                      % Echoes
-omitEchoes = 0;                     % numner of echoes to remove from data
+omitEchoes = 2;                     % numner of echoes to remove from data
 tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 400;                           % us
 preCHIRPdelay = 0.2e-6;             % s
@@ -33,8 +33,8 @@ zf = 1;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
-delta = 0.6e-3;                       % little delta time (s)
-DELTA = 0.5e-3;                       % Big delta time in s
+delta = 2.5e-3;                       % little delta time (s)
+DELTA = 10e-3;                       % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
@@ -225,8 +225,8 @@ ylim(ylimits)
 xlabel('z (um)')
 %% Data Range and Inversion
 
-minind= 49;
-maxind = 80;
+minind= 56;
+maxind = 76;
 % this is where I'm starting to put in some diffusion code. 
 
 T2Ddat = abs(T2Dprofcorr(minind:maxind,:)); %crops data set according to above indices

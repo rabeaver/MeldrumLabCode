@@ -3,19 +3,19 @@ clc
 close all
 
 %% User parameters
-filename = 'AcetoneLarge_STE_17Mar2016_1_result.tnt';
-filedir = 'C:\CommonData\Acetone\';
+filename = 'GlycerolLarge_STE_12Apr2016.tnt';
+filedir = 'C:\CommonData\Glycerol\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 400; %us
 nEchoes = 1;
-nPts = 42;
+nPts = 20;
 nPtsBlank = 4;
 omitEchoes = 0;
-DELTA = 0.5e-3; %s
-deltamin = 20e-6; %s
-deltamax = 600e-6; %s
+DELTA = 5e-3; %s
+deltamin = 100e-6; %s
+deltamax = 2000e-6; %s
 refocused_delta = 0; % if there are 180 pulses in the delta periods, set to 1 to adjust the delta time
 GM = 280; %MHz m-1
 

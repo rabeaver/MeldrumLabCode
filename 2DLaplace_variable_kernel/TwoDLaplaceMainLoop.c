@@ -62,7 +62,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	spectrum2 = mxGetPr(spectrum_OUT);
 	memcpy(spectrum2,spectrum,Xdim*sizeof(double));
 	compte_OUT = mxCreateDoubleScalar(compte);
-    /* Replaced mxCreateScalarDouble with msCreateDoubleScalar on line above, TKM 31 Mar 2016. Compiles. */
+    /* Replaced mxCreateScalarDouble with mxCreateDoubleScalar on line above, TKM 31 Mar 2016. Compiles. */
 }
 
 int do_calculations(int Xdim, double *E, int *E_dim, int indice, double *spectrum, double *data, double *W)
