@@ -3,15 +3,15 @@ clc
 close all
 
 %%
-filename = 'CPMG_degassedWaterMolecularSieves_700usTe_10sTrep_64Echoes.tnt';
-filedir = 'C:\CommonData\WaterMolecularSieves\';
+filename = 'CuWater_CPMG_21Apr2016_1.tnt';
+filedir = 'C:\CommonData\TAMU\CuWater\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 
-tEcho = 700; %us
-nEchoes = 32;
-nPts = 76;
+tEcho = 400; %us
+nEchoes = 64;
+nPts = 54;
 nPtsBlank = 4;
 
 %% SNR calc

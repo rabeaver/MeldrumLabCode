@@ -11,7 +11,7 @@ close all
 
 
 datadir = 'C:\CommonData\TAMU\CuWater\';
-datafile = 'CuWater_Channels_chirpSTE_22Apr2016_2';
+datafile = 'CuWater_Channels_chirpSTE_22Apr2016_1';
 noCHIRPfile = 'DNPWater_Channels_nochirpSTE_21Apr2016_1';
 
 
@@ -173,126 +173,97 @@ T2Dprofcorr = T2Dprofiles./pcorr;
 % caxis([0 1])
 % title('Coil sensitivity corrected T1-T2 profiles')
 
+%% Find Optimal data range with these figures
+ 
+figure(7)
+plot(abs(T2Dprofiles(:,1)))
+
+t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
+deltaFig = 2*Pchirp*(BWchirp/2-f)/BWchirp + deltaMin; % expression for delta(effective), maybe
+
+ylimits = [0 500];
+deltaEff = 2*t1_fig7 ;
+% deltaEff = delta - t1_fig7 - preCHIRPdelay;
+deltaEff = fliplr(deltaEff);
+
+figure(8)
+subplot(4,1,1)
+plot(abs(T2Dprofcorr(:,1)))
+xlim([0 NFFT])
+ylim(ylimits)
+xlabel('index')
+
+subplot(4,1,2)
+plot(1e6*t1_fig7,abs(T2Dprofcorr(:,1)))
+line(1e6*[0 0],[0 ylimits(2)])
+line(1e6*[Pchirp Pchirp],[0 ylimits(2)])
+line(1e6*[0+CHIRPtimeDelay 0+CHIRPtimeDelay],[0 ylimits(2)],'Color','r','LineStyle','--')
+line(1e6*[Pchirp-CHIRPtimeDelay Pchirp-CHIRPtimeDelay],[0 ylimits(2)],'Color','r','LineStyle','--')
+xlim(1e6*[min(t1_fig7), max(t1_fig7)]);
+ylim(ylimits)
+set(gca,'XDir','reverse')
+xlabel('CHIRP time (us)')
+
+subplot(4,1,3)
+plot(1e6*deltaEff,abs(T2Dprofcorr(:,1)))
+line(1e6*[0 0],[0 ylimits(2)])
+line(1e6*[delta delta],[0 ylimits(2)])
+line(1e6*[2*CHIRPtimeDelay 2*CHIRPtimeDelay],[0 ylimits(2)],'Color','r','LineStyle','--')
+line(1e6*[delta-2*CHIRPtimeDelay delta-2*CHIRPtimeDelay ],[0 ylimits(2)],'Color','r','LineStyle','--')
+xlim(1e6*[min(deltaEff), max(deltaEff)]);
+ylim(ylimits)
+% set(gca,'XDir','reverse')
+xlabel('effective delta (us)')
+
+subplot(4,1,4)
+plot(z,abs(T2Dprofcorr(:,1)))
+line([-sliceheight*1e3/2 -sliceheight*1e3/2],[0 ylimits(2)])
+line([sliceheight*1e3/2 1e3*sliceheight/2],[0 ylimits(2)])
+xlim([min(z), max(z)]);
+ylim(ylimits)
+% set(gca,'XDir','reverse')
+xlabel('z (um)')
+%% Data Range and Inversion
+
+minind= 85;
+maxind = 171;
+% this is where I'm starting to put in some diffusion code. 
+
+T2Ddat = abs(T2Dprofcorr(minind:maxind,:)); %crops data set according to above indices
+deltaSteps = deltaEff(minind:maxind);
+
+% deltaSteps = deltaFig(minind:maxind);
+
+yD = log(T2Ddat./T2Ddat(1))';
+xD = -gammaRad^2*G^2.*deltaSteps.^2.*(DELTA + (2/3)*deltaSteps);
+
+T2Dsize = size(T2Ddat,1); % cuts down delta points to math those selected for the indices,assuming that the 
+
+% fit to STE diffusion equation
+p = polyfit(xD(1:T2Dsize),(yD(1,:)),1);
+
+figure(9)
+hold on
+scatter(xD(1:T2Dsize),(yD(1,:))) 
+plot(xD(1:T2Dsize),polyval(p,xD(1:T2Dsize)));
+
+D = p(1)        % m^2 s^-1
+
 %%
 %Calculate delta(eff) from Excel file;
-
-% Need to only use points where abs(fIndex)<=BWchirp/2
-BigIndex = 1:NFFT;
 
 FOV = 1/(gamma*1e6*G*tD);
 m_per_pt = FOV/NFFT;
 BigDELTA = DELTA + delta;
 
-ptIndex = (1:NFFT);
-zBigIndex = FOV/2-BigIndex*m_per_pt;
-fBigIndex = zBigIndex * gamma*1e6 * G;
-
-ptIndex = find(abs(fBigIndex)<=BWchirp/2);
-fIndex = zBigIndex(min(ptIndex):max(ptIndex)) * gamma*1e6 * G;
-deltaEffIndex = (1-(((BWchirp/2)-fIndex)/BWchirp))*2*Pchirp*1000;
-qIndex = 2*pi*gamma*1e6*G*deltaEffIndex/1000;
-vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
-
-%% Find Optimal data range with these figures
-%  
-% figure(7)
-% plot(abs(T2Dprofiles(:,1)))
-% 
-% t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
-% deltaFig = 2*Pchirp*(BWchirp/2-f)/BWchirp + deltaMin; % expression for delta(effective), maybe
-% 
-% ylimits = [0 1500];
-% deltaEff = 2*t1_fig7 ;
-% % deltaEff = delta - t1_fig7 - preCHIRPdelay;
-% deltaEff = fliplr(deltaEff);
-% 
-% figure(8)
-% subplot(4,1,1)
-% plot(abs(T2Dprofcorr(:,1)))
-% xlim([0 NFFT])
-% ylim(ylimits)
-% xlabel('index')
-% 
-% subplot(4,1,2)
-% plot(1e6*t1_fig7,abs(T2Dprofcorr(:,1)))
-% line(1e6*[0 0],[0 ylimits(2)])
-% line(1e6*[Pchirp Pchirp],[0 ylimits(2)])
-% line(1e6*[0+CHIRPtimeDelay 0+CHIRPtimeDelay],[0 ylimits(2)],'Color','r','LineStyle','--')
-% line(1e6*[Pchirp-CHIRPtimeDelay Pchirp-CHIRPtimeDelay],[0 ylimits(2)],'Color','r','LineStyle','--')
-% xlim(1e6*[min(t1_fig7), max(t1_fig7)]);
-% ylim(ylimits)
-% set(gca,'XDir','reverse')
-% xlabel('CHIRP time (us)')
-% 
-% subplot(4,1,3)
-% plot(1e6*deltaEff,abs(T2Dprofcorr(:,1)))
-% line(1e6*[0 0],[0 ylimits(2)])
-% line(1e6*[delta delta],[0 ylimits(2)])
-% line(1e6*[2*CHIRPtimeDelay 2*CHIRPtimeDelay],[0 ylimits(2)],'Color','r','LineStyle','--')
-% line(1e6*[delta-2*CHIRPtimeDelay delta-2*CHIRPtimeDelay ],[0 ylimits(2)],'Color','r','LineStyle','--')
-% xlim(1e6*[min(deltaEff), max(deltaEff)]);
-% ylim(ylimits)
-% % set(gca,'XDir','reverse')
-% xlabel('effective delta (us)')
-% 
-% subplot(4,1,4)
-% plot(z,abs(T2Dprofcorr(:,1)))
-% line([-sliceheight*1e3/2 -sliceheight*1e3/2],[0 ylimits(2)])
-% line([sliceheight*1e3/2 1e3*sliceheight/2],[0 ylimits(2)])
-% xlim([min(z), max(z)]);
-% ylim(ylimits)
-% % set(gca,'XDir','reverse')
-% xlabel('z (um)')
-%% Data Range and Inversion
-
-minind= min(ptIndex);
-maxind = max(ptIndex);
-% this is where I'm starting to put in some diffusion code. 
-
-% T2Ddat = abs(T2Dprofcorr(minind:maxind,:)); %crops data set according to above indices
-% deltaSteps = deltaEff(minind:maxind);
-
-% deltaSteps = deltaFig(minind:maxind);
-
-yD = log(T2Ddat./T2Ddat(1))';
-% xD = -gammaRad^2*G^2.*deltaSteps.^2.*(DELTA + (2/3)*deltaSteps);
-
-T2Dsize = size(T2Ddat,1); % cuts down delta points to math those selected for the indices,assuming that the 
-
-% fit to STE diffusion equation
-p = polyfit(-vIndex(1:T2Dsize),(yD(1,:)),1);
-
-figure(9)
-hold on
-scatter(-vIndex(1:T2Dsize),(yD(1,:))) 
-plot(-vIndex(1:T2Dsize),polyval(p,-vIndex(1:T2Dsize)));
-
-D = p(1)        % *10-9 m^2 s^-1
-
-%%
-% %Calculate delta(eff) from Excel file;
-% 
-% % Need to only use points where abs(fIndex)<=BWchirp/2
-% BigIndex = 1:NFFT;
-% 
-% FOV = 1/(gamma*1e6*G*tD);
-% m_per_pt = FOV/NFFT;
-% BigDELTA = DELTA + delta;
-% 
-% ptIndex = (1:NFFT);
-% zBigIndex = FOV/2-BigIndex*m_per_pt;
-% fBigIndex = zBigIndex * gamma*1e6 * G;
-% 
-% ptIndex = find(abs(fBigIndex)<=BWchirp/2);
-% fIndex = zBigIndex(min(ptIndex):max(ptIndex)) * gamma*1e6 * G;
-% deltaEffIndex = (1-(((BWchirp/2)-fIndex)/BWchirp))*2*Pchirp*1000;
-% qIndex = 2*pi*gamma*1e6*G*deltaEffIndex/1000;
-% vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
+ptIndex = (minind:1:maxind);
+zIndex = FOV/2-ptIndex*m_per_pt;
+fIndex = zIndex * gamma*1e6 * G;
+deltaEffIndex = (1-(((CHIRPpw/2)-findex)/BW))*2*$E$11
 %% surf of all T2-D Profiles
 
 figure(10)
-% surf(echoVec/1000,deltaSteps*1e6,T2Ddat);
-surf(echoVec/1000,deltaEffIndex,T2Ddat);
+surf(echoVec/1000,deltaSteps*1e6,T2Ddat);
 shading flat
 colormap('jet');
 colorbar 
@@ -304,17 +275,15 @@ title('D-T2 data')
 close all
 
 t2axis = echoVec*1e-6; %s
-% vaxis = gammaRad^2*G^2.*deltaSteps.^2.*((DELTA+delta) - (1/3)*deltaSteps); %s/m2
+vaxis = gammaRad^2*G^2.*deltaSteps.^2.*((DELTA+delta) - (1/3)*deltaSteps); %s/m2
 t2axis = t2axis';
 
-% vaxis = [1.15, 1.39, 1.66, 1.94, 2.25, 2.58, 2.92, 3.29, 3.67, 4.08, 4.5, 4.93, 5.39, 5.86, 6.34]*1e7/1e9;
+vaxis = [1.15, 1.39, 1.66, 1.94, 2.25, 2.58, 2.92, 3.29, 3.67, 4.08, 4.5, 4.93, 5.39, 5.86, 6.34]*1e7/1e9;
 
-vIndex = flipud(fliplr(vIndex));
-T2Ddat = flipud(T2Ddat);
 % T2Dexp = flipud(T2Ddat);
 save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
 save(strcat(datadir,datafile, '_T2axis.dat'), 't2axis', '-ascii')
-save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
+save(strcat(datadir,datafile, '_vaxis.dat'), 'vaxis', '-ascii')
 
 %UF Points [Min, Max; min(echoVec), max(echoVec), delta(eff)(min) [us], delta(eff)(max) [us], #echoes, #D points]
 % sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
