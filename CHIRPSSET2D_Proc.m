@@ -285,12 +285,12 @@ ylabel('delta [us]');
 title('D-T2 data')
 
 %% Save data, display ILT Data params
-close all
+% close all
 
 t2axis = echoVec*1e-6; %s
 % vaxis = gammaRad^2*G^2.*deltaSteps.^2.*((DELTA+delta) - (1/3)*deltaSteps); %s/m2
 t2axis = t2axis';
-
+% 
 vIndex = flipud(fliplr(vIndex));
 T2Ddat = flipud(T2Ddat);
 % T2Dexp = flipud(T2Ddat);
@@ -298,9 +298,48 @@ save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
 save(strcat(datadir,datafile, '_T2axis.dat'), 't2axis', '-ascii')
 save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
 
-% NEED TO FIX THE OUTPUT FOR THIS
+%%
+
+Thmm = [0.01, 1]; %T2 (min and max)
+stepsh = 25; %horizontal steps
+Tvmm = [1e-12, 1e-8]; %D min and max
+stepsv = 25;
+alpha = 5e6;
+orient = 'b'; %both orientations
+kernel1 = 'exp(-h/T)';
+kernel2 = 'exp(-v*D)';
+
+Tvmm = Tvmm*1e9;
+
+tic
+    [spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(flipud(T2Ddat),echoVec*1e-6,rot90(vIndex,2),Thmm,stepsh,Tvmm,stepsv,alpha,-1,orient,kernel1,kernel2);
+toc
+
+taulv = log10(tauv);
+stb = size(taulv);
+taulh = log10(tauh);
+sta = size(taulh);
+
+% spectrum = flipdim(spectrum,1);
+% tauv = 1./tauv;
+% tauv = flipdim(tauv,2);
+    
+surf(tauh,tauv,spectrum)    
+set(gca,'XScale','log','YScale','log')
+shading interp;
+%     %set(gcf,'Renderer','zbuffer');
+% axis([tauh(1),tauh(sta(2)),tauv(1),tauv(stb(2))]);
+view([0 90])
+xlabel('T_2 [s]')
+ylabel('D [m^2 s^{-1}]')
+
+
+
 
 %%
+% NEED TO FIX THE OUTPUT FOR THIS
+
+%
 %UF Points [Min, Max; min(echoVec), max(echoVec), delta(eff)(min) [us], delta(eff)(max) [us], #echoes, #D points]
 % sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
 dt = datestr(datetime('now','Format','dd MMMM yyyy HH:mm:ss'));
