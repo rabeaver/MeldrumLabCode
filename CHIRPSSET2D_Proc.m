@@ -9,41 +9,46 @@ close all
 % ===================================
 %
 
+spectrometer = 'Kea'; %'Tecmag'
+datadir = 'Z:\Data\TKM\CHIRP\Kea\EthyleneGlycol\';
+datafile = 'UFT2D\4\data';
+noCHIRPfile = 'UFT2D_ref\3\data';
 
-datadir = '/Users/tyler/Dropbox/Data/TAMU/EthyleneGlycol/';
-datafile = 'EtGly_chirpSTE_23Apr2016_1_result';
-noCHIRPfile = 'EtGly_nochirpSTE_23Apr2016_1_result';
 
-
-Pchirp = 243.8e-6;                  % CHIRP Pulse Length (s)
-pw     = 12e-6;                      % hard pulse length
-sliceheight = 0.2;                % mm
+Pchirp = 453.75e-6;                  % CHIRP Pulse Length (s)
+pw     = 4.75e-6;                      % hard pulse length
+sliceheight = 0.10;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 38;                          % # of acqu points
+nPts = 56;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
-nEchoes = 512;                      % Echoes
+nEchoes = 128;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 400;                           % us
-preCHIRPdelay = 0.2e-6;             % s
-noisePoints = 1;                    % number of points for measuring noise
+preCHIRPdelay = 0.04e-6;             % s
+noisePoints = 4;                    % number of points for measuring noise
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
-zf = 2;                             % levels of zero filling
+zf = 0;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
-delta = 0.5e-3;                       % little delta time (s)
-DELTA = 30e-3;                       % Big delta time in s
+delta = 1e-3;                       % little delta time (s)
+DELTA = 1e-3;                       % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
 % ===================================
 
-G = 6.59;                           % T m-1, B0 field gradient
+if strcmp(spectrometer,'Tecmag')==1;
+    G = 6.59;                           % T m-1, B0 field gradient
+elseif strcmp(spectrometer,'Kea')==1;    
+    G = 23.87;
+end
+
 gamma = 42.576;                     % MHz T-1
 gammaRad = gamma*2*pi*1e6;          % rad s-1 T-1
 BWchirp = sliceheight*G*gamma*1000; % CHIRP bandwidth (Hz)
@@ -61,10 +66,15 @@ NFFT = 2^nextpow2(L);               % Next power of 2 from length of y
 echoVec = tE*(omitEchoes+1):tE:(nEchoes*tE);
 t = (-(L-1)/2:L/2)*T;               % Time vector
 f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
-z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
+z = f/(gamma*G);                    % um, 280.47 Hz/um (for PM25)
 
 %% Import CHIRP data
-[ap , spec] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
+if strcmp(spectrometer,'Tecmag')==1;
+    [ap , spec] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
+elseif strcmp(spectrometer,'Kea')==1;
+    [ap , spec] = readKea4d(strcat(datadir,datafile,'.2d'));
+end
+
 CHIRPdat = reshape(spec, nPts, nEchoes);
 CHIRPdat = CHIRPdat(1+omitPtsFront:end-omitPtsBack,omitEchoes+1:end);
 
@@ -119,7 +129,13 @@ ylabel('z [um]')
 view([0 90])
 
 %% No CHIRP load section
-[ap,spec] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
+close all
+if strcmp(spectrometer,'Tecmag')==1;
+    [~ , spec] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
+elseif strcmp(spectrometer,'Kea')==1;
+    [~ , spec] = readKea4d(strcat(datadir,noCHIRPfile,'.2d'));
+end
+
 data = reshape(spec,nPts+cutRefPts,nEchoes);
 
 % No CHIRP raw data and fft profiles
@@ -196,7 +212,7 @@ deltaEffIndex = (1-(((BWchirp/2)-fIndex)/BWchirp))*2*Pchirp*1000;
 qIndex = 2*pi*gamma*1e6*G*deltaEffIndex/1000;
 vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
 
-%% Find Optimal data range with these figures
+Find Optimal data range with these figures
 %  
 % figure(7)
 % plot(abs(T2Dprofiles(:,1)))
@@ -291,7 +307,7 @@ t2axis = echoVec*1e-6; %s
 % vaxis = gammaRad^2*G^2.*deltaSteps.^2.*((DELTA+delta) - (1/3)*deltaSteps); %s/m2
 t2axis = t2axis';
 % 
-vIndex = flipud(fliplr(vIndex));
+vIndex = (fliplr(vIndex));
 T2Ddat = flipud(T2Ddat);
 % T2Dexp = flipud(T2Ddat);
 save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
@@ -301,9 +317,9 @@ save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
 %%
 
 Thmm = [0.01, 1]; %T2 (min and max)
-stepsh = 25; %horizontal steps
-Tvmm = [1e-12, 1e-8]; %D min and max
-stepsv = 25;
+stepsh = 10; %horizontal steps
+Tvmm = [1e-11, 1e-8]; %D min and max
+stepsv = 10;
 alpha = 5e6;
 orient = 'b'; %both orientations
 kernel1 = 'exp(-h/T)';
@@ -315,10 +331,24 @@ tic
     [spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(flipud(T2Ddat),echoVec*1e-6,rot90(vIndex,2),Thmm,stepsh,Tvmm,stepsv,alpha,-1,orient,kernel1,kernel2);
 toc
 
-taulv = log10(tauv);
-stb = size(taulv);
-taulh = log10(tauh);
-sta = size(taulh);
+% the vertical (D) axis isn't calibrated correctly, and I'm not sure what
+% the reason is.
+
+%     spectrum = flipdim(spectrum,1);
+    tauv = 1./tauv;
+    tauv = tauv*1e-9;
+    tauv = flipdim(tauv,2);
+%     spectrum = spectrum';
+% figure
+% surf(echoVec*1e-6,rot90(vIndex,2),flipud(T2Ddat))
+% shading flat
+
+%%
+% taulv = log10(tauv);
+stb = size(tauv);
+% taulh = log10(tauh);
+sta = size(tauh);
+tauv = tauv';
 
 % spectrum = flipdim(spectrum,1);
 % tauv = 1./tauv;
