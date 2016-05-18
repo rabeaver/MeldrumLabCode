@@ -5,13 +5,13 @@ close all
 %%
 
 info.parfilename = 'acqu';
-info.datafilename = 'Cyclododecanone_Ceramic';
-info.dirstem = 'Z:\Data\TKM\NGA_12May2016\Hamada\Cyclododecanone_Ceramic\';
+info.datafilename = 'Noconsolidant_papyrus';
+info.dirstem = '/Volumes/ISC1026/Data/TKM/NGA_12May2016/Hamada/Noconsolidant_papyrus/';
 omitpoints = 0;
 
 fitopts = statset('MaxIter',5000,'TolX',1e-14,'UseParallel',true,'Display','off');
 
-dir = strcat(info.dirstem,num2str(1),'/');
+dir = strcat(info.dirstem,num2str(3),'/');
 cd(dir);
 
 params.acqTime = readpar_Kea(strcat(info.parfilename,'.par'),'acqTime');

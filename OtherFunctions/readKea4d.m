@@ -46,8 +46,11 @@ elseif p.dataType == 502; %(8) byte double array (r,r,r ...)
     readSize = p.xDim*p.yDim*p.zDim*p.qDim*8;
     p.data = fread(fileid,readSize,'double');
 elseif p.dataType == 503; %(4),(4) byte float x-y array (x1,x2,x3,...), (y1,y2,y3,...)
-    readSize = p.xDim*p.yDim*p.zDim*p.qDim*8;
-    p.data = fread(fileid,readSize,'float32');
+    readSize = p.xDim*p.yDim*p.zDim*p.qDim*2;
+    dataHold = fread(fileid,readSize,'float32');
+    p.data(:,1) = dataHold(1:readSize/2);
+    p.data(:,2) = dataHold(readSize/2+1:end);
+    data = p.data;
 elseif p.dataType == 504; %(4),(4,4) byte float,complex array (x1,x2,x3,...)(r1,i1,r2,i2,r3,i3,...)
     readSize = p.xDim*p.yDim*p.zDim*p.qDim*12;
     p.data = fread(fileid,readSize,'float32');
