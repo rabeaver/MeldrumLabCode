@@ -99,10 +99,6 @@ limProfile = flipud(limProfile);
 limProfile = reshape(limProfile,7*9,256);
 
 figure(2)
-surf(echoVec*1e-3,limZ,abs(limProfile)); shading interp
-xlabel('time [ms]');
-ylabel('position [um]');
-view([0 90]);
-
+pcolor(echoVec,limZ,abs(
 
 
