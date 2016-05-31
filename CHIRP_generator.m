@@ -8,10 +8,10 @@ close all
 %%%%%%% User-defined parameters %%%%%%%
 % tic
 
-dt = 2000e-9;             % time per point in waveform (s) [Scout limit is 20ns]
+dt = 1e-6;             % time per point in waveform (s) [Scout limit is 20ns]
                                                          %[Kea limit is 2000ns]
-tau = 0.150;          % pulse length (s) [Kea limit is 128ms]
-sliceheight = 0.250;     % mm
+tau = 0.0001;          % pulse length (s) [Kea limit is 128ms]
+sliceheight = 0.350;     % mm
 
 G = 6.59;               %T m-1, B0 field gradient [PM25 = 6.59]
                         %                         [PM5 = 23.87]
@@ -56,7 +56,6 @@ if LINramp == 1;
 % numerical expressions
     f = linspace(-SW/2,SW/2,N);       % frequency (Hz, or cycles s-1)
     f_s = f*360;                      % frequency (deg s-1)
-    phase = cumsum(f)*dt;             % phase (cycles, or Hz*s)
     phase_s = cumsum(f_s)*dt;         % phase (deg) 
     phase_s360 = mod(phase_s,360);    % phase (deg, mod 360)
 
