@@ -4,26 +4,26 @@ close all
 
 %%
 
-filename = '4ASieves_IRT1_18Jan2016_2.tnt';
-filedir = 'C:\CommonData\DIWaterSieves\';
+filename = 'CuWater_T1Sat_21Apr2016_1.tnt';
+filedir = 'C:\CommonData\TAMU\CuWater\';
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 700; %us
+tEcho = 150; %us
 
-nEchoes = 16;
+nEchoes = 32;
 nPts = 76;
-nPtsBlank = 4;
+nPtsBlank = 0;
 nT1Pts = 11;
-T1min = 1; %ms
-T1max = 6500; %ms
-T1guess = 50; %ms 
+T1min = 0; %ms
+T1max = 200000; %ms
+T1guess = 100000; %ms 
 
-% T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
+T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 
-T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
+% T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 
 data = reshape(spec2',nPts,nEchoes,nT1Pts);
 data = data(1:(nPts-nPtsBlank),:,:);
@@ -35,7 +35,7 @@ dataIntIm = imag(dataInt);
 
 
 %% cftool
-cftool(T1vector, dataIntRe)
+cftool(T1vector, -dataIntRe)
 
 %%
 % guesses = [1, max(dataIntRe), T1guess];

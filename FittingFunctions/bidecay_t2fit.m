@@ -1,7 +1,7 @@
-function [xfit,ypred,beta,beta_err,resid] = bidecay_t2fit(xdata,ydata,guesses,CI) %,opts)
+function [xfit,ypred,beta,beta_err,resid,ci,se] = bidecay_t2fit(xdata,ydata,guesses,CI) %,opts)
 
 % fitting routine and plotting
-[beta,resid,J,~,mse] = nlinfit(xdata,ydata,@t2bifit,guesses); %,opts);
+[beta,resid,J,~,~] = nlinfit(xdata,ydata,@t2bifit_ampSumFixed,guesses); %,opts);
 
 %output: beta is coefficients
 % resid is residuals
@@ -9,12 +9,12 @@ function [xfit,ypred,beta,beta_err,resid] = bidecay_t2fit(xdata,ydata,guesses,CI
 
 alpha = 1 - CI/100;
 
-ci = nlparci(beta,resid,'jacobian',J,'alpha',alpha);
+[ci,se] = nlparci(beta,resid,'jacobian',J,'alpha',alpha);
 
 % [ypred,delta] = nlpredci(@T1_recovery,x_fit,beta,resid,J);
 
 xfit = 0:max(xdata)/1000:max(xdata);
-ypred = nlpredci(@t2bifit,xfit,beta,resid,J);
+ypred = nlpredci(@t2bifit_ampSumFixed,xfit,beta,resid,J);
 
 pm = abs(ci(:,2) - beta); 
 beta_err = pm;

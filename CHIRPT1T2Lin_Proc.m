@@ -8,23 +8,25 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-datadir = 'C:\CommonData\BeadPack\';
-datafile = '15mMGd_SilicaBeads_CHIRP_07Jan2016_2';
-noCHIRPfile = '15mMGd_SilicaBeads_noCHIRP_07Jan2016_2';
+spectrometer = 'Kea'; %'Tecmag'
+datadir = 'Z:\Data\TKM\Mortar\10May2016_test\';
+datafile = 'UFT1T2\1\data';
+noCHIRPfile = 'UFT1T2_ref\1\data';
 filenameExt = '';
+
 
 Pchirp = 0.01; % CHIRP Pulse Length (s)
 
-sliceheight = 0.350; %mm
-PreCPMGdelay = 250e-6; %s
+sliceheight = 0.10; %mm
+PreCPMGdelay = 40e-6; %s
 
 
-nPts = 48; % # of acqu points
-nEchoes = 128; % Echoes
-tD = 4e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 280; %us
+nPts = 32; % # of acqu points
+nEchoes = 16; % Echoes
+tD = 2e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 110; %us
 omitEchoes = 0; %the number of echoes to skip
-noisePoints = 4; %number of points at beginning and end of each acqu period for noise
+noisePoints = 0; %number of points at beginning and end of each acqu period for noise
 omitPts = 0; %blank spectrometer points to skip
 
 zf = 1;                             % levels of zero filling
@@ -35,7 +37,12 @@ apofac = 5;                         % Amount of Apodization
 % === END User-defined paramaters ===
 % ===================================
 
-G = 6.59;                           % T m-1, B0 field gradient
+if strcmp(spectrometer,'Tecmag')==1;
+    G = 6.59;                           % T m-1, B0 field gradient
+elseif strcmp(spectrometer,'Kea')==1;    
+    G = 23.87;
+end
+    
 gamma = 42.576;                     % MHz T-1
 BWchirp = sliceheight*G*gamma*1000; % CHIRP bandwidth (Hz)
 
@@ -47,11 +54,16 @@ NFFT = 2^nextpow2(L);               % Next power of 2 from length of y
 echoVec = (omitEchoes+1)*tE:tE:(nEchoes*tE);
 t = (-(L-1)/2:L/2)*T;               % Time vector
 f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
-z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
+z = f/(gamma*G);                       % um, 280.47 Hz/um (for PM25)
 
 %%
 % Import CHIRP data
-[ap , spec] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
+
+if strcmp(spectrometer,'Tecmag')==1;
+    [ap , spec] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
+elseif strcmp(spectrometer,'Kea')==1;
+    [ap , spec] = readKea4d(strcat(datadir,datafile,'.2d'));
+end
 
 % CHIRPdat = spec(1,:);
 % spec = spec2(nnn, :);
@@ -111,7 +123,13 @@ hold off
 %% No CHIRP load section
 close all
 
-[~,spec] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
+if strcmp(spectrometer,'Tecma')==1;
+    [~ , spec] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
+elseif strcmp(spectrometer,'Kea')==1;
+    [~ , spec] = readKea4d(strcat(datadir,noCHIRPfile,'.2d'));
+end
+
+% [~,spec] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 data = reshape(spec,nPts,nEchoes);
 
 % No CHIRP raw data and fft profiles
@@ -203,8 +221,8 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 54;
-maxind = 87;
+minind= 29;
+maxind = 38;
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 
@@ -228,6 +246,9 @@ title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
 xlim([0 1000*Pchirp])
 ylim([-1.1 1.1])
+
+%
+% cftool(t1*1000,T1T2data(:,1))
 
 %% surf of all T1-T2 Profiles
 
