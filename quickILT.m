@@ -2,7 +2,7 @@ clear
 clc
 close all
 
-filedir = '/Users/tyler/Desktop/Bead Pack/1500uMGd_BEADPACK_90u/1/';
+filedir = 'Z:\Data\TKM\NGA_12May2016\Teresa\C_CPMG\1\';
 filename = 'data.csv';
 parname = 'acqu';
 alpha = 1e10;

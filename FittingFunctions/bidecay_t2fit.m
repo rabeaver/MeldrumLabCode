@@ -1,4 +1,4 @@
-function [xfit,ypred,beta,beta_err,resid,se] = bidecay_t2fit(xdata,ydata,guesses,CI) %,opts)
+function [xfit,ypred,beta,beta_err,resid,ci,se] = bidecay_t2fit(xdata,ydata,guesses,CI) %,opts)
 
 % fitting routine and plotting
 [beta,resid,J,~,~] = nlinfit(xdata,ydata,@t2bifit_ampSumFixed,guesses); %,opts);
@@ -9,7 +9,7 @@ function [xfit,ypred,beta,beta_err,resid,se] = bidecay_t2fit(xdata,ydata,guesses
 
 alpha = 1 - CI/100;
 
-[ci se] = nlparci(beta,resid,'jacobian',J,'alpha',alpha);
+[ci,se] = nlparci(beta,resid,'jacobian',J,'alpha',alpha);
 
 % [ypred,delta] = nlpredci(@T1_recovery,x_fit,beta,resid,J);
 

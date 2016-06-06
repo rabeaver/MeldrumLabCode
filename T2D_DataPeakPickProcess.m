@@ -7,7 +7,7 @@ close all
 datadir = 'C:\CommonData\Acetone\';
 datafile = 'AcetoneLarge_chirpSTE_short_18Mar2016_3_result.out';
 T2lims = [1e-3 1e0];
-T1lims = [1e-10 1e-7];
+Dlims = [1e-10 1e-7];
 contourLevel = 0.50;
 
 %load the data and remove 0 values (replace with NaN)
@@ -16,19 +16,19 @@ data(data == 0) = NaN;
 nPts = size(data,1);
 
 %this calculates the axes based on the limits above
-T1axis = logspace(log10(T1lims(1)),log10(T1lims(2)),nPts);
+Daxis = logspace(log10(Dlims(1)),log10(Dlims(2)),nPts);
 T2axis = logspace(log10(T2lims(1)),log10(T2lims(2)),nPts);
 
 %%plot the T2D data
 % regular T1-T2 plot
 figure(1)
-surf(T2axis,T1axis,data)
+surf(T2axis,Daxis,data)
 colormap(flipud(gray));
 shading flat
 set(gca,'XScale','log','YScale','log','XTick', [1e-4; 1e-3; 1e-2; 1e-1; 1e0; 1e1],'FontSize',18)
 xlim(T2lims)
-ylim(T1lims)
-ylabel('\itT\rm_1 [s]')
+ylim(Dlims)
+ylabel('\itD [m^2 s^{-1}]')
 xlabel('\itT\rm_2 [s]')
 view([0,90])
 
@@ -42,7 +42,7 @@ set(gca,'FontSize',18)
 xlim([0 nPts])
 ylim([0 nPts])
 ylabel('\itT\rm_1 indices')
-xlabel('\itT\rm_2 indices')
+ylabel('\itD [m^2 s^{-1}]')
 
 view([0,90])
 
@@ -61,7 +61,7 @@ line([x(1) x(1)],[y(1) y(2)])
 
 datazoom = data(y(1):y(2),x(1):x(2));
 %zoom in around peak of interest with T1 and T2 axes
-T1zoom = T1axis(y(1):y(2));
+T1zoom = Daxis(y(1):y(2));
 T2zoom = T2axis(x(1):x(2));
 figure(3)
 surf(T2zoom,T1zoom,datazoom)
@@ -71,7 +71,7 @@ set(gca,'Xscale','log','Yscale','log','FontSize',18)
 ylim([min(T1zoom) max(T1zoom)]);
 xlim([min(T2zoom) max(T2zoom)]);
 ylabel('\itT\rm_1 [s]')
-xlabel('\itT\rm_2 [s]')
+ylabel('\itD [m^2 s^{-1}]')
 view([0,90])
 
 % make a zoomed in version with indices around the peak of interest
@@ -81,7 +81,7 @@ colormap(flipud(gray));
 shading flat
 set(gca,'FontSize',18)
 ylabel('\itT\rm_1 indices')
-xlabel('\itT\rm_2 indices')
+ylabel('\itD [m^2 s^{-1}]')
 view([0,90])
 
 
@@ -98,9 +98,9 @@ hold on
 plot3(c(1,2:size(c,2)),c(2,2:size(c,2)),5e4*ones(1,size(c,2)-1),'-r','LineWidth',3); 
 
 
-T1 =[ min(c(2,2:size(c,2))) T1zoom(T1ind(1)) max(c(2,2:size(c,2)))]*1e3;
-T2 = [ min(c(1,2:size(c,2))) T2zoom(T2ind(1)) max(c(1,2:size(c,2)))]*1e3;
-T1(:,4) = T1(:,3)-T1(:,2)
+D =[ min(c(2,2:size(c,2))) T1zoom(T1ind(1)) max(c(2,2:size(c,2)))]; %m2/s
+T2 = [ min(c(1,2:size(c,2))) T2zoom(T2ind(1)) max(c(1,2:size(c,2)))]*1e3; %ms
+D(:,4) = D(:,3)-D(:,2)
 T2(:,4) = T2(:,3)-T2(:,2)
 
 %for each peak present in the sample, make a contour line showing the 50%

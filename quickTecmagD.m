@@ -3,19 +3,19 @@ clc
 close all
 
 %% User parameters
-filename = 'EVOOLarge_STE_25Jan2016_d1ms_D3ms.tnt';
-filedir = 'C:\CommonData\EVOO\';
+filename = 'GlycerolLarge_STE_12Apr2016.tnt';
+filedir = 'C:\CommonData\Glycerol\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 700; %us
-nEchoes = 256;
-nPts = 76;
+tEcho = 400; %us
+nEchoes = 1;
+nPts = 20;
 nPtsBlank = 4;
-omitEchoes = 4;
-DELTA = 3e-3; %s
+omitEchoes = 0;
+DELTA = 5e-3; %s
 deltamin = 100e-6; %s
-deltamax = 1000e-6; %s
+deltamax = 2000e-6; %s
 refocused_delta = 0; % if there are 180 pulses in the delta periods, set to 1 to adjust the delta time
 GM = 280; %MHz m-1
 
@@ -47,7 +47,7 @@ s1a = log10(abs(dataInt)./max(abs(dataInt)));
 s_x = -gamma^2*G^2.*delta.^2.*(DELTA+2*delta./3)*1e-9;
 
 %% Fit and give D
-[p,S] = polyfit(s_x,s1a,1);
+[p,S] = polyfit(s_x,s1,1);
 D = p(1)*1e-9 %output value of D in m2/s
 
 figure(1)
@@ -55,7 +55,7 @@ hold on
 scatter(s_x,s1)
 plot(s_x,polyval(p,s_x));
 set(gca,'defaulttextinterpreter','latex')
-xlabel('$-\gamma^{2}G^{2}\delta^{2}(\Delta+\frac{\delta}{3})\times 10^{-9}$')
+xlabel('$-\gamma^{2}G^{2}\delta^{2}(\Delta+\frac{2}{3}\delta)\times 10^{-9}$')
 ylabel('$log \frac{S}{S_0}$')
 
 excelOut = [s1',s_x'*1e9];
