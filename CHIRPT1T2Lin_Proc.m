@@ -8,21 +8,21 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-datadir = 'C:\CommonData\BeadPack\';
-datafile = '15mMGd_SilicaBeads_CHIRP_07Jan2016_2';
-noCHIRPfile = '15mMGd_SilicaBeads_noCHIRP_07Jan2016_2';
+datadir = 'Z:\VJL\';
+datafile = 'CHIRP_DegassedWaterMolecularSieves_25mspw_sliceheight200um_tD8u_76pts_512scans_100nsWave_15April2016_result';
+noCHIRPfile = 'noCHIRP_DegassedWaterMolecularSieves_25mspw_sliceheight200um_tD8u_76pts_512scans_100nsWave_15April2016_result';
 filenameExt = '';
 
-Pchirp = 0.01; % CHIRP Pulse Length (s)
+Pchirp = 0.025; % CHIRP Pulse Length (s)
 
-sliceheight = 0.350; %mm
-PreCPMGdelay = 250e-6; %s
+sliceheight = 0.200; %mm
+PreCPMGdelay = 100e-6; %s
 
 
-nPts = 48; % # of acqu points
-nEchoes = 128; % Echoes
-tD = 4e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 280; %us
+nPts = 76; % # of acqu points
+nEchoes = 32; % Echoes
+tD = 8e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 700; %us
 omitEchoes = 0; %the number of echoes to skip
 noisePoints = 4; %number of points at beginning and end of each acqu period for noise
 omitPts = 0; %blank spectrometer points to skip

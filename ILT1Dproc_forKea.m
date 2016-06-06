@@ -5,7 +5,7 @@ close all
 %% Get data
 
 % Get Parameters
-parfilestem = sprintf('%s', 'C:\Users\fjmorin\Desktop\PEGDA100%\100%PEGDA_180scure_slide_01Dec\3\acqu');
+parfilestem = sprintf('%s', 'Z:\Data\JYU\BSA_Naproxen\Naproxen_Only_JNK_Decay\4\acqu');
 
 params.acqTime = readpar_Kea(strcat(parfilestem,'.par'),'acqTime');
 params.bandwidth = readpar_Kea(strcat(parfilestem,'.par'),'bandwidth');
@@ -20,7 +20,7 @@ params.nrEchoes = readpar_Kea(strcat(parfilestem,'.par'),'nrEchoes');
 params.echoTime = readpar_Kea(strcat(parfilestem,'.par'),'echoTime');
 
 % Datafile
-file = sprintf('%s', 'C:\Users\fjmorin\Desktop\PEGDA100%\100%PEGDA_180scure_slide_01Dec\3\data.csv');
+file = sprintf('%s', 'Z:\Data\JYU\BSA_Naproxen\Naproxen_Only_JNK_Decay\4\data2.csv');
 data = load(file); % Open datafile
 
 % Separate data
