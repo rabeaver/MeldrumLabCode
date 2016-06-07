@@ -26,8 +26,8 @@ omitPts = 0; %blank spectrometer points to skip
 zf = 1;                             % levels of zero filling
 
 %pwrRange = [80 70 60 50 40 30 20 10 6]; % absolute value of range of CHIRP powers being evaluated
-pwrRange = [40 39 38 37 36 35 34 33 32 31 30];
-%pwrRange = [39 38 31];
+%pwrRange = [40 39 38 37 36 35 34 33 32 31 30];
+pwrRange = [80 40 34 30];
 SNR = [];
 SNR_perRtScans = [];
 maxsig = [];
@@ -55,9 +55,9 @@ z = f/(gamma*G);                    % um, 280.47 Hz/um (for PM25)
 for i = 1:length(pwrRange)
     
 spectrometer = 'Kea'; %'Tecmag' or 'Kea'
-datadir = 'C:\Users\jnking01\Desktop\50um_sliceheight\400us_cpw\40to30dBRange\';
-datafile = strcat('400us_neg', num2str(pwrRange(i)), 'db\1\data');
-noCHIRPfile = strcat('400us_neg', num2str(pwrRange(i)), 'db\1\data');
+datadir = '/Users/jaredking/Documents/Classes/Chemistry/Research/Summer2016/400us_cpw/400us_cpw/';
+datafile = strcat('400us_neg', num2str(pwrRange(i)), 'db/1/data');
+noCHIRPfile = strcat('400us_neg', num2str(pwrRange(i)), 'db/1/data');
 filenameExt = '';
 
 if strcmp(spectrometer,'Tecmag')==1;
@@ -72,6 +72,16 @@ CHIRPdat = reshape(spec, nPts, nEchoes);
 %CHIRPdat = CHIRPdat(1:(end-omitPts),omitEchoes+1:end);
 
 %%
+CHIRPdatft = padarray(CHIRPdat, size(CHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
+
+T1T2profiles = fftshift(fft(CHIRPdatft,NFFT)/L, 1); % Performs FFT algorithm
+
+figure()
+hold on
+plot(t*1e6,abs(CHIRPdatft(:,2)));
+ylim([-1.5 1.5])
+xlabel('time [us]')
+title(strcat('Echo 2 Fourier transform for -',num2str(pwrRange(i)),' dB'))
 
 %% Find Maximum
 maxsig(i) = max(max(abs(CHIRPdat)));
@@ -105,7 +115,7 @@ plot(realDat(:,2))
 plot(imagDat(:,2))
 ylim([-1.5 1.5])
 title(strcat('Echo 2 at power -', num2str(pwrRange(i))))
-hold off
+
 
 end
 

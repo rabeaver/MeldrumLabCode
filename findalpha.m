@@ -1,4 +1,4 @@
-function [alpha90, alpha180, p_c90, p_c180] = findalpha(t90, dB90, tCHIRP, swCHIRP, G, CHIRP90pwr, CHIRP180pwr)
+function [alpha90, alpha180, linpwr90, linpwr180] = findalpha(t90, dB90, tCHIRP, swCHIRP, G, CHIRP90pwr, CHIRP180pwr)
 % Function: findalpha
 % Author: Jared King
 % Date: 06/06/2016
@@ -20,27 +20,30 @@ function [alpha90, alpha180, p_c90, p_c180] = findalpha(t90, dB90, tCHIRP, swCHI
 % degree CHIRP pulse but not the 90 degree CHIRP pulse
 %
 %
-% Variables Returned: alpha90, alpha180 (units?)
-hpPwr = 1e6/t90; %Hz
-CHIRPr = swCHIRP/tCHIRP;
+% Variables Returned: alpha90, alpha180, linpwr90 (Hz), linpwr180 (Hz)
 
-if CHIRP90pwr <= 0
-    alpha90 = CHIRP90pwr/sqrt(CHIRPr);
+
+hpPwr = 4/t90; %Hz
+bwCHIRP = swCHIRP * 42.576 * G; 
+CHIRPr = bwCHIRP/(tCHIRP); % s^-2
+
+if CHIRP90pwr ~= 1
+    linpwr90 = 10^((CHIRP90pwr-dB90)/20)*hpPwr; %Hz
+    
+    alpha90 = linpwr90/sqrt(CHIRPr); %Hz
+    
 else
+    linpwr90 = NaN;
     alpha90 = NaN;
 end
 
-if CHIRP180pwr <= 0
-    alpha180 = CHIRP180pwr/sqrt(CHIRPr);
+if CHIRP180pwr ~= 1
+    linpwr180 = 10^((CHIRP180pwr-dB90)/20)*hpPwr;
+    
+    alpha180 = linpwr180/sqrt(CHIRPr);
 else
+    linpwr180 = NaN;
     alpha180 = NaN;
 end
 
-p_c90hp = CHIRP90pwr/hpPwr; %chirp90 pwr as fraction of hard pulse power
-p_c180hp = CHIRP180pwr/hpPwr; %chirp180 pwr as fraction of hard pulse power
-
-lin_hppwr = round(2^14*10^(dB90/20-1)); %linearized hard pulse power
-
-p_c90 = p_c90hp*lin_hppwr; %linearized chirp 90 power
-p_c180 = p_c180hp*lin_hppwr; %linearized chirp 180 power
 end
