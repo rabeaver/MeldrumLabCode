@@ -1,6 +1,6 @@
 function [pwr90,pwr180] = CHIRPpowercalc(t90,dB90,tCHIRP,bwCHIRP,G,alpha90,alpha180) %t in us, sw in um
 
-hpPwr = 1e6/t90; %Hz
+hpPwr = 4e6/t90; %Hz
 swCHIRP = bwCHIRP*G*42.576;
 chirpR = swCHIRP/(tCHIRP*1e-6); %Hz /s
 chirp90pwr = alpha90*sqrt(chirpR); %chirp90 power  in Hz
