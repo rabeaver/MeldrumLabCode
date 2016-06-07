@@ -1,4 +1,4 @@
-function [alpha90, alpha180] = findalpha(t90, dB90, tCHIRP, swCHIRP, G, CHIRP90pwr, CHIRP180pwr)
+function [alpha90, alpha180, p_c90, p_c180] = findalpha(t90, dB90, tCHIRP, swCHIRP, G, CHIRP90pwr, CHIRP180pwr)
 % Function: findalpha
 % Author: Jared King
 % Date: 06/06/2016
@@ -22,6 +22,25 @@ function [alpha90, alpha180] = findalpha(t90, dB90, tCHIRP, swCHIRP, G, CHIRP90p
 %
 % Variables Returned: alpha90, alpha180 (units?)
 hpPwr = 1e6/t90; %Hz
-bwCHIRP
+CHIRPr = swCHIRP/tCHIRP;
 
+if CHIRP90pwr <= 0
+    alpha90 = CHIRP90pwr/sqrt(CHIRPr);
+else
+    alpha90 = NaN;
+end
+
+if CHIRP180pwr <= 0
+    alpha180 = CHIRP180pwr/sqrt(CHIRPr);
+else
+    alpha180 = NaN;
+end
+
+p_c90hp = CHIRP90pwr/hpPwr; %chirp90 pwr as fraction of hard pulse power
+p_c180hp = CHIRP180pwr/hpPwr; %chirp180 pwr as fraction of hard pulse power
+
+lin_hppwr = round(2^14*10^(dB90/20-1)); %linearized hard pulse power
+
+p_c90 = p_c90hp*lin_hppwr; %linearized chirp 90 power
+p_c180 = p_c180hp*lin_hppwr; %linearized chirp 180 power
 end
