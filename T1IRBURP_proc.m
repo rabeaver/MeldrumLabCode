@@ -5,8 +5,13 @@ close all
 %%
 
 % Input filename, - .tnt
+<<<<<<< HEAD
+filename = 'T1IRBURP_degassedWaterMolecularSieves_20March2016';
+filedir = 'C:\users\vjlee\Desktop\';
+=======
 filename = 'T1IRBURP_degassedEthyleneGlycolMolecularSieves_19March2016_1024scans';
 filedir = 'C:\CommonData\EthyleneGlycolMolecularSieves\';
+>>>>>>> a0e3214a8be301e6e53f6eb9a1add606e2a9202c
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -16,14 +21,21 @@ fileloc = strcat(filedir,filename,'.tnt');
 % Input experiment parameters
 
 tEcho = 700; %us
-nEchoes = 256;
+nEchoes = 512;
 nPts = 76;
 nPtsBlank = 1;
 omitEchoes = 0; 
+<<<<<<< HEAD
+nT1Pts = 21;
+T1min = 0.1; %ms
+T1max = 6000; %ms
+noisePoints = 10; %number of points to use for noise at beginning and end of each acqu period
+=======
 nT1Pts = 11;
 T1min = .100; %ms
 T1max = 2000; %ms
 noisePoints = 1; %number of points to use for noise at beginning and end of each acqu period
+>>>>>>> a0e3214a8be301e6e53f6eb9a1add606e2a9202c
 noiseNumber = nT1Pts; %T1 point to use for SNR calc
 
 echoVector = ((1+omitEchoes)*tEcho:tEcho:nEchoes*tEcho); % T2 vector
@@ -33,7 +45,7 @@ echoVector = ((1+omitEchoes)*tEcho:tEcho:nEchoes*tEcho); % T2 vector
 linORlog = 0; % 0 for linearly space and 1 for log spaced
 
 % Make T1vector
-if linORlog == 1
+if linORlog == 0
     T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1 points
 else
     T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
@@ -41,7 +53,11 @@ end
 %% SNR calc
 
 % Read Noise
+<<<<<<< HEAD
+filename = 'T1IRBURP_degassedWaterMolecularSieves_20March2016';
+=======
 % filename = 'glycerol_T1IR_BURP_Noisecollect_32scans';
+>>>>>>> a0e3214a8be301e6e53f6eb9a1add606e2a9202c
 fileloc = strcat(filedir,filename,'.tnt');
 
 % Read file
