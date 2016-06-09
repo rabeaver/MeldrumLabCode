@@ -27,7 +27,8 @@ zf = 1;                             % levels of zero filling
 
 %pwrRange = [80 70 60 50 40 30 20 10 6]; % absolute value of range of CHIRP powers being evaluated
 %pwrRange = [40 39 38 37 36 35 34 33 32 31 30];
-pwrRange = [80 40 34 30];
+%pwrRange = [16 20 21 22 23 24 25]; % 26 27 28 29 30 33 34 35 36 40 50 80];
+pwrRange = [20 30];
 SNR = [];
 SNR_perRtScans = [];
 maxsig = [];
@@ -55,9 +56,8 @@ z = f/(gamma*G);                    % um, 280.47 Hz/um (for PM25)
 for i = 1:length(pwrRange)
     
 spectrometer = 'Kea'; %'Tecmag' or 'Kea'
-datadir = '/Users/jaredking/Documents/Classes/Chemistry/Research/Summer2016/400us_cpw/400us_cpw/';
+datadir = '/Users/jaredking/Documents/Classes/Chemistry/Research/Summer2016/100um_sliceheight/400us_cpw/';
 datafile = strcat('400us_neg', num2str(pwrRange(i)), 'db/1/data');
-noCHIRPfile = strcat('400us_neg', num2str(pwrRange(i)), 'db/1/data');
 filenameExt = '';
 
 if strcmp(spectrometer,'Tecmag')==1;
@@ -79,7 +79,7 @@ T1T2profiles = fftshift(fft(CHIRPdatft,NFFT)/L, 1); % Performs FFT algorithm
 figure()
 hold on
 plot(t*1e6,abs(CHIRPdatft(:,2)));
-ylim([-1.5 1.5])
+ylim([0 3])
 xlabel('time [us]')
 title(strcat('Echo 2 Fourier transform for -',num2str(pwrRange(i)),' dB'))
 
@@ -106,28 +106,29 @@ SNR_perRtScans(i) = SNR(i)/sqrt(nScans); % Set up for power cal, aka only CHIRP 
 % title(strcat('CPMG at power -',num2str(pwrRange(i))))
 % hold off
 
-realDat = real(CHIRPdat);
-imagDat = imag(CHIRPdat);
+% realDat = real(CHIRPdat);
+% imagDat = imag(CHIRPdat);
 
 figure()
 hold on
-plot(realDat(:,2))
-plot(imagDat(:,2))
-ylim([-1.5 1.5])
+plot(real(CHIRPdat(:,2)))
+plot(imag(CHIRPdat(:,2)))
+ylim([-1.5 3])
 title(strcat('Echo 2 at power -', num2str(pwrRange(i))))
+hold off
 
 
 end
 
-% figure(1)
-% plot(-pwrRange,maxsig, 'r')
-% title('Maximum signal vs. power')
+figure()
+plot(-pwrRange,maxsig, 'r')
+title('Maximum signal vs. power')
+
+
+% figure()
+% plot(-pwrRange,SNR_perRtScans, 'g')
+% title('SNR per root scan vs. power')
 % 
-% 
-% % figure(2)
-% % plot(-pwrRange,SNR_perRtScans, 'g')
-% % title('SNR per root scan vs. power')
-% 
-% figure(3)
+% figure()
 % plot(-pwrRange,SNR,'b')
 % title('SNR vs. power')
