@@ -8,7 +8,6 @@ close all
 %%%%%%% User-defined parameters %%%%%%%
 % tic
 
-
 dt = 40e-9;             % time per point in waveform (s) [Scout limit is 20ns]
 tau = 193.8e-6;            % pulse length (s)
 sliceheight = 0.200;     % mm
@@ -57,7 +56,6 @@ if LINramp == 1;
 % numerical expressions
     f = linspace(-SW/2,SW/2,N);       % frequency (Hz, or cycles s-1)
     f_s = f*360;                      % frequency (deg s-1)
-    phase = cumsum(f)*dt;             % phase (cycles, or Hz*s)
     phase_s = cumsum(f_s)*dt;         % phase (deg) 
     phase_s360 = mod(phase_s,360);    % phase (deg, mod 360)
 
