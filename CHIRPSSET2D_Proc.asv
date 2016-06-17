@@ -11,8 +11,8 @@ close all
 
 spectrometer = 'Kea'; %'Tecmag'
 datadir = 'C:\CommonData\JNK\UFT2D\';
-datafile = 'Glycerol_CHIRP_16June2016\39\data'; % 
-noCHIRPfile = 'Glycerol_noCHIRP_17June2016\1\data'; %
+datafile = 'Glycerol_CHIRP_16June2016\36\data'; % 
+noCHIRPfile = 'Glycerol_CHIRP_16June2016\35\data'; %
 
 
 Pchirp = 1495e-6;                  % CHIRP Pulse Length (s)
@@ -20,12 +20,12 @@ pw     = 4.5e-6;                      % hard pulse length
 sliceheight = 0.1;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 84;                          % # of acqu points
+nPts = 168;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
 nEchoes = 64;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 4e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 400;                           % us
 preCHIRPdelay = 2e-6;             % s
 noisePoints = 5;                    % number of points for measuring noise
@@ -36,8 +36,8 @@ zf = 1;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
-delta = 3e-3;                       % little delta time (s)
-DELTA = 10e-3;                       % Big delta time in s
+delta = 1e-3;                       % little delta time (s)
+DELTA = 3e-3;                       % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
