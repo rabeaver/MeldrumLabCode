@@ -10,25 +10,26 @@ close all
 %
 
 spectrometer = 'Kea'; %'Tecmag'
-datadir = 'C:\CommonData\JNK\UFT2D\';
-datafile = 'Glycerol_CHIRP_16June2016\39\data'; % 
-noCHIRPfile = 'Glycerol_noCHIRP_17June2016\1\data'; %
+datadir = 'C:\CommonData\JNK\UFT2D\EthyleneGlycol\';
+datafile = 'EthyleneGlycol_UFT2D_20Jun2016\2\data'; % 
+noCHIRPfile = 'EthyleneGlycol_noCHIRP_20Jun2016\2\data'; %lol you fucked that up
 
 
-Pchirp = 1495e-6;                  % CHIRP Pulse Length (s)
+Pchirp = 495e-6;                  % CHIRP Pulse Length (s)
 pw     = 4.5e-6;                      % hard pulse length
 sliceheight = 0.1;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 84;                          % # of acqu points
+nPts = 112;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
 nEchoes = 64;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 4e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 400;                           % us
+tE = 500;                           % us
 preCHIRPdelay = 2e-6;             % s
-noisePoints = 5;                    % number of points for measuring noise
+noisePoints = 10;                    % number of points for measuring noise
+nScans = 2048;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
@@ -36,8 +37,8 @@ zf = 1;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
-delta = 3e-3;                       % little delta time (s)
-DELTA = 10e-3;                       % Big delta time in s
+delta = 1e-3;                       % little delta time (s)
+DELTA = 2e-3;                       % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
@@ -95,7 +96,7 @@ S = max(abs(s));
 N = rms(n);
 
 SNR = S/N
-SNR_perRtScans = SNR/sqrt(ap.ns)
+SNR_perRtScans = SNR/sqrt(nScans)
 
 %% Apodization, zero filling, do FFT
 pVec = 1:1:(nPts-omitPtsBack-omitPtsFront);
@@ -318,16 +319,16 @@ save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
 
 %%
 
-Thmm = [0.001, 10]; %T2 (min and max)
-stepsh = 30; %horizontal steps
-Tvmm = [1e-11, 1e-8]; %D min and max
-stepsv = 20;
-alpha = 5e6;
+Thmm = [0.001, 1]; %T2 (min and max)
+stepsh = 25; %horizontal steps
+Tvmm = [0.0001, 0.01]; %D min and max
+stepsv = 25;
+alpha = 1e7;
 orient = 'b'; %both orientations
 kernel1 = 'exp(-h/T)';
 kernel2 = 'exp(-v*D)';
 
-Tvmm = Tvmm*1e9;
+% Tvmm = Tvmm*1e9;
 
 tic
     [spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(flipud(T2Ddat),echoVec*1e-6,rot90(vIndex,2),Thmm,stepsh,Tvmm,stepsv,alpha,-1,orient,kernel1,kernel2);
@@ -338,7 +339,7 @@ toc
 
 %     spectrum = flipdim(spectrum,1);
     tauv = 1./tauv;
-    tauv = tauv*1e-9;
+%     tauv = tauv*1e-9;
     tauv = flipdim(tauv,2);
 %     spectrum = spectrum';
 % figure
