@@ -10,9 +10,9 @@ close all
 %
 
 spectrometer = 'Kea'; %'Tecmag' OR 'Kea'
-datadir = 'C:\CommonData\JNK\UFT2D\Cu_H2O\';
-datafile = 'Cu_H2O_CHIRPSSE_400usdelta_21June2016'; %\1\data'; % Cu_H2O_CHIRPSSE_400usdelta_21June2016
-noCHIRPfile = 'Cu_H2O_noCHIRPSSE_21June2016'; %\1\data'; %lol you fucked that up
+datadir = 'C:\CommonData\JNK\';
+datafile = 'M212_CHIRP_23June2016\1\data'; 
+noCHIRPfile = 'M212_CHIRP_23June2016\1\data'; 
 
 Pchirp = 155e-6;                  % CHIRP Pulse Length (s)
 pw     = 4.5e-6;                      % hard pulse length
