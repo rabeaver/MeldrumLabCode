@@ -4,8 +4,8 @@ close all
 
 %%
 
-filename = 'CuWater_T1Sat_21Apr2016_1.tnt';
-filedir = 'C:\CommonData\TAMU\CuWater\';
+filename = 'EtGlyLarge_T1IR_13Jan2016.tnt';
+filedir = 'C:\CommonData\Tecmag\EthyleneGlycol\';
 
 fileloc = strcat(filedir,filename);
 
@@ -13,23 +13,23 @@ fileloc = strcat(filedir,filename);
 tEcho = 150; %us
 
 nEchoes = 32;
-nPts = 76;
+nPts = 70;
 nPtsBlank = 0;
-nT1Pts = 11;
-T1min = 0; %ms
-T1max = 200000; %ms
-T1guess = 100000; %ms 
+nT1Pts = 21;
+T1min = 0.2; %ms
+T1max = 1.4e3; %ms
+T1guess = 300; %ms 
 
-T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
+% T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 
-% T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
+T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 
 data = reshape(spec2',nPts,nEchoes,nT1Pts);
 data = data(1:(nPts-nPtsBlank),:,:);
 dataInt = sum(sum(data,1),2);
 dataInt = reshape(dataInt,1,nT1Pts);
-dataInt = dataInt./-dataInt(1);
+dataInt = dataInt./dataInt(1);
 dataIntRe = real(dataInt);
 dataIntIm = imag(dataInt);
 
