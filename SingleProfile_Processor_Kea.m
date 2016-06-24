@@ -1,17 +1,17 @@
 clear
 clc
-%close all
+close all
 
 %%
 
 info.parfilename = 'acqu';
-info.datafilename = 'Profile2_Std_26Oct';
-info.dirstem = '/Users/jaredking/Documents/Research Files and Data/Paint/Varnish Model Data/SRAL_Samples/Model 2/Profile2_Std_26Oct/';
+info.datafilename = 'Noconsolidant_papyrus';
+info.dirstem = '/Volumes/ISC1026/Data/TKM/NGA_12May2016/Hamada/Noconsolidant_papyrus/';
 omitpoints = 0;
 
 fitopts = statset('MaxIter',5000,'TolX',1e-14,'UseParallel',true,'Display','off');
 
-dir = strcat(info.dirstem,num2str(1),'/');
+dir = strcat(info.dirstem,num2str(3),'/');
 cd(dir);
 
 params.acqTime = readpar_Kea(strcat(info.parfilename,'.par'),'acqTime');
@@ -112,7 +112,7 @@ plot(final_data.position(positionlims(1):positionlims(2))+shiftAmount,final_data
 
 % plot(final_data.position(positionlims(1):positionlims(2))+shiftAmount,final_data.beta(2,positionlims(1):positionlims(2))+final_data.ci(2,positionlims(1):positionlims(2)),'--b')
 % plot(final_data.position(positionlims(1):positionlims(2))+shiftAmount,final_data.beta(2,positionlims(1):positionlims(2))-final_data.ci(2,positionlims(1):positionlims(2)),'--b')
- ylim([-0.05 600])
+ylim([-0.05 2000])
 xlim([1100 2900])
 title('T_2 vs. position')
 ylabel('T_2 (us) from fit to subtracted data')
@@ -121,7 +121,7 @@ hold on
 plot(final_data.position(positionlims(1):positionlims(2))+shiftAmount,final_data.beta(1,positionlims(1):positionlims(2)),'-o')
 % plot(final_data.position(positionlims(1):positionlims(2))+shiftAmount,final_data.beta(1,positionlims(1):positionlims(2))+final_data.ci(1,positionlims(1):positionlims(2)),'--b')
 % plot(final_data.position(positionlims(1):positionlims(2))+shiftAmount,final_data.beta(1,positionlims(1):positionlims(2))-final_data.ci(1,positionlims(1):positionlims(2)),'--b')
- ylim([0 .1])
+ ylim([0 0.3])
 xlim([1100 2900])
 title('Amplitude vs. position, Dry')
 xlabel('canvas <--- position (um) ---> paint')

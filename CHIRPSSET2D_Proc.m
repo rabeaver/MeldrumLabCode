@@ -9,38 +9,46 @@ close all
 % ===================================
 %
 
+spectrometer = 'Kea'; %'Tecmag' OR 'Kea'
+datadir = 'C:\CommonData\JNK\UFT2D\Cu_H2O\';
+datafile = 'Cu_H2O_CHIRPSSE_400usdelta_21June2016'; %\1\data'; % Cu_H2O_CHIRPSSE_400usdelta_21June2016
+noCHIRPfile = 'Cu_H2O_noCHIRPSSE_21June2016'; %\1\data'; %lol you fucked that up
 
-datadir = 'C:\CommonData\TAMU\CuWater\';
-datafile = 'bulk_CuWater_chirpSTE_11June2016_1';
-noCHIRPfile = 'water_membrane';
-
-
-Pchirp = 43.8e-6;                  % CHIRP Pulse Length (s)
-pw     = 12e-6;                      % hard pulse length
-sliceheight = 0.10;                % mm
+Pchirp = 155e-6;                  % CHIRP Pulse Length (s)
+pw     = 4.5e-6;                      % hard pulse length
+sliceheight = 0.1;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 90;                          % # of acqu points
-omitPts = 0;                        % the number of points that are zeros from the spectrometer
-nEchoes = 64;                      % Echoes
+nPts = 64;                          % # of acqu points
+omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
+omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
+nEchoes = 16;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 240;                           % us
+tE = 180;                           % us
 preCHIRPdelay = 0.2e-6;             % s
-noisePoints = 1;                    % number of points for measuring noise
+noisePoints = 2;                    % number of points for measuring noise
+nScans = 8192;                      % Number of scans in the experiment
+cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
+                                    %use only if nPts for CHIRP on and CHIRP off expts don't match
 
-zf = 2;                             % levels of zero filling
+zf = 1;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
-delta = 0.10e-3;                       % little delta time (s)
-DELTA = 0.10e-3;                       % Big delta time in s
+delta = 0.50e-3;                       % little delta time (s)
+DELTA = 0.320e-3;                       % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
 % ===================================
 
-G = 6.59;                           % T m-1, B0 field gradient
+if strcmp(spectrometer,'Tecmag')==1;
+    G = 6.59;                           % T m-1, B0 field gradient
+elseif strcmp(spectrometer,'Kea')==1;    
+    G = 23.87;
+end
+
 gamma = 42.576;                     % MHz T-1
 gammaRad = gamma*2*pi*1e6;          % rad s-1 T-1
 BWchirp = sliceheight*G*gamma*1000; % CHIRP bandwidth (Hz)
@@ -52,25 +60,30 @@ CHIRPtimeDelay = rampPct * Pchirp + preCHIRPdelay;
 
 T = tD;                             % Sample time
 Fs = 1/T;                           % Sampling frequency 
-L = (nPts-omitPts)*(2^zf);          % Length of signal
+L = (nPts-omitPtsFront-omitPtsBack)*(2^zf);          % Length of signal
 NFFT = 2^nextpow2(L);               % Next power of 2 from length of y
 
 echoVec = tE*(omitEchoes+1):tE:(nEchoes*tE);
 t = (-(L-1)/2:L/2)*T;               % Time vector
 f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
-z = f/280.47;                       % um, 280.47 Hz/um (for PM25)
+z = f/(gamma*G);                    % um, 280.47 Hz/um (for PM25)
 
 %% Import CHIRP data
-[ap , spec] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
+if strcmp(spectrometer,'Tecmag')==1;
+    [ap , spec] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
+elseif strcmp(spectrometer,'Kea')==1;
+    [ap , spec] = readKea4d(strcat(datadir,datafile,'.2d'));
+end
+
 CHIRPdat = reshape(spec, nPts, nEchoes);
-CHIRPdat = CHIRPdat(1:end-omitPts,omitEchoes+1:end);
+CHIRPdat = CHIRPdat(1+omitPtsFront:end-omitPtsBack,omitEchoes+1:end);
 
 %% SNR calc 
-n1 = CHIRPdat(1:noisePoints,:);
-n2 = CHIRPdat(nPts-noisePoints-omitPts:end,:);
+n1 = CHIRPdat(1+omitPtsFront:noisePoints+omitPtsFront,:);
+n2 = CHIRPdat(nPts-noisePoints-omitPtsBack-omitPtsFront:end,:);
 n = cat(1,n1,n2);
 n = reshape(n,1,(2*noisePoints+1)*(nEchoes-omitEchoes));
-s = reshape(CHIRPdat,1,(nPts-omitPts)*(nEchoes-omitEchoes));
+s = reshape(CHIRPdat,1,(nPts-omitPtsFront-omitPtsBack)*(nEchoes-omitEchoes));
 
 figure
 hold on
@@ -82,11 +95,11 @@ S = max(abs(s));
 N = rms(n);
 
 SNR = S/N
-SNR_perRtScans = SNR/sqrt(ap.ns)
+SNR_perRtScans = SNR/sqrt(nScans)
 
 %% Apodization, zero filling, do FFT
-pVec = 1:1:(nPts-omitPts);
-filt = exp(-(pVec-(nPts-omitPts)/2).^2/((nPts-omitPts)/apofac)^2);
+pVec = 1:1:(nPts-omitPtsBack-omitPtsFront);
+filt = exp(-(pVec-(nPts-omitPtsBack-omitPtsFront)/2).^2/((nPts-omitPtsBack-omitPtsFront)/apofac)^2);
 filt = repmat(filt',1,nEchoes-omitEchoes);
 
 if apodize == 1
@@ -95,7 +108,7 @@ end
 
 CHIRPdat = padarray(CHIRPdat, size(CHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
 
-T2Dprofiles = fftshift(fft(CHIRPdat,NFFT)/L, 1); % Performs FFT algorithm
+T2Dprofiles = flipud(fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
 
 %% Plot CHIRP results
 figure(1)
@@ -103,6 +116,7 @@ subplot(1,2,1)
 plot(t*1e6,real(CHIRPdat(:,1)));
 xlabel('time [us]')
 subplot(1,2,2)
+% figure(5)
 plot(z,2*abs(T2Dprofiles(:,1)),'LineWidth',1.5);
 xlabel('real space [um]')
 title('Plot of first T2-D FFT Profile and Echo')
@@ -116,18 +130,24 @@ ylabel('z [um]')
 view([0 90])
 
 %% No CHIRP load section
-[ap,spec] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
-data = reshape(spec,nPts,nEchoes);
+close all
+if strcmp(spectrometer,'Tecmag')==1;
+    [~ , spec] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
+elseif strcmp(spectrometer,'Kea')==1;
+    [~ , spec] = readKea4d(strcat(datadir,noCHIRPfile,'.2d'));
+end
+
+data = reshape(spec,nPts+cutRefPts,nEchoes);
 
 % No CHIRP raw data and fft profiles
-noCHIRPdat = reshape(data, nPts, nEchoes);
-noCHIRPdat = noCHIRPdat(1:end-omitPts,omitEchoes+1:end);
+noCHIRPdat = reshape(data, nPts+cutRefPts, nEchoes);
+noCHIRPdat = noCHIRPdat(1+omitPtsFront+cutRefPts/2:end-omitPtsBack-cutRefPts/2,omitEchoes+1:end);
 if apodize == 1
     noCHIRPdat = noCHIRPdat .* filt;
 end
 
 noCHIRPdat = padarray(noCHIRPdat, size(noCHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
-CPprofiles = fftshift(fft(noCHIRPdat,NFFT)/L,1);
+CPprofiles = flipud(fftshift(fft(noCHIRPdat,NFFT)/L,1));
 
 %% Plot first reference profile and coil profile
 
@@ -157,6 +177,7 @@ hold off
 xlabel('z [um]','fontsize',12)
 title('T2-D and coil reference profiles')
 set(gca,'Fontsize',12,'linewidth',2)
+legend('ref','exp')
 
 %% Coil Sensitivity Correction
 
@@ -194,7 +215,7 @@ deltaEffIndex = (1-(((BWchirp/2)-fIndex)/BWchirp))*2*Pchirp*1000;
 qIndex = 2*pi*gamma*1e6*G*deltaEffIndex/1000;
 vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
 
-%% Find Optimal data range with these figures
+% Find Optimal data range with these figures
 %  
 % figure(7)
 % plot(abs(T2Dprofiles(:,1)))
@@ -246,7 +267,7 @@ vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
 % xlabel('z (um)')
 %% Data Range and Inversion
 
-minind= min(ptIndex);
+minind = min(ptIndex);
 maxind = max(ptIndex);
 % this is where I'm starting to put in some diffusion code. 
 
@@ -270,25 +291,6 @@ plot(-vIndex(1:T2Dsize),polyval(p,-vIndex(1:T2Dsize)));
 
 D = p(1)        % *10-9 m^2 s^-1
 
-%%
-% %Calculate delta(eff) from Excel file;
-% 
-% % Need to only use points where abs(fIndex)<=BWchirp/2
-% BigIndex = 1:NFFT;
-% 
-% FOV = 1/(gamma*1e6*G*tD);
-% m_per_pt = FOV/NFFT;
-% BigDELTA = DELTA + delta;
-% 
-% ptIndex = (1:NFFT);
-% zBigIndex = FOV/2-BigIndex*m_per_pt;
-% fBigIndex = zBigIndex * gamma*1e6 * G;
-% 
-% ptIndex = find(abs(fBigIndex)<=BWchirp/2);
-% fIndex = zBigIndex(min(ptIndex):max(ptIndex)) * gamma*1e6 * G;
-% deltaEffIndex = (1-(((BWchirp/2)-fIndex)/BWchirp))*2*Pchirp*1000;
-% qIndex = 2*pi*gamma*1e6*G*deltaEffIndex/1000;
-% vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
 %% surf of all T2-D Profiles
 
 figure(10)
@@ -302,7 +304,7 @@ ylabel('delta [us]');
 title('D-T2 data')
 
 %% Save data, display ILT Data params
-close all
+% close all
 
 t2axis = echoVec*1e-6; %s
 % vaxis = gammaRad^2*G^2.*deltaSteps.^2.*((DELTA+delta) - (1/3)*deltaSteps); %s/m2
@@ -311,6 +313,7 @@ t2axis = t2axis';
 % vaxis = [1.15, 1.39, 1.66, 1.94, 2.25, 2.58, 2.92, 3.29, 3.67, 4.08, 4.5, 4.93, 5.39, 5.86, 6.34]*1e7/1e9;
 
 vIndex = rot90(vIndex,2);
+
 T2Ddat = flipud(T2Ddat);
 % T2Dexp = flipud(T2Ddat);
 save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
@@ -318,6 +321,59 @@ save(strcat(datadir,datafile, '_T2axis.dat'), 't2axis', '-ascii')
 save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
 
 %%
+
+Thmm = [0.001, 1]; %T2 (min and max)
+stepsh = 25; %horizontal steps
+Tvmm = [0.0001, 0.01]; %D min and max
+stepsv = 25;
+alpha = 1e7;
+orient = 'b'; %both orientations
+kernel1 = 'exp(-h/T)';
+kernel2 = 'exp(-v*D)';
+
+% Tvmm = Tvmm*1e9;
+
+tic
+    [spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(flipud(T2Ddat),echoVec*1e-6,rot90(vIndex,2),Thmm,stepsh,Tvmm,stepsv,alpha,-1,orient,kernel1,kernel2);
+toc
+
+% the vertical (D) axis isn't calibrated correctly, and I'm not sure what
+% the reason is.
+
+%     spectrum = flipdim(spectrum,1);
+    tauv = 1./tauv;
+%     tauv = tauv*1e-9;
+    tauv = flipdim(tauv,2);
+%     spectrum = spectrum';
+% figure
+% surf(echoVec*1e-6,rot90(vIndex,2),flipud(T2Ddat))
+% shading flat
+
+%%
+% taulv = log10(tauv);
+stb = size(tauv);
+% taulh = log10(tauh);
+sta = size(tauh);
+tauv = tauv';
+
+% spectrum = flipdim(spectrum,1);
+% tauv = 1./tauv;
+% tauv = flipdim(tauv,2);
+    
+surf(tauh,tauv,spectrum)    
+set(gca,'XScale','log','YScale','log')
+shading interp;
+%     %set(gcf,'Renderer','zbuffer');
+% axis([tauh(1),tauh(sta(2)),tauv(1),tauv(stb(2))]);
+view([0 90])
+xlabel('T_2 [s]')
+ylabel('D [m^2 s^{-1}]')
+
+
+
+
+%%
+
 %UF Points [Min, Max; min(echoVec), max(echoVec), delta(eff)(min) [us], delta(eff)(max) [us], #echoes, #D points]
 % sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
 dt = datestr(datetime('now','Format','dd MMMM yyyy HH:mm:ss'));
