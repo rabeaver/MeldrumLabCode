@@ -9,17 +9,21 @@ close all
 % ===================================
 %
 
-spectrometer = 'Kea'; %'Tecmag' OR 'Kea'
-datadir = 'Z:\JNK\PM5\UFT2Ddata\Paint_Nick\';
-datafile = 'M212_CHIRP_24June2016\7\data'; 
-noCHIRPfile = 'M212_noCHIRP_24June2016\3\data'; 
 
-Pchirp = 395e-6;                  % CHIRP Pulse Length (s)
-pw     = 4.5e-6;                      % hard pulse length
+spectrometer = 'Kea'; %'Tecmag' OR 'Kea'
+
+datadir = 'C:\CommonData\JNK\UFT2D\EthyleneGlycol\';
+datafile = 'EthyleneGlycol_CHIRP_20Jun2016_Overnight\1\data'; 
+noCHIRPfile = 'EthyleneGlycol_CHIRP_20Jun2016_Overnight\1\data'; 
+
+
+Pchirp = 495e-6;                  % CHIRP Pulse Length (s)
+pw     = 6e-6;                      % hard pulse length
 sliceheight = 0.1;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 128;                          % # of acqu points
+nPts = 112;                          % # of acqu points
+
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
 nEchoes = 128;                      % Echoes
@@ -34,10 +38,12 @@ cutRefPts = 0;                     %if necessary, can cut the data from the refe
 
 zf = 1;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
-apofac = 5;                         % Amount of Apodization
+apofac = 5;                         % Amount of Apodizatio
+
 
 delta = 0.8e-3;                       % little delta time (s)
 DELTA = 10.0e-3;                       % Big delta time in s
+
 
 % ===================================
 % === END User-defined paramaters ===
