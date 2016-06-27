@@ -9,6 +9,7 @@ close all
 % ===================================
 %
 
+
 spectrometer = 'Kea'; %'Tecmag' OR 'Kea'
 datadir = 'C:\CommonData\JNK\UFT2D\EthyleneGlycol\';
 datafile = 'EthyleneGlycol_CHIRP_20Jun2016_Overnight\1\data'; 
@@ -40,6 +41,7 @@ apofac = 5;                         % Amount of Apodizatio
 
 delta = 0.50e-3;                       % little delta time (s)
 DELTA = 0.320e-3;                       % Big delta time in s
+
 
 % ===================================
 % === END User-defined paramaters ===
