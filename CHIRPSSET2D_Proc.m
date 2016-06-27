@@ -9,35 +9,35 @@ close all
 % ===================================
 %
 
-spectrometer = 'Kea'; %'Tecmag'
-datadir = 'Z:\Data\TKM\CHIRP\Kea\EthyleneGlycol\';
-datafile = 'UFT2D\4\data';
-noCHIRPfile = 'UFT2D_ref\3\data';
+spectrometer = 'Tecmag'; %'Kea'
+datadir = '/Users/tyler/Desktop/';
+datafile = 'CuWater_Channels_chirpSTE_28May2016_2holder_result';
+noCHIRPfile = 'CuWater_Channels_nochirpSTE_28May2016_2holder_result';
 
 
-Pchirp = 453.75e-6;                  % CHIRP Pulse Length (s)
-pw     = 4.75e-6;                      % hard pulse length
+Pchirp = 43.8e-6;                  % CHIRP Pulse Length (s)
+pw     = 12e-6;                      % hard pulse length
 sliceheight = 0.10;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 56;                          % # of acqu points
+nPts = 90;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
-nEchoes = 128;                      % Echoes
+nEchoes = 64;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 400;                           % us
-preCHIRPdelay = 0.04e-6;             % s
-noisePoints = 4;                    % number of points for measuring noise
+tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 240;                           % us
+preCHIRPdelay = 0.2e-6;             % s
+noisePoints = 1;                    % number of points for measuring noise
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
-zf = 0;                             % levels of zero filling
+zf = 2;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
-delta = 1e-3;                       % little delta time (s)
-DELTA = 1e-3;                       % Big delta time in s
+delta = 0.1e-3;                       % little delta time (s)
+DELTA = 0.1e-3;                       % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
@@ -108,7 +108,7 @@ end
 
 CHIRPdat = padarray(CHIRPdat, size(CHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
 
-T2Dprofiles = (fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
+T2Dprofiles = flipud(fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
 
 %% Plot CHIRP results
 figure(1)
@@ -146,7 +146,7 @@ if apodize == 1
 end
 
 noCHIRPdat = padarray(noCHIRPdat, size(noCHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
-CPprofiles = (fftshift(fft(noCHIRPdat,NFFT)/L,1));
+CPprofiles = flipud(fftshift(fft(noCHIRPdat,NFFT)/L,1));
 
 %% Plot first reference profile and coil profile
 
@@ -212,7 +212,7 @@ deltaEffIndex = (1-(((BWchirp/2)-fIndex)/BWchirp))*2*Pchirp*1000;
 qIndex = 2*pi*gamma*1e6*G*deltaEffIndex/1000;
 vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
 
-Find Optimal data range with these figures
+% Find Optimal data range with these figures
 %  
 % figure(7)
 % plot(abs(T2Dprofiles(:,1)))
