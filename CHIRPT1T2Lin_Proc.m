@@ -25,6 +25,7 @@ nPts = 32; % # of acqu points
 nEchoes = 16; % Echoes
 tD = 2e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 110; %us
+
 omitEchoes = 0; %the number of echoes to skip
 noisePoints = 0; %number of points at beginning and end of each acqu period for noise
 omitPts = 0; %blank spectrometer points to skip
