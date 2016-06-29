@@ -9,27 +9,27 @@ close all
 % ===================================
 %
 
-spectrometer = 'Kea'; %'Tecmag' OR 'Kea'
-datadir = 'C:\CommonData\JNK\UFT2D\EthyleneGlycol\';
-datafile = 'EthyleneGlycol_CHIRP_20Jun2016_Overnight\1\data'; 
-noCHIRPfile = 'EthyleneGlycol_CHIRP_20Jun2016_Overnight\1\data'; 
+spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
+datadir = 'C:\CommonData\Membranes\MembraneTest_FilterPaper\';
+datafile = 'MembraneTest_FilterPaper_CHIRP_27Jun2016_2_result'; %\1\data'; 
+noCHIRPfile = 'MembraneTest_FilterPaper_noCHIRP_27Jun2016_2_result'; %\1\data'; 
 
 
-Pchirp = 495e-6;                  % CHIRP Pulse Length (s)
+Pchirp = 246.8e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
-sliceheight = 0.1;                % mm
+sliceheight = 0.2;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 112;                          % # of acqu points
+nPts = 90;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
-nEchoes = 16;                      % Echoes
+nEchoes = 64;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 180;                           % us
+tD = 3e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 350;                           % us
 preCHIRPdelay = 0.2e-6;             % s
-noisePoints = 2;                    % number of points for measuring noise
-nScans = 8192;                      % Number of scans in the experiment
+noisePoints = 10;                    % number of points for measuring noise
+nScans = 1024;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
@@ -38,8 +38,8 @@ apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodizatio
 
 
-delta = 0.50e-3;                       % little delta time (s)
-DELTA = 0.320e-3;                       % Big delta time in s
+delta = 0.5e-3;                       % little delta time (s)
+DELTA = 0.5e-3;                       % Big delta time in s
 
 % ===================================
 % === END User-defined paramaters ===
@@ -155,10 +155,10 @@ CPprofiles = flipud(fftshift(fft(noCHIRPdat,NFFT)/L,1));
 
 figure(3)
 subplot(1,2,1)
-plot(t*1e6,real(noCHIRPdat(:,1)));
+plot(t*1e6,real(noCHIRPdat(:,4)));
 xlabel('time [us]')
 subplot(1,2,2)
-plot(z,2*abs(CPprofiles(:,1)),'LineWidth',1.5);
+plot(z,2*abs(CPprofiles(:,4)),'LineWidth',1.5);
 xlabel('real space [um]')
 title('Plot of first reference FFT Profile and Echo')
 
@@ -172,8 +172,8 @@ view([0 90])
 
 figure(5)
 hold on
-plot(z,abs(CPprofiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','k')
-plot(z,abs(T2Dprofiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','r')
+plot(z,abs(CPprofiles(:,4))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','k')
+plot(z,abs(T2Dprofiles(:,4))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','r')
 % ylim([0 0.1])
 hold off
 xlabel('z [um]','fontsize',12)
@@ -316,7 +316,7 @@ t2axis = t2axis';
 
 vIndex = rot90(vIndex,2);
 
-T2Ddat = flipud(T2Ddat);
+T2Ddat = (T2Ddat);
 % T2Dexp = flipud(T2Ddat);
 save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
 save(strcat(datadir,datafile, '_T2axis.dat'), 't2axis', '-ascii')

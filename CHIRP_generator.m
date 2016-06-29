@@ -8,16 +8,9 @@ close all
 %%%%%%% User-defined parameters %%%%%%%
 % tic
 
-<<<<<<< HEAD
-
-dt = 100e-9;             % time per point in waveform (s) [Scout limit is 20ns]
-tau = 193.8e-6;            % pulse length (s)
-sliceheight = 0.100;     % mm
-=======
 dt = 40e-9;             % time per point in waveform (s) [Scout limit is 20ns]
-tau = 196.8e-6;            % pulse length (s)
+tau = 396.8e-6;            % pulse length (s)
 sliceheight = 0.200;     % mm
->>>>>>> 25e41e3727f682aa4898a86d671b95bf3fd88056
 
 
 G = 6.59;               %T m-1, B0 field gradient [PM25 = 6.59]
