@@ -30,14 +30,14 @@ DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
   Serial.begin(9600); 
-  Serial.println("DHTxx test!");
+  //Serial.println("DHTxx test!");
  
   dht.begin();
 }
 
 void loop() {
   // Wait a few seconds between measurements.
-  delay(60000);
+  delay(2000);
 
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
