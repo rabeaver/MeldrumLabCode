@@ -30,7 +30,7 @@ DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
   Serial.begin(9600); 
-  Serial.println("DHTxx test!");
+  //Serial.println("DHTxx test!");
  
   dht.begin();
 }
@@ -58,12 +58,12 @@ void loop() {
   // Must send in temp in Fahrenheit!
   //float hi = dht.computeHeatIndex(f, h);
 
-  Serial.print("Humidity: "); 
+  //Serial.print("Humidity: "); 
   Serial.print(h);
-  Serial.print(" %\t");
-  Serial.print("Temperature: "); 
-  Serial.print(t);
-  Serial.println(" *C ");
+  Serial.print(",");
+  //Serial.print("Temperature: "); 
+  Serial.println(t);
+  //Serial.println(" *C ");
   //Serial.print(f);
   //Serial.print(" *F\t");
   //Serial.print("Heat index: ");

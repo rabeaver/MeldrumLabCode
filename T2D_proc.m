@@ -3,19 +3,19 @@ clc
 close all
 
 %%
-datadir = '/Users/tyler/Dropbox/Data/CommonData/Acetone/';
-datafile = 'AcetoneLarge_STE_refoc_fixTd_06Apr2016_3_result';
+datadir = 'C:\Users\jnking01\Desktop\ToLookThrough\EthGly_PM25\Tradexp\';
+datafile = 'EtGlyLarge_STE_20Jan2016_1_result';
 
 
-nPts = 54;                          % # of acqu points
-omitPts = 0;                        % the number of points that are zeros from the spectrometer
-nEchoes = 64;                      % Echoes
-omitEchoes = 2;                     % numner of echoes to remove from data
-tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 400;                           % us
-deltaMin = 20e-6;                  % s
-deltaMax = 560e-6;                 % s
-DELTA = 0.5e-3;                      % s
+nPts = 76;                          % # of acqu points
+omitPts = 0;                        % the number  of points that are zeros from the spectrometer
+nEchoes = 128;                      % Echoes
+omitEchoes = 0;                     % numner of echoes to remove from data
+tD = 8e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 700;                           % us
+deltaMin = 100e-6;                  % s
+deltaMax = 1000e-6;                 % s
+DELTA = 3e-3;                      % s
 noisePoints = 4;                   % number of points for measuring noise
 noiseNumber = 1;                    % scan number to use for determining SNR
 G = 6.59;                           % T m-1, B0 field gradient

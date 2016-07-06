@@ -6,7 +6,7 @@ close all
 
 filename = 'data2D_Cp';
 fileext = '.2d';
-filedir = 'C:\Users\jnking01\Desktop\TradSSET2_M212_Overnight_23June2016\1\';
+filedir = 'C:\Users\jnking01\Desktop\TradSSET2_M212_24month_Overnight_29June2016\1\';
 
 fileloc = strcat(filedir,filename,fileext);           % String together file name
 parloc  = strcat(filedir,'acqu.par');         % String together Acquisition param location
@@ -45,12 +45,12 @@ ptIndex = (1:nPtsD);
 zBigIndex = FOV/2-BigIndex*m_per_pt;
 fBigIndex = zBigIndex * gamma*1e6 * G;
 
-qIndex = 2*pi*gamma*1e6*G*deltavec./1000;
-vIndex = qIndex.^2.*(BigDELTA-deltavec./3000).*1e-9;
+qIndex = 2*pi*gamma*1e6*G*deltavec;
+vIndex = qIndex.^2.*(BigDELTA-deltavec).*1e-9;
 
 vIndex = rot90(vIndex,2);
 vIndex = flipud(vIndex);
-T2Ddat = (real(spec2d))';
+T2Ddat = (abs(spec2d))';
 
 
 
