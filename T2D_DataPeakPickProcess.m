@@ -5,10 +5,10 @@ close all
 %%
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = 'Z:\Data\JNK\UFT2DData\EthGly_PM25\CHIRPexp\';
-datafile = 'EtGlyLarge_chirpSTE_20Jan2016_17_result.dat.out';
+datadir = 'Z:\JNK\UFT2Dupdate\EthyleneGlycol\CHIRP\';
+datafile = 'EthyleneGlycol_CHIRP_6July2016.dat.out';
 T2lims = [1e-3 1e0];
-Dlims = [1e-12 1e-9];
+Dlims = [1e-12 1e-8];
 contourLevel = 0.50;
 
 %load the data and remove 0 values (replace with NaN)
@@ -16,6 +16,7 @@ data = load(strcat(datadir,datafile));
 data = interp2(data,2);
 data(data == 0) = NaN; 
 nPts = size(data,1);
+
 
 %this calculates the axes based on the limits above
 Daxis = logspace(log10(Dlims(1)),log10(Dlims(2)),nPts);

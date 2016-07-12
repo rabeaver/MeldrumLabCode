@@ -10,29 +10,29 @@ close all
 %
 
 spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
-datadir = 'C:\Users\jnking01\Desktop\ToLookThrough\EthGly_PM25\';
-datafile = 'EtGlyLarge_chirpSTE_20Jan2016_17_result'; %\1\data'; 
-noCHIRPfile = 'EtGlyLarge_nochirpSTE_20Jan2016_3_result'; %\1\data'; 
+datadir = 'C:\Users\jnking01\Desktop\PureH2OBeadPack\';
+datafile = 'PureH2O_BeadPack_CHIRP_10July2016'; %\2\data'; 
+noCHIRPfile = 'PureH2O_BeadPack_noCHIRP_10July2016'; %\2\data'; 
 
 
 
-Pchirp = 496e-6;                  % CHIRP Pulse Length (s)
+Pchirp = 296.8e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
-sliceheight = 0.350;                % mm
+sliceheight = 0.200;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
 
-nPts = 76;                          % # of acqu points
+nPts = 100;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
 nEchoes = 128;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 8e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700;                           % us
+tD = 3e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 400;                           % us
 preCHIRPdelay = 0.2e-6;             % s
 noisePoints = 10;                    % number of points for measuring noise
 
-nScans = 4096;                      % Number of scans in the experiment
+nScans = 1024;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
@@ -42,8 +42,8 @@ apofac = 5;                         % Amount of Apodizatio
 
 
 
-delta = 1e-3;                       % little delta time (s)
-DELTA = 3e-3;                       % Big delta time in s
+delta = 0.60e-3;                       % little delta time (s)
+DELTA = 5e-3;                       % Big delta time in s
 
 
 % ===================================
@@ -320,9 +320,9 @@ t2axis = t2axis';
 
 % vaxis = [1.15, 1.39, 1.66, 1.94, 2.25, 2.58, 2.92, 3.29, 3.67, 4.08, 4.5, 4.93, 5.39, 5.86, 6.34]*1e7/1e9;
 
-vIndex = rot90(vIndex,2);
+vIndex = rot90(vIndex,2)';
 
-T2Ddat = flipud(T2Ddat);
+T2Ddat = (T2Ddat);
 % T2Dexp = flipud(T2Ddat);
 save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
 save(strcat(datadir,datafile, '_T2axis.dat'), 't2axis', '-ascii')

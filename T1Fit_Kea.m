@@ -4,7 +4,7 @@ close all
 
 %% T1 Fit from Kea Data
 
-parfilestem = sprintf('%s', 'C:\users\vjlee\Desktop\1\acqu');
+parfilestem = sprintf('%s', 'C:\Users\jnking01\Desktop\Atlas in ARLO 9.2\T1\1\acqu');
 
 params.acqTime = readpar_Kea(strcat(parfilestem,'.par'),'acqTime');
 params.bandwidth = readpar_Kea(strcat(parfilestem,'.par'),'bandwidth');
@@ -19,7 +19,7 @@ params.nrEchoes = readpar_Kea(strcat(parfilestem,'.par'),'nrEchoes');
 params.echoTime = readpar_Kea(strcat(parfilestem,'.par'),'echoTime');
 
 
-file = sprintf('%s', 'C:\users\vjlee\Desktop\1\data.dat');
+file = sprintf('%s', 'C:\Users\jnking01\Desktop\Atlas in ARLO 9.2\T1\1\data.dat');
 data = load(file);
 
 data = data';
@@ -30,15 +30,15 @@ T1vector = data(2,:);
 %% T1 Bifit
 
 % Input guess, do fitting
-guess = [1, 100e-3, 1, 500e-3];
-[beta,Resids,J,covB] = nlinfit(T1amp,T1vector,@T1_birecovery,guess);
+guess = [0.02 1 100e-3];
+[beta,Resids,J,covB] = nlinfit(T1amp,T1vector,@T1_recovery,guess);
 
 % Confidence Interval and Margin of Error (+/-)
 CI=nlparci(beta,Resids,'jacobian',J);
 MOE_T1 = (CI(2,2) - CI(2,1))/2;
 
 % Curve from fit
-ypred = T1_birecovery(beta, T1amp);
+ypred = T1_recovery(beta, T1amp);
 
 % plot fit
 figure(1)
