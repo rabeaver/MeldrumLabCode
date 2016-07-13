@@ -3,15 +3,15 @@ clc
 close all
 
 %%
-datadir = 'C:\Users\jnking01\Desktop\ToLookThrough\EthGly_PM25\Tradexp\';
-datafile = 'EtGlyLarge_STE_20Jan2016_1_result';
+datadir = '/Users/jaredking/Desktop/EthyleneGlycol/Trad/';
+datafile = 'SSET2Trad_EthyleneGlycol_6July2016';
 
 
-nPts = 76;                          % # of acqu points
+nPts = 46;                          % # of acqu points
 omitPts = 0;                        % the number  of points that are zeros from the spectrometer
-nEchoes = 128;                      % Echoes
+nEchoes = 64;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 8e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 700;                           % us
 deltaMin = 100e-6;                  % s
 deltaMax = 1000e-6;                 % s
