@@ -20,11 +20,11 @@ shading flat
 
 
 %% T2D
-cd('Z:\Data\VJL\PM5\20B_2_T2D\2');
-dataInD = load('20B_2_T2D_2.out');
+cd('Z:\Data\JNK\PM5\Paint_Nick\1July2016_to_4July2016\M212_2014_TradSSET2_Overnight_4July2016\1\');
+dataInD = load('ProspaILT_correctaxes.out');
 
 T2Dlim = [-5 0];
-Dlim = [-12 -6];
+Dlim = [-12 -7];
 
 T2Daxis = logspace(T2Dlim(1),T2Dlim(2), size(dataInD,1));
 Daxis = logspace(Dlim(1),Dlim(2), size(dataInD,2));
@@ -33,9 +33,10 @@ figure(2)
 surf(T2Daxis,Daxis,dataInD)
 set(gca,'XScale','log')
 set(gca,'YScale','log')
-xlabel('T_2 times (s)')
+xlabel('T_2 (s)')
 ylabel('D (m^2 s^{-1})')
 shading flat
+view(0,90)
 
 %% Combined
 
