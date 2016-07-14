@@ -3,20 +3,20 @@ clc
 close all
 
 %%
-datadir = '/Users/tyler/Dropbox/Data/CommonData/Acetone/';
-datafile = 'AcetoneLarge_STE_refoc_fixTd_06Apr2016_3_result';
+datadir = 'C:\CommonData\Membranes\PureWater\';
+datafile = 'SSET2Trad_membrane_PureWater_PostEDTA_12July2016_Overnight';
 
 
-nPts = 54;                          % # of acqu points
+nPts = 56;                          % # of acqu points
 omitPts = 0;                        % the number of points that are zeros from the spectrometer
-nEchoes = 64;                      % Echoes
-omitEchoes = 2;                     % numner of echoes to remove from data
-tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 400;                           % us
+nEchoes = 512;                      % Echoes
+omitEchoes = 0;                     % numner of echoes to remove from data
+tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 200;                           % us
 deltaMin = 20e-6;                  % s
-deltaMax = 560e-6;                 % s
-DELTA = 0.5e-3;                      % s
-noisePoints = 4;                   % number of points for measuring noise
+deltaMax = 400e-6;                 % s
+DELTA = 5e-3;                      % s
+noisePoints = 5;                   % number of points for measuring noise
 noiseNumber = 1;                    % scan number to use for determining SNR
 G = 6.59;                           % T m-1, B0 field gradient
 

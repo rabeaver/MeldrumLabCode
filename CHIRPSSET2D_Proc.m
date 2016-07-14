@@ -10,29 +10,29 @@ close all
 %
 
 spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
-datadir = 'C:\CommonData\Membranes\MembraneTest_FilterPaper\';
-datafile = 'MembraneTest_FilterPaper_CHIRP_27Jun2016_2_result'; %\1\data'; 
-noCHIRPfile = 'MembraneTest_FilterPaper_noCHIRP_27Jun2016_2_result'; %\1\data'; 
+datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\5000us\';
+datafile = 'Membrane_PureWater_CHIRP_13July2016_DELTAseries5000_Overnight'; %\1\data'; 
+noCHIRPfile = 'Membrane_PureWater_noCHIRP_13July2016_DELTAseries20000'; %\1\data'; 
 
 
 
-Pchirp = 246.8e-6;                  % CHIRP Pulse Length (s)
+Pchirp = 196.8e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
 sliceheight = 0.2;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
 
-nPts = 90;                          % # of acqu points
+nPts = 56;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
-nEchoes = 64;                      % Echoes
+nEchoes = 512;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 3e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 350;                           % us
+tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 200;                           % us
 preCHIRPdelay = 0.2e-6;             % s
-noisePoints = 10;                    % number of points for measuring noise
+noisePoints = 1;                    % number of points for measuring noise
 
-nScans = 1024;                      % Number of scans in the experiment
+nScans = 4096;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
@@ -42,8 +42,8 @@ apofac = 5;                         % Amount of Apodizatio
 
 
 
-delta = 0.5e-3;                       % little delta time (s)
-DELTA = 0.5e-3;                       % Big delta time in s
+delta = 0.4e-3;                       % little delta time (s)
+DELTA = 5e-3;                       % Big delta time in s
 
 
 % ===================================
@@ -115,16 +115,16 @@ end
 
 CHIRPdat = padarray(CHIRPdat, size(CHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
 
-T2Dprofiles = flipud(fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
+T2Dprofiles = (fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
 
 %% Plot CHIRP results
 figure(1)
 subplot(1,2,1)
-plot(t*1e6,real(CHIRPdat(:,1)));
+plot(t*1e6,real(CHIRPdat(:,2)));
 xlabel('time [us]')
 subplot(1,2,2)
 % figure(5)
-plot(z,2*abs(T2Dprofiles(:,1)),'LineWidth',1.5);
+plot(z,2*abs(T2Dprofiles(:,2)),'LineWidth',1.5);
 xlabel('real space [um]')
 title('Plot of first T2-D FFT Profile and Echo')
 
@@ -154,16 +154,16 @@ if apodize == 1
 end
 
 noCHIRPdat = padarray(noCHIRPdat, size(noCHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
-CPprofiles = flipud(fftshift(fft(noCHIRPdat,NFFT)/L,1));
+CPprofiles = (fftshift(fft(noCHIRPdat,NFFT)/L,1));
 
 %% Plot first reference profile and coil profile
 
 figure(3)
 subplot(1,2,1)
-plot(t*1e6,real(noCHIRPdat(:,4)));
+plot(t*1e6,real(noCHIRPdat(:,2)));
 xlabel('time [us]')
 subplot(1,2,2)
-plot(z,2*abs(CPprofiles(:,4)),'LineWidth',1.5);
+plot(z,2*abs(CPprofiles(:,2)),'LineWidth',1.5);
 xlabel('real space [um]')
 title('Plot of first reference FFT Profile and Echo')
 
@@ -177,8 +177,8 @@ view([0 90])
 
 figure(5)
 hold on
-plot(z,abs(CPprofiles(:,4))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','k')
-plot(z,abs(T2Dprofiles(:,4))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','r')
+plot(z,abs(CPprofiles(:,2))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','k')
+plot(z,abs(T2Dprofiles(:,2))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','r')
 % ylim([0 0.1])
 hold off
 xlabel('z [um]','fontsize',12)
@@ -203,7 +203,7 @@ T2Dprofcorr = T2Dprofiles./pcorr;
 % caxis([0 1])
 % title('Coil sensitivity corrected T1-T2 profiles')
 
-%%
+
 %Calculate delta(eff) from Excel file;
 
 % Need to only use points where abs(fIndex)<=BWchirp/2

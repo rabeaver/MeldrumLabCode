@@ -6,7 +6,7 @@ close all
 
 filename = 'data2D_Cp';
 fileext = '.2d';
-filedir = 'C:\Users\jnking01\Desktop\TradSSET2_M212_Overnight_23June2016\1\';
+filedir = 'C:\Users\tkmeldrum\Desktop\P250_2014e_SSET2Trad_6July2016\1\';
 
 fileloc = strcat(filedir,filename,fileext);           % String together file name
 parloc  = strcat(filedir,'acqu.par');         % String together Acquisition param location
@@ -50,7 +50,7 @@ vIndex = qIndex.^2.*(BigDELTA-deltavec./3000).*1e-9;
 
 vIndex = rot90(vIndex,2);
 vIndex = flipud(vIndex);
-T2Ddat = (real(spec2d))';
+T2Ddat = (abs(spec2d))';
 
 
 
