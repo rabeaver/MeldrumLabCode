@@ -2,6 +2,7 @@ clear
 clc
 close all
 
+%%
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
 datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\10000us\';
@@ -12,13 +13,16 @@ contourLevel = 0.50;
 
 %load the data and remove 0 values (replace with NaN)
 data = load(strcat(datadir,datafile));
+data = interp2(data,2);
 data(data == 0) = NaN; 
 nPts = size(data,1);
+
 
 %this calculates the axes based on the limits above
 Daxis = logspace(log10(Dlims(1)),log10(Dlims(2)),nPts);
 T2axis = logspace(log10(T2lims(1)),log10(T2lims(2)),nPts);
 
+%%
 %%plot the T2D data
 % regular T1-T2 plot
 figure(1)
@@ -32,6 +36,7 @@ ylabel('\itD [m^2 s^{-1}]')
 xlabel('\itT\rm_2 [s]')
 view([0,90])
 
+%%
 % plot with indices for peak selection. Click on four points to make a box
 % around the peak of interest. Go clockwise from the upper left corner.
 figure(2)

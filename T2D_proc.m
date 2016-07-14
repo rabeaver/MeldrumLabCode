@@ -67,7 +67,7 @@ S = max(abs(s));
 N = rms(n);
 
 SNR = S/N
-SNR_perRtScans = SNR/sqrt(2*ap.ns)
+SNR_perRtScans = SNR/sqrt(ap.td(2)*ap.ns)
 
 %% Plot T2D data
 

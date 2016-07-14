@@ -45,8 +45,8 @@ ptIndex = (1:nPtsD);
 zBigIndex = FOV/2-BigIndex*m_per_pt;
 fBigIndex = zBigIndex * gamma*1e6 * G;
 
-qIndex = 2*pi*gamma*1e6*G*deltavec./1000;
-vIndex = qIndex.^2.*(BigDELTA-deltavec./3000).*1e-9;
+qIndex = 2*pi*gamma*1e6*G*deltavec;
+vIndex = qIndex.^2.*(BigDELTA-deltavec).*1e-9;
 
 vIndex = rot90(vIndex,2);
 vIndex = flipud(vIndex);

@@ -18,7 +18,7 @@ noCHIRPfile = 'Membrane_PureWater_noCHIRP_13July2016_DELTAseries20000'; %\1\data
 
 Pchirp = 196.8e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
-sliceheight = 0.2;                % mm
+sliceheight = 0.200;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
 
@@ -29,6 +29,7 @@ nEchoes = 512;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 200;                           % us
+
 preCHIRPdelay = 0.2e-6;             % s
 noisePoints = 1;                    % number of points for measuring noise
 
@@ -320,7 +321,7 @@ t2axis = t2axis';
 
 % vaxis = [1.15, 1.39, 1.66, 1.94, 2.25, 2.58, 2.92, 3.29, 3.67, 4.08, 4.5, 4.93, 5.39, 5.86, 6.34]*1e7/1e9;
 
-vIndex = rot90(vIndex,2);
+vIndex = rot90(vIndex,2)';
 
 T2Ddat = (T2Ddat);
 % T2Dexp = flipud(T2Ddat);
