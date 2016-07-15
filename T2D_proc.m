@@ -3,8 +3,8 @@ clc
 close all
 
 %%
-datadir = 'C:\CommonData\Membranes\PureWater\';
-datafile = 'SSET2Trad_membrane_PureWater_PostEDTA_12July2016_Overnight';
+datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\';
+datafile = 'SSET2Trad_membrane_PureWate__DELTA20000_14July2016_Overnight_result';
 
 
 nPts = 56;                          % # of acqu points
@@ -15,7 +15,7 @@ tD = 2e-6;                          % dwell time (Tecmag shows correct dwell tim
 tE = 200;                           % us
 deltaMin = 20e-6;                  % s
 deltaMax = 400e-6;                 % s
-DELTA = 5e-3;                      % s
+DELTA = 20e-3;                      % s
 noisePoints = 5;                   % number of points for measuring noise
 noiseNumber = 1;                    % scan number to use for determining SNR
 G = 6.59;                           % T m-1, B0 field gradient
