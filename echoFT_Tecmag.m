@@ -9,14 +9,15 @@ close all
 %
 
 
-datadir = '/Users/tyler/Dropbox/Data/TAMU/CuWater_filterpaper/';
-datafile = 'CuWater_CPMG_18May2016_2m';
+
+datadir = 'C:\CommonData\TAMU\membrane holder_CuWater & Water test\';
+datafile = 'Water_CPMG_13June2016_1m';
 
 
-nPts = 54;                          % # of acqu points
+nPts = 30;                          % # of acqu points
 nEchoes = 64;                      % Echoes% omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 400;                           % us
+tE = 450;                           % us
 
 zf = 2;                             % levels of zero filling
 
@@ -55,3 +56,4 @@ ylabel('position [um]')
 
 %%
 cftool(echoVec*1e-3,abs(profile(NFFT/2,:)))
+

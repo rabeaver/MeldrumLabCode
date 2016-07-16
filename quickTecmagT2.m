@@ -3,16 +3,16 @@ clc
 close all
 
 %%
-filename = 'CuWater_CPMG_21Apr2016_1.tnt';
-filedir = 'C:\CommonData\TAMU\CuWater\';
+filename = 'bulkCuWater_CPMG_11June2016_1.tnt';
+filedir = 'C:\CommonData\TAMU\membrane holder_CuWater & Water test\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 
-tEcho = 400; %us
+tEcho = 410; %us
 nEchoes = 64;
 nPts = 54;
-nPtsBlank = 4;
+nPtsBlank = 2;
 
 %% SNR calc
 
@@ -25,7 +25,7 @@ N = (imag(spec(Spoint-nPts/2:Spoint+nPts/2)));
 
 SNR = snr(S,N)
 
-figure
+figure(1)
 hold on
 plot(S)
 plot(N)
@@ -45,9 +45,11 @@ guess = [1 15e-3];% 0.6 6e-03];
 beta = nlinfit(echoVector,dataIntRe, @t2monofit_simple, guess);
 ypred = t2monofit_simple(beta,echoVector);
 
-figure(1)
+figure(2)
 hold on
 plot(echoVector,dataIntRe);
 plot(echoVector,dataIntIm);
 plot(echoVector,ypred,'-r');
-xlabel('time/s')
+xlabel('time[s]');
+ylabel('intensity');
+set(gca, 'Fontsize',18,'linewidth',2);

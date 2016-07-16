@@ -17,7 +17,7 @@ sliceheight = 0.100;     % mm
 G = 6.59;               %T m-1, B0 field gradient [PM25 = 6.59]
                         %                         [PM5 = 23.87]
 offset = 0;             %mm, frequency offset (if applicable)
-amplitude = 24;         %pwr, for Tecmag
+amplitude = 5;         %pwr, for Tecmag
 % NOTE: positive offset moves to the left in the FT spectrum (negative
 % position)
 
@@ -57,7 +57,6 @@ if LINramp == 1;
 % numerical expressions
     f = linspace(-SW/2,SW/2,N);       % frequency (Hz, or cycles s-1)
     f_s = f*360;                      % frequency (deg s-1)
-    phase = cumsum(f)*dt;             % phase (cycles, or Hz*s)
     phase_s = cumsum(f_s)*dt;         % phase (deg) 
     phase_s360 = mod(phase_s,360);    % phase (deg, mod 360)
 

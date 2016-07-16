@@ -8,25 +8,26 @@ close all
 % ===== User-defined paramaters =====
 % ===================================
 
-spectrometer = 'Kea'; %'Tecmag'
-datadir = 'Z:\Data\TKM\Mortar\10May2016_test\';
-datafile = 'UFT1T2\1\data';
-noCHIRPfile = 'UFT1T2_ref\1\data';
-filenameExt = '';
+spectrometer = 'Tecmag'; %'Tecmag'
+datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\';
+datafile = 'Membrane_PureWater_CHIRP_T1T2_13July2016';
+noCHIRPfile = 'Membrane_PureWater_noCHIRP_T1T2_13July2016';
+filenameExt = '.tnt';
 
 
-Pchirp = 0.01; % CHIRP Pulse Length (s)
+Pchirp = 1; % CHIRP Pulse Length (s)
 
-sliceheight = 0.10; %mm
-PreCPMGdelay = 40e-6; %s
+sliceheight = 0.200; %mm
+PreCPMGdelay = 20e-6; %s
 
 
-nPts = 32; % # of acqu points
-nEchoes = 16; % Echoes
+nPts = 56; % # of acqu points
+nEchoes = 512; % Echoes
 tD = 2e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 110; %us
+tE = 200; %us
+
 omitEchoes = 0; %the number of echoes to skip
-noisePoints = 0; %number of points at beginning and end of each acqu period for noise
+noisePoints = 8; %number of points at beginning and end of each acqu period for noise
 omitPts = 0; %blank spectrometer points to skip
 
 zf = 1;                             % levels of zero filling
@@ -123,7 +124,7 @@ hold off
 %% No CHIRP load section
 close all
 
-if strcmp(spectrometer,'Tecma')==1;
+if strcmp(spectrometer,'Tecmag')==1;
     [~ , spec] = readTecmag4d(strcat(datadir,noCHIRPfile,'.tnt'));
 elseif strcmp(spectrometer,'Kea')==1;
     [~ , spec] = readKea4d(strcat(datadir,noCHIRPfile,'.2d'));
@@ -221,8 +222,8 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 29;
-maxind = 38;
+minind= 57;
+maxind = 71;
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 
@@ -266,10 +267,21 @@ title('T1-T2 data')
 %% Save data, display ILT Data params
 close all
 
-T1T2data = T1T2data(:,1:end);
-T1T2data2 = flipud(T1T2data);
-data2d = T1T2data2;
-save(strcat(datadir,datafile,filenameExt, '.dat'), 'T1T2data2', '-ascii');
+%Prepare 2D data
+T1T2data2 = T1T2data(:,1:end);
+T1T2data2 = flipud(T1T2data2);
+
+% Prepare T1 and T2 axes
+vaxis = t1; %us
+vaxis = rot90(vaxis,2);
+T2axis = echoVec'/1e6;   %us
+
+
+
+save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii');
+save(strcat(datadir,datafile,'_T2axis.dat'),'T2axis','-ascii')
+save(strcat(datadir,datafile,'_vaxis.dat'),'vaxis','-ascii')
+
 % size(T1T2data);
 % 1e6*abs(t1(1)-t1(end)); %#ok<NOPTS>
 % 1e6*[min(t1), max(t1)]; %#ok<NOPTS>
@@ -280,4 +292,3 @@ save(strcat(datadir,datafile,filenameExt, '.dat'), 'T1T2data2', '-ascii');
 fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
 fprintf(fileID,'%s: %f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d\n',datafile, SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1));
 fclose(fileID);
-

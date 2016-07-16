@@ -5,13 +5,13 @@ clc
 %% T1T2
 
 % Load data
-cd('C:\users\jnking01\desktop\'); % cd into desired directory
-datafile = 'CHIRP_15mMGdH2O_40mspw_sliceheight350um_Td8u_76pts_512scans_50nsWave_10dB_3Aug2015'; % Datafile
+cd('/Users/jaredking/Documents/Classes/Chemistry/Research/Summer2016/TradSSET2_M212Samples_23_28June2016/TradSSET2_M212_Fresh_Overnight_24June2016/2/ILTs/'); % cd into desired directory
+datafile = 'TradSSET2_M212_Fresh_Overnight_24June2016'; % Datafile
 invDat = load(strcat(datafile, '.out')); % Load Prospa File
 
 % Match axes to Prospa Inversion
-T2lim = [-4 -1]; % T2 limits
-T1lim = [-4 -0]; % T1 limits
+T2lim = [-5 -0]; % T2 limits
+T1lim = [-12 -7]; % T1 limits
 
 % Make Axes
 T2axis = logspace(T2lim(1),T2lim(2), size(invDat,1));
@@ -29,5 +29,5 @@ shading flat
 view(2) % Sets correct view for saving
 
 % Save figure to bring into Adobe Illustrator
-cd('Z:\JNK\CHIRP\Best_Data_Sets\Ville_Update\') % cd into desired directory
+% cd('Z:\JNK\CHIRP\Best_Data_Sets\Ville_Update\') % cd into desired directory
 saveas(f, datafile, 'tif') % Save as .tif
