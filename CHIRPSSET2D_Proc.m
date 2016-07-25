@@ -1,3 +1,4 @@
+
 clear
 clc
 close all
@@ -15,7 +16,6 @@ datafile = 'BrickInWater_CHIRP_21July2016_long'; %\1\data';
 noCHIRPfile = 'BrickInWater_noCHIRP_21July2016_2'; %\1\data'; 
 
 
-
 Pchirp = 96.8e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
 sliceheight = 0.150;                % mm
@@ -27,20 +27,19 @@ omitPtsBack = 0;                    % the number of points at the end of each ec
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
 nEchoes = 64;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 3e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 250;                           % us
-
 preCHIRPdelay = 0.2e-6;             % s
-noisePoints = 1;                    % number of points for measuring noise
+noisePoints = 5;                    % number of points for measuring noise
+
 
 nScans = 16000;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
-zf = 1;                             % levels of zero filling
+zf = 0;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodizatio
-
 
 
 delta = 0.2e-3;                       % little delta time (s)
@@ -51,9 +50,9 @@ DELTA = 1e-3;                       % Big delta time in s
 % === END User-defined paramaters ===
 % ===================================
 
-if strcmp(spectrometer,'Tecmag')==1;
+if strcmp(spectrometer,'Tecmag')==1
     G = 6.59;                           % T m-1, B0 field gradient
-elseif strcmp(spectrometer,'Kea')==1;    
+elseif strcmp(spectrometer,'Kea')==1    
     G = 23.87;
 end
 
@@ -77,9 +76,9 @@ f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/(gamma*G);                    % um, 280.47 Hz/um (for PM25)
 
 %% Import CHIRP data
-if strcmp(spectrometer,'Tecmag')==1;
+if strcmp(spectrometer,'Tecmag')==1
     [ap , spec] = readTecmag4d(strcat(datadir,datafile,'.tnt'));
-elseif strcmp(spectrometer,'Kea')==1;
+elseif strcmp(spectrometer,'Kea')==1
     [ap , spec] = readKea4d(strcat(datadir,datafile,'.2d'));
 end
 
@@ -116,7 +115,7 @@ end
 
 CHIRPdat = padarray(CHIRPdat, size(CHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
 
-T2Dprofiles = (fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
+T2Dprofiles = flipud(fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
 
 %% Plot CHIRP results
 figure(1)
@@ -155,7 +154,7 @@ if apodize == 1
 end
 
 noCHIRPdat = padarray(noCHIRPdat, size(noCHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
-CPprofiles = (fftshift(fft(noCHIRPdat,NFFT)/L,1));
+CPprofiles = flipud(fftshift(fft(noCHIRPdat,NFFT)/L,1));
 
 %% Plot first reference profile and coil profile
 
@@ -224,7 +223,8 @@ deltaEffIndex = (1-(((BWchirp/2)-fIndex)/BWchirp))*2*Pchirp*1000;
 qIndex = 2*pi*gamma*1e6*G*deltaEffIndex/1000;
 vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
 
-% Find Optimal data range with these figures
+%%Find Optimal data range with these figures
+
 %  
 % figure(7)
 % plot(abs(T2Dprofiles(:,1)))
@@ -232,19 +232,19 @@ vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
 % t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 % deltaFig = 2*Pchirp*(BWchirp/2-f)/BWchirp + deltaMin; % expression for delta(effective), maybe
 % 
-% ylimits = [0 1500];
+% ylimits = [0 3];
 % deltaEff = 2*t1_fig7 ;
 % % deltaEff = delta - t1_fig7 - preCHIRPdelay;
 % deltaEff = fliplr(deltaEff);
 % 
 % figure(8)
-% subplot(4,1,1)
+% subplot(2,1,1)
 % plot(abs(T2Dprofcorr(:,1)))
 % xlim([0 NFFT])
 % ylim(ylimits)
 % xlabel('index')
-% 
-% subplot(4,1,2)
+% % 
+% subplot(2,1,2)
 % plot(1e6*t1_fig7,abs(T2Dprofcorr(:,1)))
 % line(1e6*[0 0],[0 ylimits(2)])
 % line(1e6*[Pchirp Pchirp],[0 ylimits(2)])
@@ -277,8 +277,7 @@ vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
 %% Data Range and Inversion
 
 minind = min(ptIndex);
-maxind = max(ptIndex);
-% this is where I'm starting to put in some diffusion code. 
+maxind = max(ptIndex); 
 
 T2Ddat = abs(T2Dprofcorr(minind:maxind,:)); %crops data set according to above indices
 % deltaSteps = deltaEff(minind:maxind);
@@ -291,14 +290,14 @@ yD = log(T2Ddat./T2Ddat(1))';
 T2Dsize = size(T2Ddat,1); % cuts down delta points to math those selected for the indices,assuming that the 
 
 % fit to STE diffusion equation
-p = polyfit(-vIndex(1:T2Dsize),(yD(1,:)),1);
+p = polyfit(-vIndex(14:18), yD(1,14:18),1); %T2Dsize),(yD(1,:)),1);
 
 figure(9)
 hold on
-scatter(-vIndex(1:T2Dsize),(yD(1,:))) 
+scatter(-vIndex(1:T2Dsize),(yD(1,:)));
 plot(-vIndex(1:T2Dsize),polyval(p,-vIndex(1:T2Dsize)));
 
-D = p(1)        % *10-9 m^2 s^-1
+D = p(1)*1e-9         % *10-9 m^2 s^-1
 
 %% surf of all T2-D Profiles
 
@@ -331,11 +330,13 @@ save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
 
 %%
 
+
 Thmm = [0.001, 1]; %T2 (min and max)
 stepsh = 25; %horizontal steps
 Tvmm = [0.0001, 0.01]; %D min and max
 stepsv = 25;
 alpha = 1e7;
+
 orient = 'b'; %both orientations
 kernel1 = 'exp(-h/T)';
 kernel2 = 'exp(-v*D)';

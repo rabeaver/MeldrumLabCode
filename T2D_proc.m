@@ -3,6 +3,7 @@ clc
 close all
 
 %%
+
 datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\';
 datafile = 'SSET2Trad_membrane_PureWate__DELTA20000_14July2016_Overnight';
 
