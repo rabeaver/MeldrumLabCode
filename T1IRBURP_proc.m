@@ -5,8 +5,9 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'T1IRBURP_degassedEthyleneGlycolMolecularSieves_19March2016_1024scans';
-filedir = 'C:\CommonData\EthyleneGlycolMolecularSieves\';
+
+filename = 'Membrane_PureWater_T1IR_BURP_11July2016_overnight_result';
+filedir = 'C:\CommonData\Membranes\PureWater\';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -15,22 +16,22 @@ fileloc = strcat(filedir,filename,'.tnt');
 
 % Input experiment parameters
 
-tEcho = 700; %us
+tEcho = 200; %us
 nEchoes = 512;
-nPts = 76;
-nPtsBlank = 1;
-omitEchoes = 0; 
-nT1Pts = 11;
-T1min = .100; %ms
-T1max = 2000; %ms
-noisePoints = 1; %number of points to use for noise at beginning and end of each acqu period
+nPts = 48;
+nPtsBlank = 0;
+omitEchoes = 0;
+nT1Pts = 21;
+T1min = 0.1; %ms
+T1max = 1750; %ms
+noisePoints = 4; %number of points to use for noise at beginning and end of each acqu period
 noiseNumber = nT1Pts; %T1 point to use for SNR calc
 
 echoVector = ((1+omitEchoes)*tEcho:tEcho:nEchoes*tEcho); % T2 vector
 
 
 % Specify lin or log spaced points
-linORlog = 0; % 0 for linearly space and 1 for log spaced
+linORlog = 1; % 0 for linearly space and 1 for log spaced
 
 % Make T1vector
 if linORlog == 0
@@ -38,6 +39,7 @@ if linORlog == 0
 else
     T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 end
+
 % %% SNR calc
 % 
 % fileloc = strcat(filedir,filename,'.tnt');
@@ -92,9 +94,15 @@ data2d = data2d';
 figure(2)
 surf(echoVector,T1vector,data2d); shading flat
 
+% Fix T2 and T1 axes (s)
+echoVector = echoVector./1e6;
+T1vector = T1vector'./1e3;
+
 % Save data in specified directory with the same filename and ".dat"
 % extension
 save(strcat(filedir,filename,'.dat'), 'data2d', '-ascii')
+save(strcat(filedir,filename,'_T2axis.dat'),'echoVector','-ascii')
+save(strcat(filedir,filename,'_vaxis.dat'),'T1vector','-ascii')
 
  %% 1D Fits
 

@@ -6,7 +6,7 @@ close all
 
 filename = 'data2D_Cp';
 fileext = '.2d';
-filedir = 'C:\Users\jnking01\Desktop\AtlasInARLO_9.2percent_Cured2years_T2D_10July2016\1\';
+filedir = 'C:\Users\tkmeldrum\Desktop\P250_2014e_SSET2Trad_6July2016\1\';
 
 fileloc = strcat(filedir,filename,fileext);           % String together file name
 parloc  = strcat(filedir,'acqu.par');         % String together Acquisition param location

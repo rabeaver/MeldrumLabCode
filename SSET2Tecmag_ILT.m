@@ -3,23 +3,23 @@ clc
 close all
 
 %% User parameters
-filename = 'EtGlyLarge_STE_20Jan2016_1_result.tnt';
-filedir = 'C:\Users\jnking01\Desktop\ToLookThrough\EthGly_PM25\';
+filename = 'SSET2Trad_membrane_PureWate__DELTA20000_14July2016_Overnight_result.tnt';
+filedir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tE = 700; %us
-nEchoes = 128;
-nPts = 76;
-tD = 8e-6;
+tE = 200; %us
+nEchoes = 512;
+nPts = 56;
+tD = 2e-6;
 nPtsD = 21;
 nPtsBlank = 0;
 omitEchoes = 0;
-DELTA = 3e-3; %s
-deltamin = 100e-6; %s
-deltamax = 1000e-6; %s
+DELTA = 20e-3; %s
+deltamin = 20e-6; %s
+deltamax = 400e-6; %s
 deltavec = linspace(deltamin,deltamax,nPtsD)';
-G = 6.57; %MHz m-1
+G = 6.59; %MHz m-1
 gamma = 42.576;
 
 data = reshape(spec2',nPts,nEchoes,nPtsD);
