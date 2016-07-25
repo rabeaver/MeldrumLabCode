@@ -3,7 +3,7 @@ clc
 close all
 
 %%
-datadir = 'C:\Users\naudell\Desktop\Trad\';
+datadir = '/Users/jaredking/Desktop/';
 datafile = 'SSET2Trad_EthyleneGlycol_6July2016';
 
 

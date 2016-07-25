@@ -10,39 +10,39 @@ close all
 %
 
 spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
-datadir = 'C:\Users\jnking01\Desktop\PureH2OBeadPack\';
-datafile = 'PureH2O_BeadPack_CHIRP_10July2016'; %\2\data'; 
-noCHIRPfile = 'PureH2O_BeadPack_noCHIRP_10July2016'; %\2\data'; 
+datadir = '/Users/jaredking/Desktop/UFT2D/';
+datafile = 'BrickInWater_CHIRP_20July2016_5000'; 
+noCHIRPfile = 'BrickInWater_noCHIRP_20July2016'; 
 
 
 
-Pchirp = 296.8e-6;                  % CHIRP Pulse Length (s)
+Pchirp = 196.8e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
 sliceheight = 0.200;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
 
-nPts = 100;                          % # of acqu points
+nPts = 82;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
-nEchoes = 128;                      % Echoes
+nEchoes = 64;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 3e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 400;                           % us
+tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 250;                           % us
 preCHIRPdelay = 0.2e-6;             % s
-noisePoints = 10;                    % number of points for measuring noise
+noisePoints = 5;                    % number of points for measuring noise
 
-nScans = 1024;                      % Number of scans in the experiment
+nScans = 4096;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
-zf = 1;                             % levels of zero filling
+zf = 0;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodizatio
 
 
 
-delta = 0.60e-3;                       % little delta time (s)
+delta = 0.40e-3;                       % little delta time (s)
 DELTA = 5e-3;                       % Big delta time in s
 
 
@@ -223,7 +223,7 @@ deltaEffIndex = (1-(((BWchirp/2)-fIndex)/BWchirp))*2*Pchirp*1000;
 qIndex = 2*pi*gamma*1e6*G*deltaEffIndex/1000;
 vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
 
-% Find Optimal data range with these figures
+%Find Optimal data range with these figures
 %  
 % figure(7)
 % plot(abs(T2Dprofiles(:,1)))
@@ -276,8 +276,7 @@ vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
 %% Data Range and Inversion
 
 minind = min(ptIndex);
-maxind = max(ptIndex);
-% this is where I'm starting to put in some diffusion code. 
+maxind = max(ptIndex); 
 
 T2Ddat = abs(T2Dprofcorr(minind:maxind,:)); %crops data set according to above indices
 % deltaSteps = deltaEff(minind:maxind);
