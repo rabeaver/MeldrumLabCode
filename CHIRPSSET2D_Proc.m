@@ -10,30 +10,30 @@ close all
 %
 
 spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
-datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\5000us\';
-datafile = 'Membrane_PureWater_CHIRP_13July2016_DELTAseries5000_Overnight'; %\1\data'; 
-noCHIRPfile = 'Membrane_PureWater_noCHIRP_13July2016_DELTAseries20000'; %\1\data'; 
+datadir = 'C:\CommonData\JNK\Mortar\BrickInWater\UFT2D\';
+datafile = 'BrickInWater_CHIRP_21July2016_long'; %\1\data'; 
+noCHIRPfile = 'BrickInWater_noCHIRP_21July2016_2'; %\1\data'; 
 
 
 
-Pchirp = 196.8e-6;                  % CHIRP Pulse Length (s)
+Pchirp = 96.8e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
-sliceheight = 0.200;                % mm
+sliceheight = 0.150;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
 
-nPts = 56;                          % # of acqu points
+nPts = 54;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
-nEchoes = 512;                      % Echoes
+nEchoes = 64;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 200;                           % us
+tD = 3e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 250;                           % us
 
 preCHIRPdelay = 0.2e-6;             % s
 noisePoints = 1;                    % number of points for measuring noise
 
-nScans = 4096;                      % Number of scans in the experiment
+nScans = 16000;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
@@ -43,8 +43,8 @@ apofac = 5;                         % Amount of Apodizatio
 
 
 
-delta = 0.4e-3;                       % little delta time (s)
-DELTA = 5e-3;                       % Big delta time in s
+delta = 0.2e-3;                       % little delta time (s)
+DELTA = 1e-3;                       % Big delta time in s
 
 
 % ===================================

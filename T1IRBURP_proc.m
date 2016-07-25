@@ -5,8 +5,8 @@ close all
 %%
 
 % Input filename, - .tnt
-filename = 'Membrane_PureWater_T1IR_BURP_11July2016_overnight_result';
-filedir = 'C:\CommonData\Membranes\PureWater\';
+filename = '0P_mortar_T1IR_BURP_22July2016';
+filedir = 'C:\CommonData\JNK\Mortar\';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -15,22 +15,22 @@ fileloc = strcat(filedir,filename,'.tnt');
 
 % Input experiment parameters
 
-tEcho = 200; %us
-nEchoes = 512;
-nPts = 48;
+tEcho = 400; %us
+nEchoes = 128;
+nPts = 156;
 nPtsBlank = 0;
 omitEchoes = 0;
-nT1Pts = 21;
+nT1Pts = 11;
 T1min = 0.1; %ms
-T1max = 1750; %ms
-noisePoints = 4; %number of points to use for noise at beginning and end of each acqu period
+T1max = 1500; %ms
+noisePoints = 12; %number of points to use for noise at beginning and end of each acqu period
 noiseNumber = nT1Pts; %T1 point to use for SNR calc
 
 echoVector = ((1+omitEchoes)*tEcho:tEcho:nEchoes*tEcho); % T2 vector
 
 
 % Specify lin or log spaced points
-linORlog = 1; % 0 for linearly space and 1 for log spaced
+linORlog = 0; % 0 for linearly space and 1 for log spaced
 
 % Make T1vector
 if linORlog == 0
