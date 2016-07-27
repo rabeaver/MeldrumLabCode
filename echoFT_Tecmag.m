@@ -9,6 +9,7 @@ close all
 %
 
 
+
 datadir = 'C:\CommonData\TAMU\membrane holder_CuWater & Water test\';
 datafile = 'Water_CPMG_13June2016_1m';
 
@@ -52,3 +53,7 @@ surf(echoVec*1e-3,z,abs(profile)); shading flat
 view([0 90])
 xlabel('time [ms]')
 ylabel('position [um]')
+
+%%
+cftool(echoVec*1e-3,abs(profile(NFFT/2,:)))
+

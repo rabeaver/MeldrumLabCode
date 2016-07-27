@@ -5,13 +5,9 @@ close all
 %%
 
 % Input filename, - .tnt
-<<<<<<< HEAD
-filename = 'T1IRBURP_degassedWaterMolecularSieves_20March2016';
-filedir = 'C:\users\vjlee\Desktop\';
-=======
-filename = 'T1IRBURP_degassedEthyleneGlycolMolecularSieves_19March2016_1024scans';
-filedir = 'C:\CommonData\EthyleneGlycolMolecularSieves\';
->>>>>>> a0e3214a8be301e6e53f6eb9a1add606e2a9202c
+
+filename = 'Membrane_PureWater_T1IR_BURP_11July2016_overnight_result';
+filedir = 'C:\CommonData\Membranes\PureWater\';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -20,22 +16,15 @@ fileloc = strcat(filedir,filename,'.tnt');
 
 % Input experiment parameters
 
-tEcho = 700; %us
-nEchoes = 512;
-nPts = 76;
-nPtsBlank = 1;
-omitEchoes = 0; 
-<<<<<<< HEAD
-nT1Pts = 21;
-T1min = 0.1; %ms
-T1max = 6000; %ms
-noisePoints = 10; %number of points to use for noise at beginning and end of each acqu period
-=======
+tEcho = 400; %us
+nEchoes = 128;
+nPts = 156;
+nPtsBlank = 0;
+omitEchoes = 0;
 nT1Pts = 11;
-T1min = .100; %ms
-T1max = 2000; %ms
-noisePoints = 1; %number of points to use for noise at beginning and end of each acqu period
->>>>>>> a0e3214a8be301e6e53f6eb9a1add606e2a9202c
+T1min = 0.1; %ms
+T1max = 1500; %ms
+noisePoints = 12; %number of points to use for noise at beginning and end of each acqu period
 noiseNumber = nT1Pts; %T1 point to use for SNR calc
 
 echoVector = ((1+omitEchoes)*tEcho:tEcho:nEchoes*tEcho); % T2 vector
@@ -50,27 +39,22 @@ if linORlog == 0
 else
     T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 end
-%% SNR calc
 
-% Read Noise
-<<<<<<< HEAD
-filename = 'T1IRBURP_degassedWaterMolecularSieves_20March2016';
-=======
-% filename = 'glycerol_T1IR_BURP_Noisecollect_32scans';
->>>>>>> a0e3214a8be301e6e53f6eb9a1add606e2a9202c
-fileloc = strcat(filedir,filename,'.tnt');
-
-% Read file
-[ap,specN,spec,spec3,spec4] = readTecmag4d(fileloc);
-
-
-[~,Spoint] = max(abs(real(spec2(21,:))));
-Spoint = Spoint + 16*nPts;
-S = (real(spec2(nT1Pts,Spoint-nPts/2:Spoint+nPts/2)));
-N = (imag(spec2(nT1Pts,Spoint-nPts/2:Spoint+nPts/2)));
-% N = (real(specN(Spoint-nPts/2:Spoint+nPts/2)))';
-
-SNR = snr(S,N)
+% %% SNR calc
+% 
+% fileloc = strcat(filedir,filename,'.tnt');
+% 
+% % Read file
+% [ap,specN,spec,spec3,spec4] = readTecmag4d(fileloc);
+% 
+% 
+% [~,Spoint] = max(abs(real(spec2(21,:))));
+% Spoint = Spoint + 16*nPts;
+% S = (real(spec2(nT1Pts,Spoint-nPts/2:Spoint+nPts/2)));
+% N = (imag(spec2(nT1Pts,Spoint-nPts/2:Spoint+nPts/2)));
+% % N = (real(specN(Spoint-nPts/2:Spoint+nPts/2)))';
+% 
+% SNR = snr(S,N)
 
 %% SNR calc
 data = reshape(spec2,nT1Pts,nPts,nEchoes);
@@ -110,9 +94,15 @@ data2d = data2d';
 figure(2)
 surf(echoVector,T1vector,data2d); shading flat
 
+% Fix T2 and T1 axes (s)
+echoVector = echoVector./1e6;
+T1vector = T1vector'./1e3;
+
 % Save data in specified directory with the same filename and ".dat"
 % extension
 save(strcat(filedir,filename,'.dat'), 'data2d', '-ascii')
+save(strcat(filedir,filename,'_T2axis.dat'),'echoVector','-ascii')
+save(strcat(filedir,filename,'_vaxis.dat'),'T1vector','-ascii')
 
  %% 1D Fits
 
