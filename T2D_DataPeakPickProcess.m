@@ -5,10 +5,10 @@ close all
 %%
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = 'Z:\JNK\UFT2Dupdate\EthyleneGlycol\CHIRP\';
-datafile = 'EthyleneGlycol_CHIRP_6July2016.dat.out';
+datadir = 'C:\Users\jnking01\Desktop\CopperDELTAseriescheck\';
+datafile = '3per_CuH2O_CHIRP_15July2016_DELTAseries10000_Weekend.dat.out';
 T2lims = [1e-3 1e0];
-Dlims = [1e-12 1e-8];
+Dlims = [1e-12 1e-6];
 contourLevel = 0.50;
 
 %load the data and remove 0 values (replace with NaN)
