@@ -3,8 +3,8 @@ clc
 close all
 
 %% User parameters
-filename = 'SSET2Trad_membrane_PureWate__DELTA20000_14July2016_Overnight_result.tnt';
-filedir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\';
+filename = '3per_CuH2O_SSET2Trad_19July2016_DELTAseries.tnt';
+filedir = 'C:\CommonData\Membranes\CopperDELTAseriescheck\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
@@ -15,7 +15,7 @@ tD = 2e-6;
 nPtsD = 21;
 nPtsBlank = 0;
 omitEchoes = 0;
-DELTA = 20e-3; %s
+DELTA = 3e-3; %s
 deltamin = 20e-6; %s
 deltamax = 400e-6; %s
 deltavec = linspace(deltamin,deltamax,nPtsD)';
@@ -28,7 +28,7 @@ dataInt = sum(data,1);
 spec2d = reshape(dataInt,nEchoes,nPtsD);
 
 echoVec = tE:tE:nEchoes*tE;                   % Make Echovector
-echoVec = echoVec';         % Reshape Data
+echoVec = echoVec'./1e6;         % Reshape Data
 
 
 
@@ -50,7 +50,7 @@ vIndex = qIndex.^2.*(BigDELTA-deltavec).*1e-9;
 
 vIndex = rot90(vIndex,2);
 vIndex = flipud(vIndex);
-T2Ddat = (abs(spec2d))';
+T2Ddat = abs(spec2d)';
 
 
 

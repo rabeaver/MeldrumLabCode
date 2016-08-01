@@ -5,13 +5,9 @@ close all
 %%
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-<<<<<<< HEAD
-datadir = '/Users/jaredking/Desktop/UFT2D/';
-datafile = 'SSET2Trad_membrane_PureWater_PostEDTA_12July2016_Overnight.dat.out';
-=======
+
 datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\100us\';
 datafile = 'Membrane_PureWater_CHIRP_13July2016_DELTAseries100_Overnight.dat.out';
->>>>>>> fdedec0de9c570457105235008caeb28190528aa
 T2lims = [1e-4 1e0];
 Dlims = [1e-12 1e-6];
 contourLevel = 0.50;

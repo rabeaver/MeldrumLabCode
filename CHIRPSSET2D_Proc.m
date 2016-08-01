@@ -1,3 +1,4 @@
+
 clear
 clc
 close all
@@ -10,42 +11,39 @@ close all
 %
 
 spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
-datadir = '/Users/jaredking/Desktop/UFT2D/';
-datafile = 'BrickInWater_CHIRP_20July2016_5000'; 
-noCHIRPfile = 'BrickInWater_noCHIRP_20July2016'; 
+datadir = 'C:\CommonData\JNK\Mortar\BrickInWater\UFT2D\';
+datafile = 'BrickInWater_CHIRP_21July2016_long'; %\1\data'; 
+noCHIRPfile = 'BrickInWater_noCHIRP_21July2016_2'; %\1\data'; 
+
+Pchirp = 96.8e-6;                  % CHIRP Pulse Length (s)
 
 
-
-Pchirp = 196.8e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
-sliceheight = 0.200;                % mm
+sliceheight = 0.150;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
 
-nPts = 82;                          % # of acqu points
+nPts = 54;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
 nEchoes = 64;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 250;                           % us
+tE = 400;                           % us
 preCHIRPdelay = 0.2e-6;             % s
 noisePoints = 5;                    % number of points for measuring noise
 
-
-nScans = 4096;                      % Number of scans in the experiment
+nScans = 2048;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
-zf = 0;                             % levels of zero filling
+zf = 2;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodizatio
 
 
-
-
-delta = 0.40e-3;                       % little delta time (s)
-DELTA = 5e-3;                       % Big delta time in s
+delta = 0.2e-3;                       % little delta time (s)
+DELTA = 1e-3;                       % Big delta time in s
 
 
 % ===================================
@@ -162,7 +160,10 @@ CPprofiles = flipud(fftshift(fft(noCHIRPdat,NFFT)/L,1));
 
 figure(3)
 subplot(1,2,1)
-plot(t*1e6,real(noCHIRPdat(:,2)));
+hold on
+% plot(t*1e6,abs(noCHIRPdat(:,4)));
+plot(t*1e6,real(noCHIRPdat(:,4)));
+plot(t*1e6,imag(noCHIRPdat(:,4)));
 xlabel('time [us]')
 subplot(1,2,2)
 plot(z,2*abs(CPprofiles(:,2)),'LineWidth',1.5);
@@ -305,7 +306,7 @@ D = p(1)*1e-9         % *10-9 m^2 s^-1
 
 figure(10)
 % surf(echoVec/1000,deltaSteps*1e6,T2Ddat);
-surf(echoVec/1000,deltaEffIndex,T2Ddat);
+surf(echoVec/1000,deltaEffIndex(1:end-5),T2Ddat(1:end-5,:));
 shading flat
 colormap('jet');
 colorbar 
@@ -324,7 +325,7 @@ t2axis = t2axis';
 
 vIndex = rot90(vIndex,2)';
 
-T2Ddat = (T2Ddat);
+T2Ddat = flipud(flipud(T2Ddat));
 % T2Dexp = flipud(T2Ddat);
 save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
 save(strcat(datadir,datafile, '_T2axis.dat'), 't2axis', '-ascii')

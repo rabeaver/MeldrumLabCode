@@ -4,8 +4,8 @@ close all
 
 %%
 
-datadir = '/Users/jaredking/Desktop/';
-datafile = 'SSET2Trad_EthyleneGlycol_6July2016';
+datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\';
+datafile = 'SSET2Trad_membrane_PureWate__DELTA20000_14July2016_Overnight';
 
 
 nPts = 56;                          % # of acqu points
@@ -44,6 +44,7 @@ echoVec = tE*(omitEchoes+1):tE:(nEchoes*tE);
 data = sum(real(T2Ddat),2);
 % data = max(real(T2Ddat),[],2);
 data = reshape(data,ap.td(2),(nEchoes-omitEchoes));
+data = abs(data);
 
 dataY = zeros(ap.td(2),nEchoes-omitEchoes);
 
@@ -87,8 +88,8 @@ save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
 %UF Points [Min, Max; min(echoVec), max(echoVec), delta(eff)(min) [us], delta(eff)(max) [us], #echoes, #D points]
 % sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
 
-%%
-
-fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
-fprintf(fileID,'%s: %f; %.0f %.0f %.2f %.2f; %d %d\n',datafile, SNR, min(echoVec), max(echoVec), 1e6*min(deltaVec), 1e6*max(deltaVec), size(data,2), size(data,1));
-fclose(fileID);
+% %%
+% 
+% fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
+% fprintf(fileID,'%s: %f; %.0f %.0f %.2f %.2f; %d %d\n',datafile, SNR, min(echoVec), max(echoVec), 1e6*min(deltaVec), 1e6*max(deltaVec), size(data,2), size(data,1));
+% fclose(fileID);

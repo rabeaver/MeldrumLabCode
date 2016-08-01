@@ -9,13 +9,13 @@ close all
 % ===================================
 
 spectrometer = 'Tecmag'; %'Tecmag'
-datadir = '/Users/jaredking/Documents/Classes/Chemistry/Research/Summer2016/';
-datafile = '0P_mortar_CHIRP_T1T2_22July2016';
-noCHIRPfile = '0P_mortar_noCHIRP_T1T2_22July2016';
+datadir = 'C:\CommonData\JNK\Mortar\BrickInWater\UFT1T2\';
+datafile = 'BrickInWater_CHIRP_T1T2_22July2016';
+noCHIRPfile = 'BrickInWater_noCHIRP_T1T2_22July2016';
 filenameExt = '.tnt';
 
 
-Pchirp = 1; % CHIRP Pulse Length (s)
+Pchirp = 0.050; % CHIRP Pulse Length (s)
 
 sliceheight = 0.300; %mm
 PreCPMGdelay = 20e-6; %s
@@ -27,7 +27,7 @@ tD = 2e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no
 tE = 200; %us
 
 omitEchoes = 0; %the number of echoes to skip
-noisePoints = 8; %number of points at beginning and end of each acqu period for noise
+noisePoints = 5; %number of points at beginning and end of each acqu period for noise
 omitPts = 0; %blank spectrometer points to skip
 
 zf = 2;                             % levels of zero filling
@@ -209,13 +209,13 @@ figure(7)
 subplot(2,1,1)
 plot(abs(T1T2profcorr(:,1)))
 xlim([0 NFFT])
-ylim([0 1.05])
+ylim([0 4])
 subplot(2,1,2)
 plot(t1_fig7,abs(T1T2profcorr(:,1)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
-ylim([0 1.05])
+ylim([0 4])
 set(gca,'XDir','reverse')
 xlabel('CHIRPtime (s)')
 
