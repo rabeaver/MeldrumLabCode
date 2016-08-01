@@ -12,27 +12,27 @@ close all
 
 spectrometer = 'Kea'; %'Tecmag' OR 'Kea'
 
-datadir = 'C:\CommonData\JNK\UFT2D\EthyleneGlycol\';
-datafile = 'EthyleneGlycol_CHIRP_20Jun2016_Overnight\1\data'; 
-noCHIRPfile = 'EthyleneGlycol_CHIRP_20Jun2016_Overnight\1\data'; 
+datadir = 'Z:\JNK\PM5\UFT2Ddata\Paint_Nick\';
+datafile = 'LinseedOil_CHIRP_27June2016\4\data'; 
+noCHIRPfile = 'LinseedOil_noCHIRP_27June2016\4\data'; 
 
 
 Pchirp = 495e-6;                  % CHIRP Pulse Length (s)
-pw     = 6e-6;                      % hard pulse length
+pw     = 4.5e-6;                      % hard pulse length
 sliceheight = 0.1;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 112;                          % # of acqu points
+nPts = 300;                          % # of acqu points
 
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
 nEchoes = 128;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 3e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 180;                           % us
+tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 700;                           % us
 preCHIRPdelay = 0.2e-6;             % s
-noisePoints = 2;                    % number of points for measuring noise
-nScans = 1024;                      % Number of scans in the experiment
+noisePoints = 15;                    % number of points for measuring noise
+nScans = 2048;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
@@ -41,8 +41,8 @@ apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodizatio
 
 
-delta = 0.8e-3;                       % little delta time (s)
-DELTA = 10.0e-3;                       % Big delta time in s
+delta = 1e-3;                       % little delta time (s)
+DELTA = 14.0e-3;                       % Big delta time in s
 
 
 % ===================================
@@ -114,7 +114,7 @@ end
 
 CHIRPdat = padarray(CHIRPdat, size(CHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
 
-T2Dprofiles = flipud(fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
+T2Dprofiles = (fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
 
 %% Plot CHIRP results
 figure(1)
@@ -153,7 +153,7 @@ if apodize == 1
 end
 
 noCHIRPdat = padarray(noCHIRPdat, size(noCHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
-CPprofiles = flipud(fftshift(fft(noCHIRPdat,NFFT)/L,1));
+CPprofiles = (fftshift(fft(noCHIRPdat,NFFT)/L,1));
 
 %% Plot first reference profile and coil profile
 
