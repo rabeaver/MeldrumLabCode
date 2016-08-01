@@ -9,20 +9,20 @@ close all
 % ===================================
 
 spectrometer = 'Tecmag'; %'Tecmag'
-datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\';
-datafile = 'Membrane_PureWater_CHIRP_T1T2_13July2016';
-noCHIRPfile = 'Membrane_PureWater_noCHIRP_T1T2_13July2016';
+datadir = '/Users/jaredking/Documents/Classes/Chemistry/Research/Summer2016/';
+datafile = '0P_mortar_CHIRP_T1T2_22July2016';
+noCHIRPfile = '0P_mortar_noCHIRP_T1T2_22July2016';
 filenameExt = '.tnt';
 
 
 Pchirp = 1; % CHIRP Pulse Length (s)
 
-sliceheight = 0.200; %mm
+sliceheight = 0.300; %mm
 PreCPMGdelay = 20e-6; %s
 
 
 nPts = 56; % # of acqu points
-nEchoes = 512; % Echoes
+nEchoes = 1024; % Echoes
 tD = 2e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 200; %us
 
@@ -30,7 +30,7 @@ omitEchoes = 0; %the number of echoes to skip
 noisePoints = 8; %number of points at beginning and end of each acqu period for noise
 omitPts = 0; %blank spectrometer points to skip
 
-zf = 1;                             % levels of zero filling
+zf = 2;                             % levels of zero filling
 apodize = 0;                        %Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
@@ -222,8 +222,8 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 57;
-maxind = 71;
+minind= 106;
+maxind = 150;
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 

@@ -6,8 +6,8 @@ close all
 
 % Input filename, - .tnt
 
-filename = 'Membrane_PureWater_T1IR_BURP_11July2016_overnight_result';
-filedir = 'C:\CommonData\Membranes\PureWater\';
+filename = '0P_mortar_T1IR_BURP_22July2016_logspace';
+filedir = '/Users/jaredking/Documents/Classes/Chemistry/Research/Summer2016/';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
@@ -17,13 +17,13 @@ fileloc = strcat(filedir,filename,'.tnt');
 % Input experiment parameters
 
 tEcho = 200; %us
-nEchoes = 512;
-nPts = 48;
+nEchoes = 1024;
+nPts = 56;
 nPtsBlank = 0;
 omitEchoes = 0;
-nT1Pts = 21;
+nT1Pts = 31;
 T1min = 0.1; %ms
-T1max = 1750; %ms
+T1max = 1625; %ms
 noisePoints = 4; %number of points to use for noise at beginning and end of each acqu period
 noiseNumber = nT1Pts; %T1 point to use for SNR calc
 
