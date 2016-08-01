@@ -17,12 +17,12 @@ filenameExt = '.tnt';
 
 Pchirp = 0.050; % CHIRP Pulse Length (s)
 
-sliceheight = 0.200; %mm
+sliceheight = 0.300; %mm
 PreCPMGdelay = 20e-6; %s
 
 
 nPts = 56; % # of acqu points
-nEchoes = 128; % Echoes
+nEchoes = 1024; % Echoes
 tD = 2e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 200; %us
 
@@ -30,7 +30,7 @@ omitEchoes = 0; %the number of echoes to skip
 noisePoints = 5; %number of points at beginning and end of each acqu period for noise
 omitPts = 0; %blank spectrometer points to skip
 
-zf = 1;                             % levels of zero filling
+zf = 2;                             % levels of zero filling
 apodize = 0;                        %Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
@@ -222,8 +222,8 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 50;
-maxind = 76;
+minind= 106;
+maxind = 150;
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 

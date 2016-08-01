@@ -6,8 +6,8 @@ close all
 
 % Input filename, - .tnt
 
-filename = 'Membrane_PureWater_T1IR_BURP_11July2016_overnight_result';
-filedir = 'C:\CommonData\Membranes\PureWater\';
+filename = '0P_mortar_T1IR_BURP_22July2016_logspace';
+filedir = '/Users/jaredking/Documents/Classes/Chemistry/Research/Summer2016/';
 
 fileloc = strcat(filedir,filename,'.tnt');
 
