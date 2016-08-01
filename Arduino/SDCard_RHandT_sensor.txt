@@ -1,0 +1,202 @@
+// Timestamped Temp and RH monitor
+// From ladyada code
+
+#include "SD.h"
+#include "Wire.h"
+#include "RTClib.h"
+#include "DHT.h"
+#include "SPI.h"
+
+
+#define DHTPIN 2     // what pin we're connected to for T/RH sensor
+#define LOGDELAY 1000 // time delay for logging
+#define ECHO_TO_SERIAL 1 //
+
+
+// Uncomment whatever type you're using!
+//#define DHTTYPE DHT11   // DHT 11 
+#define DHTTYPE DHT22   // DHT 22  (AM2302)
+//#define DHTTYPE DHT21   // DHT 21 (AM2301)
+
+
+// Initialize DHT sensor for normal 16mhz Arduino
+DHT dht(DHTPIN, DHTTYPE);
+// NOTE: For working with a faster chip, like an Arduino Due or Teensy, you
+// might need to increase the threshold for cycle counts considered a 1 or 0.
+// You can do this by passing a 3rd parameter for this threshold.  It's a bit
+// of fiddling to find the right value, but in general the faster the CPU the
+// higher the value.  The default for a 16mhz AVR is a value of 6.  For an
+// Arduino Due that runs at 84mhz a value of 30 works.
+// Example to initialize DHT sensor for Arduino Due:
+//DHT dht(DHTPIN, DHTTYPE, 30);
+
+RTC_DS1307 RTC; // define the Real Time Clock object
+
+
+// for the data logging shield, we use digital pin 10 for the SD cs line
+const int chipSelect = 10;
+
+// the logging file
+File logfile;
+
+void error(char *str)
+{
+  Serial.print("error: ");
+  Serial.println(str);
+  
+  // red LED indicates error
+  digitalWrite(redLEDpin, HIGH);
+  
+  while(1);
+}
+
+
+void setup() {
+  Serial.begin(9600); 
+  //Serial.println("DHTxx test!");
+  
+  // initialize the SD card
+  Serial.print("Initializing SD card...");
+  // make sure that the default chip select pin is set to
+  // output, even if you don't use it:
+  pinMode(10, OUTPUT);
+  
+  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    // don't do anything more:
+    return;
+  }
+  Serial.println("card initialized.");
+  
+  // create a new file
+  char filename[] = "LOGGER00.CSV";
+  for (uint8_t i = 0; i < 100; i++) {
+    filename[6] = i/10 + '0';
+    filename[7] = i%10 + '0';
+    if (! SD.exists(filename)) {
+      // only open a new file if it doesn't exist
+      logfile = SD.open(filename, FILE_WRITE); 
+      break;  // leave the loop!
+    }
+  }
+  
+  if (! logfile) {
+    error("couldnt create file");
+  }
+  
+  Serial.print("Logging to: ");
+  Serial.println(filename);
+  
+    Wire.begin();  
+  if (!RTC.begin()) {
+    logfile.println("RTC failed");
+#if ECHO_TO_SERIAL
+    Serial.println("RTC failed");
+#endif  //ECHO_TO_SERIAL
+  }
+  
+
+  logfile.println("millis,time,light,temp");    
+#if ECHO_TO_SERIAL
+  Serial.println("millis,time,light,temp");
+#if ECHO_TO_SERIAL// attempt to write out the header to the file
+  if (logfile.writeError || !logfile.sync()) {
+    error("write header");
+  }
+  
+
+ 
+   // If you want to set the aref to something other than 5v
+  //analogReference(EXTERNAL);
+}
+ }
+
+void loop() {
+  // Wait a few seconds between measurements.
+  delay(LOGDELAY);
+void loop(void)
+{
+  DateTime now;
+
+  // delay for the amount of time we want between readings
+  delay((LOGDELAY -1) - (millis() % LOGDELAY));
+  
+
+  // log milliseconds since starting
+  uint32_t m = millis();
+  logfile.print(m);           // milliseconds since start
+  logfile.print(", ");    
+#if ECHO_TO_SERIAL
+  Serial.print(m);         // milliseconds since start
+  Serial.print(", ");  
+#endif
+
+  // fetch the time
+  now = RTC.now();
+  // log time
+  logfile.print(now.get()); // seconds since 2000
+  logfile.print(", ");
+  logfile.print(now.year(), DEC);
+  logfile.print("/");
+  logfile.print(now.month(), DEC);
+  logfile.print("/");
+  logfile.print(now.day(), DEC);
+  logfile.print(" ");
+  logfile.print(now.hour(), DEC);
+  logfile.print(":");
+  logfile.print(now.minute(), DEC);
+  logfile.print(":");
+  logfile.print(now.second(), DEC);
+#if ECHO_TO_SERIAL
+  Serial.print(now.get()); // seconds since 2000
+  Serial.print(", ");
+  Serial.print(now.year(), DEC);
+  Serial.print("/");
+  Serial.print(now.month(), DEC);
+  Serial.print("/");
+  Serial.print(now.day(), DEC);
+  Serial.print(" ");
+  Serial.print(now.hour(), DEC);
+  Serial.print(":");
+  Serial.print(now.minute(), DEC);
+  Serial.print(":");
+  Serial.print(now.second(), DEC);
+#endif //ECHO_TO_SERIAL
+
+  // Reading temperature or humidity takes about 250 milliseconds!
+  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+  float h = dht.readHumidity();
+  // Read temperature as Celsius
+  float t = dht.readTemperature();
+  // Read temperature as Fahrenheit
+  //float f = dht.readTemperature(true);
+  
+  // Check if any reads failed and exit early (to try again).
+  //if (isnan(h) || isnan(t) || isnan(f)) {
+    if (isnan(h) || isnan(t)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+
+  // Compute heat index
+  // Must send in temp in Fahrenheit!
+  //float hi = dht.computeHeatIndex(f, h);
+
+  logfile.print(h);
+  logfile.print(",");
+   logfile.println(t);
+   
+  //Serial.print("Humidity: "); 
+  Serial.print(h);
+  Serial.print(",");
+  //Serial.print("Temperature: "); 
+  Serial.println(t);
+  //Serial.println(" *C ");
+  //Serial.print(f);
+  //Serial.print(" *F\t");
+  //Serial.print("Heat index: ");
+  //Serial.print(hi);
+  //Serial.println(" *F");
+}
+

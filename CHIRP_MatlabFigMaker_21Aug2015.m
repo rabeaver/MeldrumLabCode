@@ -6,7 +6,7 @@ sampleCt = 3;
 viewlim = [1e-4 1e-1];
 %%
 % Glycerol
-data = load('/Users/tyler/Dropbox/Data/CHIRP/Dec2015/BigSamples_19Nov2015/out files/Gd_Trad_1024_19Nov2015_result.out');
+data = load('/Users/jaredking/Documents/Classes/Chemistry/Research/Summer2016/TradSSET2_M212Samples_23_28June2016/TradSSET2_M212_9months_Overnight_23June2016/1/ILTs/TradSSET2_M212_Overnight_23June2016.out');
 lowlim = 1e-4;
 hilim = 1e-1;
 

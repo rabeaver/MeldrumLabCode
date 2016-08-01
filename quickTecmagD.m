@@ -3,19 +3,19 @@ clc
 close all
 
 %% User parameters
-filename = 'GlycerolLarge_STE_12Apr2016.tnt';
-filedir = 'C:\CommonData\Glycerol\';
+filename = 'EtGlyLarge_STE_20Jan2016_1_result.tnt';
+filedir = 'C:\Users\jnking01\Desktop\ToLookThrough\EthGly_PM25\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 400; %us
-nEchoes = 1;
-nPts = 20;
-nPtsBlank = 4;
+tEcho = 700; %us
+nEchoes = 128;
+nPts = 76;
+nPtsBlank = 0;
 omitEchoes = 0;
-DELTA = 5e-3; %s
+DELTA = 3e-3; %s
 deltamin = 100e-6; %s
-deltamax = 2000e-6; %s
+deltamax = 1000e-6; %s
 refocused_delta = 0; % if there are 180 pulses in the delta periods, set to 1 to adjust the delta time
 GM = 280; %MHz m-1
 

@@ -4,7 +4,7 @@ close all
 
 % USER-DEFINED PARAMETERS
 filename = 'data.2d';
-filedir = 'Z:\Data\VJL\Coatings\CPMG\PEGDA_100%_11s_10%_30June2016\1\';
+filedir = 'Z:\Data\JYU\Summer Research 2016\11July_100%PEGDA_N2\60sec\60sec_11July2016\1\';
 
 omitEchoes = 2; %front-end echoes to omit
 G = 23.87; %T/m
