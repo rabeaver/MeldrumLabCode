@@ -5,10 +5,13 @@ close all
 %%
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = '/Users/tyler/Dropbox/Data/TAMU/DNP_Water/DNPWater_Channels_chirpSTE_21Apr2016_2/';
-datafile = 'DNPWater_Channels_chirpSTE_22Apr2016_2.dat.out';
-T2lims = [1e-3 1e0];
-Dlims = [1e-12 1e-8];
+
+
+datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\100us\';
+datafile = 'Membrane_PureWater_CHIRP_13July2016_DELTAseries100_Overnight.dat.out';
+T2lims = [1e-4 1e0];
+Dlims = [1e-12 1e-6];
+
 contourLevel = 0.50;
 
 %load the data and remove 0 values (replace with NaN)
@@ -16,6 +19,7 @@ data = load(strcat(datadir,datafile));
 data = interp2(data,2);
 data(data == 0) = NaN; 
 nPts = size(data,1);
+
 
 %this calculates the axes based on the limits above
 Daxis = logspace(log10(Dlims(1)),log10(Dlims(2)),nPts);

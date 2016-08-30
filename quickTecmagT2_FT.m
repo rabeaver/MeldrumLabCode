@@ -11,11 +11,11 @@ fileloc = strcat(filedir,filename);
 
 zf = 1;
 
-tEcho = 150; %us
-nEchoes = 64;
-nPts = 32;
+tEcho = 200; %us
+nEchoes = 512;
+nPts = 48;
 nPtsBlank = 0;
-tD = 1e-6; %dwell time, s
+tD = 2e-6; %dwell time, s
 
 G = 6.59;
 gamma = 42.576;                     % MHz T-1
