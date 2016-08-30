@@ -10,9 +10,9 @@ close all
 %
 
 spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
-datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\5000us\';
-datafile = 'Membrane_PureWater_CHIRP_13July2016_DELTAseries5000_Overnight'; %\1\data'; 
-noCHIRPfile = 'Membrane_PureWater_noCHIRP_13July2016_DELTAseries20000'; %\1\data'; 
+datadir = '~/Desktop/CopperDELTAseriescheck/20ms/';
+datafile = '3per_CuH2O_CHIRP_15July2016_DELTAseries20000_Weekend_result'; %\1\data'; 
+noCHIRPfile = '3per_CuH2O_noCHIRP_15July2016_DELTAseries100_Weekend_result'; %\1\data'; 
 
 
 
@@ -43,8 +43,8 @@ apofac = 5;                         % Amount of Apodizatio
 
 
 
-delta = 0.15e-3;                       % little delta time (s)
-DELTA = 0.15e-3;                       % Big delta time in s
+delta = 0.4e-3;                       % little delta time (s)
+DELTA = 20e-3;                       % Big delta time in s
 
 
 % ===================================
