@@ -3,19 +3,20 @@ clc
 close all
 
 %%
-datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\';
-datafile = 'SSET2Trad_membrane_PureWate__DELTA20000_14July2016_Overnight_result';
+
+datadir = 'C:\Users\jnking01\Desktop\10PBrickdust\';
+datafile = '10PBrickdust_SSET2_26July2016';
 
 
 nPts = 56;                          % # of acqu points
 omitPts = 0;                        % the number of points that are zeros from the spectrometer
-nEchoes = 512;                      % Echoes
+nEchoes = 1024;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 200;                           % us
 deltaMin = 20e-6;                  % s
-deltaMax = 400e-6;                 % s
-DELTA = 20e-3;                      % s
+deltaMax = 800e-6;                 % s
+DELTA = 3e-3;                      % s
 noisePoints = 5;                   % number of points for measuring noise
 noiseNumber = 1;                    % scan number to use for determining SNR
 G = 6.59;                           % T m-1, B0 field gradient
@@ -43,6 +44,7 @@ echoVec = tE*(omitEchoes+1):tE:(nEchoes*tE);
 data = sum(real(T2Ddat),2);
 % data = max(real(T2Ddat),[],2);
 data = reshape(data,ap.td(2),(nEchoes-omitEchoes));
+data = abs(data);
 
 dataY = zeros(ap.td(2),nEchoes-omitEchoes);
 
@@ -86,8 +88,8 @@ save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
 %UF Points [Min, Max; min(echoVec), max(echoVec), delta(eff)(min) [us], delta(eff)(max) [us], #echoes, #D points]
 % sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
 
-%%
-
-fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
-fprintf(fileID,'%s: %f; %.0f %.0f %.2f %.2f; %d %d\n',datafile, SNR, min(echoVec), max(echoVec), 1e6*min(deltaVec), 1e6*max(deltaVec), size(data,2), size(data,1));
-fclose(fileID);
+% %%
+% 
+% fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
+% fprintf(fileID,'%s: %f; %.0f %.0f %.2f %.2f; %d %d\n',datafile, SNR, min(echoVec), max(echoVec), 1e6*min(deltaVec), 1e6*max(deltaVec), size(data,2), size(data,1));
+% fclose(fileID);

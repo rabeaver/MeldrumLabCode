@@ -4,7 +4,7 @@ close all
 
 % USER-DEFINED PARAMETERS
 filename = 'data.2d';
-filedir = 'Z:\Data\VJL\Coatings\PEGDA100%_40scure_CPMG_7June16\1\';
+filedir = 'Z:\JNK\PM5\UFT2Ddata\Paint_Nick\LinseedOil_T2_28June2016\1\';
 
 omitEchoes = 2; %front-end echoes to omit
 % END USER-DEFINED PARAMETERS

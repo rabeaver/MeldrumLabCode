@@ -17,7 +17,7 @@ sliceheight = 0.100;     % mm
 G = 6.59;               %T m-1, B0 field gradient [PM25 = 6.59]
                         %                         [PM5 = 23.87]
 offset = 0;             %mm, frequency offset (if applicable)
-amplitude = 5;         %pwr, for Tecmag
+amplitude = 4;         %pwr, for Tecmag
 % NOTE: positive offset moves to the left in the FT spectrum (negative
 % position)
 
