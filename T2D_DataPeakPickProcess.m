@@ -5,10 +5,10 @@ close all
 %%
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = 'Z:\Data\JNK\UFT2DData\EthGly_PM25\CHIRPexp\';
-datafile = 'EtGlyLarge_chirpSTE_20Jan2016_17_result.dat.out';
+datadir = '/Users/tyler/Dropbox/Data/TAMU/DNP_Water/DNPWater_Channels_chirpSTE_21Apr2016_2/';
+datafile = 'DNPWater_Channels_chirpSTE_22Apr2016_2.dat.out';
 T2lims = [1e-3 1e0];
-Dlims = [1e-12 1e-9];
+Dlims = [1e-12 1e-8];
 contourLevel = 0.50;
 
 %load the data and remove 0 values (replace with NaN)
