@@ -10,49 +10,38 @@ close all
 % ===================================
 %
 
-spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
-datadir = 'C:\CommonData\JNK\Mortar\BrickInWater\UFT2D\';
-datafile = 'BrickInWater_CHIRP_21July2016_long'; %\1\data'; 
-noCHIRPfile = 'BrickInWater_noCHIRP_21July2016_2'; %\1\data'; 
+spectrometer = 'Kea'; %'Tecmag' OR 'Kea'
+datadir = 'C:\Users\ISC1026\Desktop\';
+datafile = 'UFT2D_CHIRP_12Sep2016\1\data'; %\1\data'; 
+noCHIRPfile = 'UFT2D_noCHIRP_12Sep2016\1\data'; %\1\data'; 
 
-Pchirp = 96.8e-6;                  % CHIRP Pulse Length (s)
+Pchirp = 1497e-6;                  % CHIRP Pulse Length (s)
 
-pw     = 6e-6;                      % hard pulse length
-sliceheight = 0.150;                % mm
+pw     = 3e-6;                      % hard pulse length
+sliceheight = 0.100;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 54;                          % # of acqu points
+nPts = 80;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
-nEchoes = 64;                      % Echoes
+nEchoes = 128;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-<<<<<<< HEAD
-tE = 700;                           % us
-preCHIRPdelay = 0.2e-6;             % s
-noisePoints = 15;                    % number of points for measuring noise
-=======
-tE = 400;                           % us
+tE = 250;                           % us
 preCHIRPdelay = 0.2e-6;             % s
 noisePoints = 5;                    % number of points for measuring noise
 
->>>>>>> 7b0783252649687024845b0e9a850220348b6e79
-nScans = 2048;                      % Number of scans in the experiment
+nScans = 41000;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
-zf = 2;                             % levels of zero filling
+zf = 0;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodizatio
 
 
-<<<<<<< HEAD
-delta = 1e-3;                       % little delta time (s)
-DELTA = 14.0e-3;                       % Big delta time in s
-=======
-delta = 0.2e-3;                       % little delta time (s)
-DELTA = 1e-3;                       % Big delta time in s
->>>>>>> 7b0783252649687024845b0e9a850220348b6e79
+delta = 3e-3;                       % little delta time (s)
+DELTA = 5e-3;                       % Big delta time in s
 
 
 % ===================================
