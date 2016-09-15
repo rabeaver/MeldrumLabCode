@@ -10,6 +10,7 @@ close all
 % ===================================
 %
 
+
 spectrometer = 'Kea'; %'Tecmag' OR 'Kea'
 datadir = 'C:\Users\ISC1026\Desktop\';
 datafile = 'UFT2D_CHIRP_12Sep2016\1\data'; %\1\data'; 
@@ -27,11 +28,12 @@ omitPtsFront = 0;                    % the number of points at the beginning of 
 nEchoes = 128;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 250;                           % us
-preCHIRPdelay = 0.2e-6;             % s
-noisePoints = 5;                    % number of points for measuring noise
 
-nScans = 41000;                      % Number of scans in the experiment
+tE = 700;                           % us
+preCHIRPdelay = 0.2e-6;             % s
+noisePoints = 15;                    % number of points for measuring noise
+
+nScans = 2048;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
@@ -42,6 +44,7 @@ apofac = 5;                         % Amount of Apodizatio
 
 delta = 3e-3;                       % little delta time (s)
 DELTA = 5e-3;                       % Big delta time in s
+
 
 
 % ===================================
