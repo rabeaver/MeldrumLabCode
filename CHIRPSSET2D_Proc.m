@@ -10,40 +10,40 @@ close all
 % ===================================
 %
 
-spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
-datadir = 'C:\CommonData\JNK\Mortar\BrickInWater\UFT2D\';
-datafile = 'BrickInWater_CHIRP_21July2016_long'; %\1\data'; 
-noCHIRPfile = 'BrickInWater_noCHIRP_21July2016_2'; %\1\data'; 
+spectrometer = 'Kea'; %'Tecmag' OR 'Kea'
+datadir = 'C:\Users\jnking01\Desktop\10uspwUFT2Dtest\';
+datafile = 'UFT2D_CHIRP_Glycerol_21Oct2016\1\data'; 
+noCHIRPfile = 'UFT2D_noCHIRP_Glycerol_21Oct2016\1\data'; 
 
-Pchirp = 96.8e-6;                  % CHIRP Pulse Length (s)
+Pchirp = 1496.8e-6;                  % CHIRP Pulse Length (s)
 
 
-pw     = 6e-6;                      % hard pulse length
-sliceheight = 0.150;                % mm
+pw     = 10e-6;                      % hard pulse length
+sliceheight = 0.100;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
 
-nPts = 54;                          % # of acqu points
+nPts = 60;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
 nEchoes = 64;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 400;                           % us
+tD = 10e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 700;                           % us
 preCHIRPdelay = 0.2e-6;             % s
 noisePoints = 5;                    % number of points for measuring noise
 
-nScans = 2048;                      % Number of scans in the experiment
+nScans = 4096;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
-zf = 2;                             % levels of zero filling
+zf = 1;                             % levels of zero filling
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodizatio
 
 
-delta = 0.2e-3;                       % little delta time (s)
-DELTA = 1e-3;                       % Big delta time in s
+delta = 3e-3;                       % little delta time (s)
+DELTA = 10e-3;                       % Big delta time in s
 
 
 % ===================================
@@ -326,70 +326,71 @@ t2axis = t2axis';
 vIndex = rot90(vIndex,2)';
 
 T2Ddat = flipud(flipud(T2Ddat));
+
 % T2Dexp = flipud(T2Ddat);
 save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
 save(strcat(datadir,datafile, '_T2axis.dat'), 't2axis', '-ascii')
 save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
 
-%%
-
-
-Thmm = [0.001, 1]; %T2 (min and max)
-stepsh = 25; %horizontal steps
-Tvmm = [0.0001, 0.01]; %D min and max
-stepsv = 25;
-alpha = 1e7;
-
-orient = 'b'; %both orientations
-kernel1 = 'exp(-h/T)';
-kernel2 = 'exp(-v*D)';
-
-% Tvmm = Tvmm*1e9;
-
-tic
-    [spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(flipud(T2Ddat),echoVec*1e-6,rot90(vIndex,2),Thmm,stepsh,Tvmm,stepsv,alpha,-1,orient,kernel1,kernel2);
-toc
-
-% the vertical (D) axis isn't calibrated correctly, and I'm not sure what
-% the reason is.
-
-%     spectrum = flipdim(spectrum,1);
-    tauv = 1./tauv;
-%     tauv = tauv*1e-9;
-    tauv = flipdim(tauv,2);
-%     spectrum = spectrum';
-% figure
-% surf(echoVec*1e-6,rot90(vIndex,2),flipud(T2Ddat))
-% shading flat
-
-%%
-% taulv = log10(tauv);
-stb = size(tauv);
-% taulh = log10(tauh);
-sta = size(tauh);
-tauv = tauv';
-
-% spectrum = flipdim(spectrum,1);
-% tauv = 1./tauv;
-% tauv = flipdim(tauv,2);
-    
-surf(tauh,tauv,spectrum)    
-set(gca,'XScale','log','YScale','log')
-shading interp;
-%     %set(gcf,'Renderer','zbuffer');
-% axis([tauh(1),tauh(sta(2)),tauv(1),tauv(stb(2))]);
-view([0 90])
-xlabel('T_2 [s]')
-ylabel('D [m^2 s^{-1}]')
-
-
-
-
-%%
-
-%UF Points [Min, Max; min(echoVec), max(echoVec), delta(eff)(min) [us], delta(eff)(max) [us], #echoes, #D points]
-% sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
-dt = datestr(datetime('now','Format','dd MMMM yyyy HH:mm:ss'));
-fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
-fprintf(fileID,'%s %s: %f; %d %d; %.0f %.0f %.2f %.2f; %d %d\n',dt,datafile, SNR, minind, maxind, min(echoVec), max(echoVec), 1e6*min(deltaSteps), 1e6*max(deltaSteps), size(T2Ddat,2), size(T2Ddat,1));
-fclose(fileID);
+% %%
+% 
+% 
+% Thmm = [0.001, 1]; %T2 (min and max)
+% stepsh = 25; %horizontal steps
+% Tvmm = [0.0001, 0.01]; %D min and max
+% stepsv = 25;
+% alpha = 1e7;
+% 
+% orient = 'b'; %both orientations
+% kernel1 = 'exp(-h/T)';
+% kernel2 = 'exp(-v*D)';
+% 
+% % Tvmm = Tvmm*1e9;
+% 
+% tic
+%     [spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(flipud(T2Ddat),echoVec*1e-6,rot90(vIndex,2),Thmm,stepsh,Tvmm,stepsv,alpha,-1,orient,kernel1,kernel2);
+% toc
+% 
+% % the vertical (D) axis isn't calibrated correctly, and I'm not sure what
+% % the reason is.
+% 
+% %     spectrum = flipdim(spectrum,1);
+%     tauv = 1./tauv;
+% %     tauv = tauv*1e-9;
+%     tauv = flipdim(tauv,2);
+% %     spectrum = spectrum';
+% % figure
+% % surf(echoVec*1e-6,rot90(vIndex,2),flipud(T2Ddat))
+% % shading flat
+% 
+% %%
+% % taulv = log10(tauv);
+% stb = size(tauv);
+% % taulh = log10(tauh);
+% sta = size(tauh);
+% tauv = tauv';
+% 
+% % spectrum = flipdim(spectrum,1);
+% % tauv = 1./tauv;
+% % tauv = flipdim(tauv,2);
+%     
+% surf(tauh,tauv,spectrum)    
+% set(gca,'XScale','log','YScale','log')
+% shading interp;
+% %     %set(gcf,'Renderer','zbuffer');
+% % axis([tauh(1),tauh(sta(2)),tauv(1),tauv(stb(2))]);
+% view([0 90])
+% xlabel('T_2 [s]')
+% ylabel('D [m^2 s^{-1}]')
+% 
+% 
+% 
+% 
+% %%
+% 
+% %UF Points [Min, Max; min(echoVec), max(echoVec), delta(eff)(min) [us], delta(eff)(max) [us], #echoes, #D points]
+% % sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
+% dt = datestr(datetime('now','Format','dd MMMM yyyy HH:mm:ss'));
+% fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
+% fprintf(fileID,'%s %s: %f; %d %d; %.0f %.0f %.2f %.2f; %d %d\n',dt,datafile, SNR, minind, maxind, min(echoVec), max(echoVec), 1e6*min(deltaSteps), 1e6*max(deltaSteps), size(T2Ddat,2), size(T2Ddat,1));
+% fclose(fileID);

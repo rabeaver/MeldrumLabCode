@@ -6,15 +6,15 @@ close all
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
 
-datadir = 'Z:\Data\JNK\UFT2DData\EthGly_PM25\CHIRPexp\';
-datafile = 'EtGlyLarge_chirpSTE_20Jan2016_17_result.dat.out';
-T2lims = [1e-3 1e1];
-Dlims = [1e-7 1e-12];
-contourLevel = 0.50;
+datadir = 'Z:\Data\JNK\UFT2DData\CuH2O\Tradexp\';
+datafile = 'SSET2Trad_CuH2O_30June2016_3.dat.out';
+T2lims = [1e-3 1e-1];
+Dlims = [1e-7 1e-10];
+contourLevel = 1;
 
 %load the data and remove 0 values (replace with NaN)
 data = load(strcat(datadir,datafile));
-% data = interp2(data,2);
+data = interp2(data,2);
 data(data == 0) = NaN; 
 nPts = size(data,1);
 

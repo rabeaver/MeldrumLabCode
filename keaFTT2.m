@@ -4,9 +4,9 @@ close all
 
 % USER-DEFINED PARAMETERS
 filename = 'data.2d';
-filedir = 'Z:\Data\JYU\Summer Research 2016\11July_100%PEGDA_N2\60sec\60sec_11July2016\1\';
+filedir = 'C:\Users\jnking01\Desktop\10uspwUFT2Dtest\Glycerol_CPMG_21Oct2016\1\';
 
-omitEchoes = 2; %front-end echoes to omit
+omitEchoes = 0; %front-end echoes to omit
 G = 23.87; %T/m
 zf = 1; %levels of zeo-filling
 % END USER-DEFINED PARAMETERS

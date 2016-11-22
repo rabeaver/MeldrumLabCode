@@ -3,17 +3,17 @@ clc
 close all
 
 %%
-filename = 'GasketPositioningTest_CPMG_27Jun2016.tnt';
-filedir = 'C:\CommonData\Membranes\';
+filename = 'WeirdStuff.tnt';
+filedir = 'C:\Users\jnking01\Desktop\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 
-zf = 1;
+zf = 2;
 
 tEcho = 200; %us
-nEchoes = 512;
-nPts = 48;
+nEchoes = 1024;
+nPts = 56;
 nPtsBlank = 0;
 tD = 2e-6; %dwell time, s
 
