@@ -10,11 +10,12 @@ datadir = 'Z:\Data\JNK\UFT2DData\EthGly_PM25\CHIRPexp\';
 datafile = 'EtGlyLarge_chirpSTE_20Jan2016_17_result.dat.out';
 T2lims = [1e-3 1e1];
 Dlims = [1e-7 1e-12];
+
 contourLevel = 0.50;
 
 %load the data and remove 0 values (replace with NaN)
 data = load(strcat(datadir,datafile));
-% data = interp2(data,2);
+data = interp2(data,2);
 data(data == 0) = NaN; 
 nPts = size(data,1);
 

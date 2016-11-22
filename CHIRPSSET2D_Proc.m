@@ -17,21 +17,21 @@ noCHIRPfile = 'UFT2D_noCHIRP_Glycerol_21Oct2016\1\data';
 
 Pchirp = 1496.8e-6;                  % CHIRP Pulse Length (s)
 
-
-pw     = 10e-6;                      % hard pulse length
+pw     = 3e-6;                      % hard pulse length
 sliceheight = 0.100;                % mm
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
+nPts = 80;                          % # of acqu points
 
-nPts = 60;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
-nEchoes = 64;                      % Echoes
+nEchoes = 128;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 10e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+
 tE = 700;                           % us
 preCHIRPdelay = 0.2e-6;             % s
-noisePoints = 5;                    % number of points for measuring noise
+noisePoints = 15;                    % number of points for measuring noise
 
 nScans = 4096;                      % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
@@ -115,7 +115,7 @@ end
 
 CHIRPdat = padarray(CHIRPdat, size(CHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
 
-T2Dprofiles = flipud(fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
+T2Dprofiles = (fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
 
 %% Plot CHIRP results
 figure(1)
@@ -154,7 +154,7 @@ if apodize == 1
 end
 
 noCHIRPdat = padarray(noCHIRPdat, size(noCHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
-CPprofiles = flipud(fftshift(fft(noCHIRPdat,NFFT)/L,1));
+CPprofiles = (fftshift(fft(noCHIRPdat,NFFT)/L,1));
 
 %% Plot first reference profile and coil profile
 
