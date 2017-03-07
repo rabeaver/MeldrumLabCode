@@ -9,20 +9,20 @@ close all
 % ===================================
 
 spectrometer = 'Tecmag'; %'Tecmag'
-datadir = 'C:\CommonData\JNK\Mortar\BrickInWater\UFT1T2\';
-datafile = 'BrickInWater_CHIRP_T1T2_22July2016';
-noCHIRPfile = 'BrickInWater_noCHIRP_T1T2_22July2016';
+datadir = 'C:\Users\jnking01\Desktop\WaterMiscible_Yellow\';
+datafile = 'WMYellow_UFT1T2_8Sep2016_result';
+noCHIRPfile = 'WMYellow_UFT1T2_noCHIRP_8Sep2016_result';
 filenameExt = '.tnt';
 
 
-Pchirp = 0.050; % CHIRP Pulse Length (s)
+Pchirp = 0.500; % CHIRP Pulse Length (s)
 
-sliceheight = 0.300; %mm
+sliceheight = 0.200; %mm
 PreCPMGdelay = 20e-6; %s
 
 
 nPts = 56; % # of acqu points
-nEchoes = 1024; % Echoes
+nEchoes = 128; % Echoes
 tD = 2e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 200; %us
 
@@ -222,8 +222,8 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 106;
-maxind = 150;
+minind= 114;
+maxind = 145;
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 
