@@ -4,11 +4,10 @@ close all
 
 % USER-DEFINED PARAMETERS
 filename = 'data.2d';
-filedir = 'Z:\Data\JYU\Summer Research 2016\11July_100%PEGDA_N2\60sec\60sec_11July2016\1\';
-
-omitEchoes = 2; %front-end echoes to omit
+filedir = 'Z:\Data\JYU\CPMG\24Jan\5scure\4\';
+omitEchoes = 0; %front-end echoes to omit
 G = 23.87; %T/m
-zf = 1; %levels of zeo-filling
+zf = 0; %levels of zero-filling
 % END USER-DEFINED PARAMETERS
 
 
@@ -45,7 +44,7 @@ FTT2 = (fftshift(fft(FTdat,NFFT)/L, 1)); % Performs FFT algorithm
 % Plot CHIRP results
 figure(1)
 subplot(1,2,1)
-plot(t*1e6,real(FTT2(:,1)));
+plot(t*1e6,real(FTdat(:,1)));
 xlabel('time [us]')
 subplot(1,2,2)
 plot(z,2*abs(FTT2(:,1)),'LineWidth',1.5);
