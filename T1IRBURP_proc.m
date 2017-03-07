@@ -6,8 +6,10 @@ close all
 
 % Input filename, - .tnt
 
+
 filename = 'Gouda2_T1IR_BURP_27Sep2016';
 filedir = 'C:\CommonData\JNK\UFT2D\Food\Gouda\';
+
 
 fileloc = strcat(filedir,filename,'.tnt');
 

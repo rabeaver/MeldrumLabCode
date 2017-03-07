@@ -4,11 +4,10 @@ close all
 
 % USER-DEFINED PARAMETERS
 filename = 'data.2d';
-filedir = 'Z:\Data\Hamada Samples\Camphene\CPMG\FTCampheneTile\Camphene\18\';
-
-omitEchoes = 2; %front-end echoes to omit
+filedir = 'C:\Users\jnking01\Desktop\10uspwUFT2Dtest\Glycerol_CPMG_21Oct2016\1\';
+omitEchoes = 0; %front-end echoes to omit
 G = 23.87; %T/m
-zf = 0; %levels of zeo-filling
+zf = 0; %levels of zero-filling
 % END USER-DEFINED PARAMETERS
 
 

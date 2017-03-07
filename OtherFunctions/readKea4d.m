@@ -35,6 +35,7 @@ p.qDim                    =fread(fileid,1,'int32'); %size qDim
 if p.dataType == 500; %(4) byte float array (r,r,r ...)
     readSize = p.xDim*p.yDim*p.zDim*p.qDim*4;
     p.data = fread(fileid,readSize,'float32');
+    data = p.data;
 elseif p.dataType == 501; %(4,4) byte complex array (r,i,r,i ...)
     readSize = p.xDim*p.yDim*p.zDim*p.qDim*8;
     p.data = fread(fileid,readSize,'float32');

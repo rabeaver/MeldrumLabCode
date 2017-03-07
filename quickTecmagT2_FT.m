@@ -17,6 +17,7 @@ nPts = 164; % Number of acquisition points
 nPtsBlank = 0; %Don't touch
 tD = 1e-6; %dwell time, (s)
 
+
 G = 6.59;                           % Gradient (T m-1)
 gamma = 42.576;                     % MHz T-1
 gammaRad = gamma*2*pi*1e6;          % rad s-1 T-1

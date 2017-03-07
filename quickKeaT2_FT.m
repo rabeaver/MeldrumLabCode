@@ -4,7 +4,7 @@ close all
 
 % USER-DEFINED PARAMETERS
 filename = 'data.2d';
-filedir = 'C:\CommonData\JNK\UFT2D\PaintForNick\M212_CPMG_23June2016\2\';
+filedir = 'Z:\Data\TKM\WMO_2017\CPMG\P250.2015f\2\';
 
 zf = 1;
 

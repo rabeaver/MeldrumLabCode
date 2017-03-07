@@ -3,7 +3,6 @@ clc
 close all
 
 %%
-
 datadir = 'C:\CommonData\ADF\Gouda\';
 datafile = 'TradGouda_CPMG_20Feb2017';
 

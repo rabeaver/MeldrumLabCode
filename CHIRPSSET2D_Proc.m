@@ -10,36 +10,43 @@ close all
 % ===================================
 %
 
+
 spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
 datadir = 'C:\CommonData\MTR\';
 datafile = '3per_CuH2O_CHIRP_23Feb2017_result_result'; %\1\data'; 
 noCHIRPfile = '3per_CuH2O_noCHIRP_23Feb2017_result_result'; %\1\data'; 
 
 
+Pchirp = 1496.8e-6;                  % CHIRP Pulse Length (s)
+
+
 Pchirp = 246.8e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
 sliceheight = 0.20;                % mm
+
 rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
 
+nPts = 80;                          % # of acqu points
 
-nPts = 54;                          % # of acqu points
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
-nEchoes = 64;                      % Echoes
+nEchoes = 128;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
+
 tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 400e-6;                           % us
 preCHIRPdelay = 0.2e-6;             % s
 noisePoints = 5;                    % number of points for measuring noise
-
 
 nScans = 256;                     % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
 zf = 2;                             % levels of zero filling
+
 apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodizatio
+
 
 
 delta = 0.5e-3;                       % little delta time (s)
@@ -115,7 +122,7 @@ end
 
 CHIRPdat = padarray(CHIRPdat, size(CHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
 
-T2Dprofiles = flipud(fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
+T2Dprofiles = (fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
 
 %% Plot CHIRP results
 figure(1)
@@ -154,13 +161,16 @@ if apodize == 1
 end
 
 noCHIRPdat = padarray(noCHIRPdat, size(noCHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
-CPprofiles = flipud(fftshift(fft(noCHIRPdat,NFFT)/L,1));
+CPprofiles = (fftshift(fft(noCHIRPdat,NFFT)/L,1));
 
 %% Plot first reference profile and coil profile
 
 figure(3)
 subplot(1,2,1)
-plot(t*1e6,real(noCHIRPdat(:,2)));
+hold on
+% plot(t*1e6,abs(noCHIRPdat(:,4)));
+plot(t*1e6,real(noCHIRPdat(:,4)));
+plot(t*1e6,imag(noCHIRPdat(:,4)));
 xlabel('time [us]')
 subplot(1,2,2)
 plot(z,2*abs(CPprofiles(:,2)),'LineWidth',1.5);
@@ -320,7 +330,7 @@ D = p(1)*1e-9         % *10-9 m^2 s^-1
 
 figure(10)
 % surf(echoVec/1000,deltaSteps*1e6,T2Ddat);
-surf(echoVec/1000,deltaEffIndex,T2Ddat);
+surf(echoVec/1000,deltaEffIndex(1:end-5),T2Ddat(1:end-5,:));
 shading flat
 colormap('jet');
 colorbar 
@@ -339,71 +349,77 @@ t2axis = t2axis';
 
 vIndex = rot90(vIndex,2)';
 
+<<<<<<< HEAD
 % T2Ddat = (T2Ddat);
 T2Ddat = (T2Ddat);
+=======
+T2Ddat = flipud(flipud(T2Ddat));
+
+% T2Dexp = flipud(T2Ddat);
+>>>>>>> 5240ed358d043b316de87980144ae362a314a9dc
 save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
 save(strcat(datadir,datafile, '_T2axis.dat'), 't2axis', '-ascii')
 save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
 
-%%
-
-
-Thmm = [0.001, 1]; %T2 (min and max)
-stepsh = 25; %horizontal steps
-Tvmm = [0.0001, 0.01]; %D min and max
-stepsv = 25;
-alpha = 1e7;
-
-orient = 'b'; %both orientations
-kernel1 = 'exp(-h/T)';
-kernel2 = 'exp(-v*D)';
-
-% Tvmm = Tvmm*1e9;
-
-tic
-    [spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(flipud(T2Ddat),echoVec*1e-6,rot90(vIndex,2),Thmm,stepsh,Tvmm,stepsv,alpha,-1,orient,kernel1,kernel2);
-toc
-
-% the vertical (D) axis isn't calibrated correctly, and I'm not sure what
-% the reason is.
-
-%     spectrum = flipdim(spectrum,1);
-    tauv = 1./tauv;
-%     tauv = tauv*1e-9;
-    tauv = flipdim(tauv,2);
-%     spectrum = spectrum';
-% figure
-% surf(echoVec*1e-6,rot90(vIndex,2),flipud(T2Ddat))
-% shading flat
-
-%%
-% taulv = log10(tauv);
-stb = size(tauv);
-% taulh = log10(tauh);
-sta = size(tauh);
-tauv = tauv';
-
-% spectrum = flipdim(spectrum,1);
-% tauv = 1./tauv;
-% tauv = flipdim(tauv,2);
-    
-surf(tauh,tauv,spectrum)    
-set(gca,'XScale','log','YScale','log')
-shading interp;
-%     %set(gcf,'Renderer','zbuffer');
-% axis([tauh(1),tauh(sta(2)),tauv(1),tauv(stb(2))]);
-view([0 90])
-xlabel('T_2 [s]')
-ylabel('D [m^2 s^{-1}]')
-
-
-
-
-%%
-
-%UF Points [Min, Max; min(echoVec), max(echoVec), delta(eff)(min) [us], delta(eff)(max) [us], #echoes, #D points]
-% sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
-dt = datestr(datetime('now','Format','dd MMMM yyyy HH:mm:ss'));
-fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
-fprintf(fileID,'%s %s: %f; %d %d; %.0f %.0f %.2f %.2f; %d %d\n',dt,datafile, SNR, minind, maxind, min(echoVec), max(echoVec), 1e6*min(deltaSteps), 1e6*max(deltaSteps), size(T2Ddat,2), size(T2Ddat,1));
-fclose(fileID);
+% %%
+% 
+% 
+% Thmm = [0.001, 1]; %T2 (min and max)
+% stepsh = 25; %horizontal steps
+% Tvmm = [0.0001, 0.01]; %D min and max
+% stepsv = 25;
+% alpha = 1e7;
+% 
+% orient = 'b'; %both orientations
+% kernel1 = 'exp(-h/T)';
+% kernel2 = 'exp(-v*D)';
+% 
+% % Tvmm = Tvmm*1e9;
+% 
+% tic
+%     [spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(flipud(T2Ddat),echoVec*1e-6,rot90(vIndex,2),Thmm,stepsh,Tvmm,stepsv,alpha,-1,orient,kernel1,kernel2);
+% toc
+% 
+% % the vertical (D) axis isn't calibrated correctly, and I'm not sure what
+% % the reason is.
+% 
+% %     spectrum = flipdim(spectrum,1);
+%     tauv = 1./tauv;
+% %     tauv = tauv*1e-9;
+%     tauv = flipdim(tauv,2);
+% %     spectrum = spectrum';
+% % figure
+% % surf(echoVec*1e-6,rot90(vIndex,2),flipud(T2Ddat))
+% % shading flat
+% 
+% %%
+% % taulv = log10(tauv);
+% stb = size(tauv);
+% % taulh = log10(tauh);
+% sta = size(tauh);
+% tauv = tauv';
+% 
+% % spectrum = flipdim(spectrum,1);
+% % tauv = 1./tauv;
+% % tauv = flipdim(tauv,2);
+%     
+% surf(tauh,tauv,spectrum)    
+% set(gca,'XScale','log','YScale','log')
+% shading interp;
+% %     %set(gcf,'Renderer','zbuffer');
+% % axis([tauh(1),tauh(sta(2)),tauv(1),tauv(stb(2))]);
+% view([0 90])
+% xlabel('T_2 [s]')
+% ylabel('D [m^2 s^{-1}]')
+% 
+% 
+% 
+% 
+% %%
+% 
+% %UF Points [Min, Max; min(echoVec), max(echoVec), delta(eff)(min) [us], delta(eff)(max) [us], #echoes, #D points]
+% % sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
+% dt = datestr(datetime('now','Format','dd MMMM yyyy HH:mm:ss'));
+% fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
+% fprintf(fileID,'%s %s: %f; %d %d; %.0f %.0f %.2f %.2f; %d %d\n',dt,datafile, SNR, minind, maxind, min(echoVec), max(echoVec), 1e6*min(deltaSteps), 1e6*max(deltaSteps), size(T2Ddat,2), size(T2Ddat,1));
+% fclose(fileID);

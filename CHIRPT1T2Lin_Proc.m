@@ -9,6 +9,7 @@ close all
 % ===================================
 
 spectrometer = 'Tecmag'; %'Tecmag'
+
 datadir = 'C:\CommonData\TKM\';
 datafile = 'P250_CHIRP_3_T1IR_7Mar2017_result';
 noCHIRPfile = 'P250_noCHIRP_4_T1IR_6Mar2017_result';
@@ -16,6 +17,7 @@ filenameExt = '.tnt';
 
 
 Pchirp = 0.120; % CHIRP Pulse Length (s)
+
 
 sliceheight = 0.250; %mm
 PreCPMGdelay = 40e-6; %s
@@ -225,8 +227,10 @@ xlabel('CHIRPtime (s)')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
+
 minind= 223;
 maxind = 269;
+
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 

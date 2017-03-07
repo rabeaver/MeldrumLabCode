@@ -5,13 +5,13 @@ close all
 %%
 
 info.parfilename = 'acqu';
-info.datafilename = 'Noconsolidant_papyrus';
-info.dirstem = '/Volumes/ISC1026/Data/TKM/NGA_12May2016/Hamada/Noconsolidant_papyrus/';
+info.datafilename = '2017NoConsolidant';
+info.dirstem = 'Z:\Data\Hamada Samples\CDD\Profiles\2017NoConsolidant\1\';
 omitpoints = 0;
 
 fitopts = statset('MaxIter',5000,'TolX',1e-14,'UseParallel',true,'Display','off');
 
-dir = strcat(info.dirstem,num2str(3),'/');
+dir = strcat(info.dirstem);
 cd(dir);
 
 params.acqTime = readpar_Kea(strcat(info.parfilename,'.par'),'acqTime');
