@@ -4,19 +4,20 @@ close all
 
 %%
 
-datadir = 'C:\CommonData\Membranes\PureWater\DELTAseries_Overnight_14July2016\';
-datafile = 'SSET2Trad_membrane_PureWate__DELTA20000_14July2016_Overnight';
+datadir = 'C:\CommonData\ADF\Gouda\';
+datafile = 'TradGouda_CPMG_20Feb2017';
 
 
-nPts = 56;                          % # of acqu points
+nPts = 82;                          % # of acqu points
 omitPts = 0;                        % the number of points that are zeros from the spectrometer
-nEchoes = 512;                      % Echoes
+nEchoes = 1024;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 200;                           % us
-deltaMin = 20e-6;                  % s
-deltaMax = 400e-6;                 % s
-DELTA = 20e-3;                      % s
+tE = 250;                           % us
+deltaMin = 12e-6;                  % s
+deltaMax = 3500e-6;                 % s
+lin = 0;                            % 1 if delta is linearly spaced, 0 if log spaced
+DELTA = 3e-3;                      % s
 noisePoints = 5;                   % number of points for measuring noise
 noiseNumber = 1;                    % scan number to use for determining SNR
 G = 6.59;                           % T m-1, B0 field gradient
@@ -33,7 +34,13 @@ gammaRad = gamma*2*pi*1e6;          % rad s-1 T-1
 T2Ddat = reshape(spec2, ap.td(2), nPts, nEchoes);
 T2Ddat = T2Ddat(:,1:nPts-omitPts,omitEchoes+1:end);
 
-deltaVec = linspace(deltaMin,deltaMax,ap.td(2));
+
+if lin==1;
+    deltaVec = linspace(deltaMin,deltaMax,ap.td(2));
+else
+    deltaVec = logspace(log10(deltaMin),log10(deltaMax),ap.td(2));
+end
+
 BigDELTA = DELTA + deltaVec;
 qIndex = 2*pi*gamma*1e6*G*deltaVec;
 vIndex = (qIndex.^2.*(BigDELTA-deltaVec./3).*1e-9)';
@@ -59,10 +66,11 @@ n = reshape(n,1,(2*noisePoints+1)*(nEchoes-omitEchoes));
 s = T2Ddat(noiseNumber,:,:);
 s = reshape(s,1,(nPts-omitPts)*(nEchoes-omitEchoes));
 
-figure
+figure(1)
 hold on
 plot(abs(s))
 plot(abs(n))
+
 
 
 S = max(abs(s));
@@ -73,11 +81,15 @@ SNR_perRtScans = SNR/sqrt(ap.td(2)*ap.ns)
 
 %% Plot T2D data
 
-figure(1)
+figure(2)
+hold on
 surf(echoVec/1000,vIndex',data)
 shading flat
 xlabel('T2 [ms]')
 ylabel('delta [ms]')
+if lin==0
+    set(gca,'YScale','log')
+end
 
 t2axis = echoVec'*1e-6; %s
 

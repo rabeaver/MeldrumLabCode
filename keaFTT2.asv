@@ -4,7 +4,7 @@ close all
 
 % USER-DEFINED PARAMETERS
 filename = 'data.2d';
-filedir = 'Z:\Data\Hamada Samples\Camphene\CPMG\FTCampheneTile\Camphene\18\';
+filedir = 'Z:\Data\Hamada Samples\Camphene\CPMG\FTCampheneTile\Camphene\1\';
 
 omitEchoes = 2; %front-end echoes to omit
 G = 23.87; %T/m
@@ -42,10 +42,7 @@ FTdat = padarray(spec2d, size(spec2d(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
 
 FTT2 = (fftshift(fft(FTdat,NFFT)/L, 1)); % Performs FFT algorithm
 
-% save('Z:\Data\Hamada Samples\Camphene\CPMG\FTCampheneTile\Camphene\z.mat','z');
-% save('Z:\Data\Hamada Samples\Camphene\CPMG\FTCampheneTile\Camphene\FTdat18.mat','FTT2');
-
-
+save('Z:\Data\Hamada Samples\Camphene\CPMG\FTCampheneTile\Camphene\z.mat',
 % Plot CHIRP results
 figure(1)
 subplot(1,2,1)

@@ -3,16 +3,16 @@ clc
 close all
 
 %%
-filename = 'bulkCuWater_CPMG_11June2016_1.tnt';
-filedir = 'C:\CommonData\TAMU\membrane holder_CuWater & Water test\';
+filename = 'copperwaterecho200CPMG.tnt';
+filedir = 'C:\CommonData\MTR\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 
-tEcho = 410; %us
+tEcho = 200; %us
 nEchoes = 64;
 nPts = 54;
-nPtsBlank = 2;
+nPtsBlank = 0;
 
 %% SNR calc
 

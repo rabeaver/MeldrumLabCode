@@ -9,28 +9,28 @@ close all
 % ===================================
 
 spectrometer = 'Tecmag'; %'Tecmag'
-datadir = 'C:\CommonData\JNK\Mortar\BrickInWater\UFT1T2\';
-datafile = 'BrickInWater_CHIRP_T1T2_22July2016';
-noCHIRPfile = 'BrickInWater_noCHIRP_T1T2_22July2016';
+datadir = 'C:\CommonData\TKM\';
+datafile = 'P250_CHIRP_3_T1IR_7Mar2017_result';
+noCHIRPfile = 'P250_noCHIRP_4_T1IR_6Mar2017_result';
 filenameExt = '.tnt';
 
 
-Pchirp = 0.050; % CHIRP Pulse Length (s)
+Pchirp = 0.120; % CHIRP Pulse Length (s)
 
-sliceheight = 0.200; %mm
-PreCPMGdelay = 20e-6; %s
+sliceheight = 0.250; %mm
+PreCPMGdelay = 40e-6; %s
 
 
-nPts = 56; % # of acqu points
-nEchoes = 128; % Echoes
+nPts = 82; % # of acqu points
+nEchoes = 64; % Echoes
 tD = 2e-6; % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 200; %us
+tE = 250; % Echotime (us)
 
 omitEchoes = 0; %the number of echoes to skip
 noisePoints = 5; %number of points at beginning and end of each acqu period for noise
 omitPts = 0; %blank spectrometer points to skip
 
-zf = 1;                             % levels of zero filling
+zf = 2;                             % levels of zero filling
 apodize = 0;                        %Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodization
 
@@ -199,31 +199,34 @@ T1T2profcorr = T1T2profiles./pcorr;
 
 %% Find Optimal data range with these figures
 close all
+ylims = [0 1];
+echoIndex = 2; 
+
 
 figure(8)
-plot(abs(T1T2profiles(:,1)))
+plot(abs(T1T2profiles(:,echoIndex)))
 
 t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
 figure(7)
 subplot(2,1,1)
-plot(abs(T1T2profcorr(:,1)))
+plot(abs(T1T2profcorr(:,echoIndex)))
 xlim([0 NFFT])
-ylim([0 4])
+ylim(ylims)
 subplot(2,1,2)
-plot(t1_fig7,abs(T1T2profcorr(:,1)))
+plot(t1_fig7,abs(T1T2profcorr(:,echoIndex)))
 line([0 0],[-2 2])
 line([Pchirp Pchirp],[-2 2])
 xlim([min(t1_fig7), max(t1_fig7)]);
-ylim([0 4])
+ylim(ylims)
 set(gca,'XDir','reverse')
 xlabel('CHIRPtime (s)')
 
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 50;
-maxind = 76;
+minind= 223;
+maxind = 269;
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 

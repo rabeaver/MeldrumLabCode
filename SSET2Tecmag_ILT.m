@@ -3,21 +3,21 @@ clc
 close all
 
 %% User parameters
-filename = '3per_CuH2O_SSET2Trad_19July2016_DELTAseries.tnt';
-filedir = 'C:\CommonData\Membranes\CopperDELTAseriescheck\';
+filename = 'Gouda_SSET2_Overnight_11FEB2017.tnt';
+filedir = 'C:\CommonData\ADF\Gouda\Gouda Traditional SSET2\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tE = 200; %us
-nEchoes = 512;
-nPts = 56;
-tD = 2e-6;
-nPtsD = 21;
+tE = 250; %us
+nEchoes = 1024;
+nPts = 82; %# of acquisition points 
+tD = 2e-6; %Dwell time (us)
+nPtsD = 41; %number of 2D points
 nPtsBlank = 0;
 omitEchoes = 0;
-DELTA = 3e-3; %s
+DELTA = 5e-3; %s
 deltamin = 20e-6; %s
-deltamax = 400e-6; %s
+deltamax = 3500e-6; %s
 deltavec = linspace(deltamin,deltamax,nPtsD)';
 G = 6.59; %MHz m-1
 gamma = 42.576;

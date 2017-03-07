@@ -4,26 +4,26 @@ close all
 
 %%
 
-filename = 'Membrane_w_pureH2O_T1IR_BURP_28June2016.tnt';
-filedir = 'C:\CommonData\Membranes\PureWater\';
+filename = 'P250_BURP_T1IR_6Mar2017.tnt';
+filedir = 'C:\CommonData\TKM\';
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
-tEcho = 150; %us
+tEcho = 250; %us
 
-nEchoes = 64;
-nPts = 16;
+nEchoes = 16;
+nPts = 164;
 nPtsBlank = 0;
-nT1Pts = 11;
-T1min = 0.1; %ms
-T1max = 200; %ms
-T1guess = 50; %ms 
+nT1Pts = 15
+T1min = 0.05; %ms
+T1max = 500; %ms
+T1guess = 100; %ms 
 
-T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
+% T1vector = linspace((T1min),(T1max),nT1Pts); % Linspace T1sat
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 
-% T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
+T1vector = logspace(log10(T1min),log10(T1max),nT1Pts); % Logspace T1sat
 
 data = reshape(spec2',nPts,nEchoes,nT1Pts);
 data = data(1:(nPts-nPtsBlank),:,:);

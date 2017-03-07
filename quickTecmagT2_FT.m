@@ -3,39 +3,39 @@ clc
 close all
 
 %%
-filename = 'GasketPositioningTest_CPMG_27Jun2016.tnt';
-filedir = 'C:\CommonData\Membranes\';
+filename = 'P250_CPMG_2_6Mar2017.tnt'; %Input experiment file name
+filedir = 'C:\CommonData\TKM\'; %Copy file path
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 
-zf = 1;
+zf = 2; %zero filling... Don't touch
 
-tEcho = 200; %us
-nEchoes = 512;
-nPts = 48;
-nPtsBlank = 0;
-tD = 2e-6; %dwell time, s
+tEcho = 250; %Echotime (us)
+nEchoes = 16; %Number of echoes
+nPts = 164; % Number of acquisition points
+nPtsBlank = 0; %Don't touch
+tD = 1e-6; %dwell time, (s)
 
-G = 6.59;
+G = 6.59;                           % Gradient (T m-1)
 gamma = 42.576;                     % MHz T-1
 gammaRad = gamma*2*pi*1e6;          % rad s-1 T-1
 
-%% SNR calc
-
-
-[~,Spoint] = max(real(spec2));
-Spoint = Spoint + 3.5*nPts;
-S = (real(spec(Spoint-nPts/2:Spoint+nPts/2)));
-N = (imag(spec(Spoint-nPts/2:Spoint+nPts/2)));
+% % SNR calc
+% 
+% 
+% [~,Spoint] = max(real(spec2));
+% Spoint = Spoint + 3.5*nPts;
+% S = (real(spec(Spoint-nPts/2:Spoint+nPts/2)));
+% N = (imag(spec(Spoint-nPts/2:Spoint+nPts/2)));
 % N = (real(specN(Spoint-nPts/2:Spoint+nPts/2)))';
-
-SNR = snr(S,N)
-
-figure(1)
-hold on
-plot(S)
-plot(N)
+% 
+% SNR = snr(S,N)
+% 
+% figure(1)
+% hold on
+% plot(S)
+% plot(N)
 
 %%
 
@@ -43,7 +43,7 @@ plot(N)
 echoVector = (tEcho:tEcho:nEchoes*tEcho)*1e-6;
 
 data = reshape(spec,nPts,nEchoes);
-data = data(1:(nPts-nPtsBlank),:);
+data = data((nPtsBlank+1):(nPts-nPtsBlank),:);
 dataInt = sum(data,1);
 dataIntRe = real(dataInt)./max(real(dataInt));
 dataIntIm = imag(dataInt)./max(real(dataInt));
@@ -61,12 +61,14 @@ dat = padarray(data, size(data(:,1),1)/2*((2^zf)-1),0); % Pad with 0's
 profiles = flipud(fftshift(fft(dat,NFFT)/L, 1)); % Performs FFT algorithm
 
 close
-plot(z,abs(profiles(:,1)));
+plot(z,abs(profiles(:,2)));
 
 %%
 guess = [1 15e-3];% 0.6 6e-03];
-beta = nlinfit(echoVector,dataIntRe, @t2monofit_simple, guess);
+[beta,R,J,CovB] = nlinfit(echoVector,dataIntRe, @t2monofit_simple, guess);
 ypred = t2monofit_simple(beta,echoVector);
+ci = nlparci(beta,R,'jacobian',J);
+
 
 figure(2)
 hold on
