@@ -11,7 +11,7 @@ close all
 spectrometer = 'Tecmag'; %'Tecmag'
 
 datadir = 'C:\CommonData\TKM\P250\';
-datafile = 'P250_CHIRP_4_T1IR_9Mar2017_result';
+datafile = 'P250_CHIRP_14_T1IR_8Mar2017_result';
 noCHIRPfile = 'P250_noCHIRP_2_T1IR_8Mar2017_result';
 filenameExt = '.tnt';
 
@@ -19,8 +19,7 @@ filenameExt = '.tnt';
 Pchirp = 0.250; % CHIRP Pulse Length (s)
 
 
-sliceheight = 0.350; %mm
-sliceoffset = +0.100; %mm
+sliceheight = 0.200; %mm
 PreCPMGdelay = 40e-6; %s
 
 
@@ -49,7 +48,6 @@ end
     
 gamma = 42.576;                     % MHz T-1
 BWchirp = sliceheight*G*gamma*1000; % CHIRP bandwidth (Hz)
-BWoffset = sliceoffset*G*gamma*1000; %CHIRP bandwidth offset (Hz)
 
 T = tD;                             % Sample time
 Fs = 1/T;                           % Sampling frequency 
@@ -60,10 +58,6 @@ echoVec = (omitEchoes+1)*tE:tE:(nEchoes*tE);
 t = (-(L-1)/2:L/2)*T;               % Time vector
 f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
 z = f/(gamma*G);                       % um, 280.47 Hz/um (for PM25)
-
-ChirpTRange = (range(z)/(1000*sliceheight)*Pchirp);
-ChirpTOverZ = ChirpTRange/range(z);
-ChirpT = (z+sliceheight*500-sliceoffset*1000)*ChirpTOverZ;
 
 %%
 % Import CHIRP data
@@ -207,45 +201,35 @@ T1T2profcorr = T1T2profiles./pcorr;
 
 %% Find Optimal data range with these figures
 close all
-ylims = [0 5];
-echoIndex = 2; 
+ylims = [0 1];
+echoIndex = 1; 
 
 
 figure(8)
 plot(abs(T1T2profiles(:,echoIndex)))
-t1_fig7=Pchirp*((BWchirp+BWoffset)/2-f)/(BWchirp+BWoffset);
+t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 
 figure(7)
-subplot(3,1,1)
+subplot(2,1,1)
 plot(abs(T1T2profcorr(:,echoIndex)))
-line([find(ChirpT==0) 0],ylims,'Color','k')
-line([Pchirp Pchirp],ylims,'Color','k')
 xlim([0 NFFT])
 ylim(ylims)
 xlabel('index')
-subplot(3,1,2)
+subplot(2,1,2)
 plot(z,abs(T1T2profcorr(:,echoIndex)))
-line([-sliceheight*500+sliceoffset*1000 -sliceheight*500+sliceoffset*1000],ylims,'Color','k')
-line([ sliceheight*500+sliceoffset*1000  sliceheight*500+sliceoffset*1000],ylims,'Color','k')
+line([-sliceheight*500 -sliceheight*500],ylims,'Color','k')
+line([sliceheight*500 sliceheight*500],ylims,'Color','k')
 xlim([min(z), max(z)]);
 ylim(ylims)
 % set(gca,'XDir','reverse')
 xlabel('position (\mum)')
-subplot(3,1,3)
-plot(ChirpT,abs(T1T2profcorr(:,echoIndex)))
-line([0 0],ylims,'Color','k')
-line([Pchirp Pchirp],ylims,'Color','k')
-xlim([min(ChirpT), max(ChirpT)]);
-ylim(ylims)
-% set(gca,'XDir','reverse')
-xlabel('effective CHIRP time [s])')
 
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
 
-minind= 184;
-maxind = 206;
+minind= 233;
+maxind = 305;
 
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
@@ -260,7 +244,7 @@ end
 
 % T1T2data=T1T2profiles2;
 T1T2data=T1T2profiles2/max(max(abs(T1T2profiles2)));
-t1=Pchirp*((BWchirp-BWoffset)/2-f(minind:maxind))/(BWchirp-BWoffset);
+t1=Pchirp*(BWchirp/2-f(minind:maxind))/BWchirp;
 
 %plot first T1 column
 figure

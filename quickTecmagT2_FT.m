@@ -3,8 +3,8 @@ clc
 close all
 
 %%
-filename = 'P250_CPMG_2_6Mar2017.tnt'; %Input experiment file name
-filedir = 'C:\CommonData\TKM\'; %Copy file path
+filename = 'P250_CPMG_3_8Mar2017.tnt'; %Input experiment file name
+filedir = 'C:\CommonData\TKM\P250\'; %Copy file path
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
