@@ -64,6 +64,7 @@ z = f/(gamma*G);                       % um, 280.47 Hz/um (for PM25)
 ChirpTRange = (range(z)/(1000*sliceheight)*Pchirp);
 ChirpTOverZ = ChirpTRange/range(z);
 ChirpT = (z+sliceheight*500-sliceoffset*1000)*ChirpTOverZ;
+RecoveryT = -(z-sliceheight*500-sliceoffset*1000)*ChirpTOverZ;
 
 %%
 % Import CHIRP data
@@ -207,8 +208,8 @@ T1T2profcorr = T1T2profiles./pcorr;
 
 %% Find Optimal data range with these figures
 close all
-ylims = [0 5];
-echoIndex = 2; 
+ylims = [0 1];
+echoIndex = 1; 
 
 
 figure(8)
@@ -232,20 +233,19 @@ ylim(ylims)
 % set(gca,'XDir','reverse')
 xlabel('position (\mum)')
 subplot(3,1,3)
-plot(ChirpT,abs(T1T2profcorr(:,echoIndex)))
+plot(RecoveryT,abs(T1T2profcorr(:,echoIndex)))
 line([0 0],ylims,'Color','k')
 line([Pchirp Pchirp],ylims,'Color','k')
-xlim([min(ChirpT), max(ChirpT)]);
+xlim([min(RecoveryT), max(RecoveryT)]);
 ylim(ylims)
-% set(gca,'XDir','reverse')
-xlabel('effective CHIRP time [s])')
+set(gca,'XDir','reverse')
+xlabel('effective recovery time [s])')
 
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-
-minind= 184;
-maxind = 206;
+minind= 269;
+maxind = 302;
 
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
@@ -260,24 +260,23 @@ end
 
 % T1T2data=T1T2profiles2;
 T1T2data=T1T2profiles2/max(max(abs(T1T2profiles2)));
-t1=Pchirp*((BWchirp-BWoffset)/2-f(minind:maxind))/(BWchirp-BWoffset);
 
 %plot first T1 column
 figure
-scatter(t1*1000,T1T2data(:,1),'linewidth',2)
+scatter(RecoveryT(minind:maxind)*1000,T1T2data(:,1),'linewidth',2)
 xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
 xlim([0 1000*Pchirp])
 ylim([-1.1 1.1])
 
-%
+
 % cftool(t1*1000,T1T2data(:,1))
 
 %% surf of all T1-T2 Profiles
 
 figure
-surf(echoVec(:,1:end)*1000,t1*1000,T1T2data(:,1:end)); 
+surf(echoVec(:,1:end)*1000,RecoveryT(minind:maxind)*1000,T1T2data(:,1:end)); 
 shading flat;
 colormap('jet');
 % shading interp;
@@ -295,23 +294,18 @@ T1T2data2 = T1T2data(:,1:end);
 T1T2data2 = flipud(T1T2data2);
 
 % Prepare T1 and T2 axes
-vaxis = t1; %us
+vaxis = RecoveryT(minind:maxind); %s
 vaxis = rot90(vaxis,2);
-T2axis = echoVec'/1e6;   %us
-
-
+T2axis = echoVec'/1e6;   %s
 
 save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii');
 save(strcat(datadir,datafile,'_T2axis.dat'),'T2axis','-ascii')
 save(strcat(datadir,datafile,'_vaxis.dat'),'vaxis','-ascii')
 
-% size(T1T2data);
-% 1e6*abs(t1(1)-t1(end)); %#ok<NOPTS>
-% 1e6*[min(t1), max(t1)]; %#ok<NOPTS>
 
 %UF Points [Min, Max, Inv; min(echoVec), max(echoVec), InvTime(min) [us], InvTime(max) [us], #echoes, #T1 points]
 % sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
 
 fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
-fprintf(fileID,'%s: %f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d\n',datafile, SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1));
+fprintf(fileID,'%s: %f; %d %d %d; %.0f %.0f %.2f %.2f; %d %d\n',datafile, SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), RecoveryT(maxind)*1e3, RecoveryT(minind)*1e3, size(T1T2data,2), size(T1T2data,1));
 fclose(fileID);
