@@ -11,7 +11,7 @@ close all
 spectrometer = 'Tecmag'; %'Tecmag'
 
 datadir = 'C:\CommonData\TKM\P250\';
-datafile = 'P250_CHIRP_4_T1IR_9Mar2017_result';
+datafile = 'P250_CHIRP_1_T1IR_11Mar2017_result';
 noCHIRPfile = 'P250_noCHIRP_2_T1IR_8Mar2017_result';
 filenameExt = '.tnt';
 
@@ -19,8 +19,8 @@ filenameExt = '.tnt';
 Pchirp = 0.250; % CHIRP Pulse Length (s)
 
 
-sliceheight = 0.350; %mm
-sliceoffset = +0.100; %mm
+sliceheight = 0.150; %mm
+sliceoffset = 0.00; %mm
 PreCPMGdelay = 40e-6; %s
 
 
@@ -208,7 +208,7 @@ T1T2profcorr = T1T2profiles./pcorr;
 
 %% Find Optimal data range with these figures
 close all
-ylims = [0 1];
+ylims = [0 3];
 echoIndex = 1; 
 
 
@@ -244,15 +244,16 @@ xlabel('effective recovery time [s])')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 269;
-maxind = 302;
+minind= 229;
+firstinvertedind = 282;
+maxind = 307;
 
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 
 for ii = 1:nEchoes-omitEchoes;
-    [~,firstinvertedind] = min(abs(T1T2profcorr(minind:maxind,ii)));
-    firstinvertedind = firstinvertedind+minind-1;
+%     [~,firstinvertedind] = min(abs(T1T2profcorr(minind:maxind,ii)));
+%     firstinvertedind = firstinvertedind+minind-1;
     T1T2profiles2(1:firstinvertedind-minind+1,ii) = (abs(T1T2profcorr(minind:firstinvertedind,ii)));
     T1T2profiles2(firstinvertedind-minind+2:end,ii) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,ii)));
 end
@@ -260,14 +261,14 @@ end
 
 % T1T2data=T1T2profiles2;
 T1T2data=T1T2profiles2/max(max(abs(T1T2profiles2)));
-
+t1 = 1000*(linspace(RecoveryT(minind),RecoveryT(maxind),maxind-minind+1));
 %plot first T1 column
 figure
-scatter(RecoveryT(minind:maxind)*1000,T1T2data(:,1),'linewidth',2)
+scatter(t1,T1T2data(:,1),'linewidth',2)
 xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
-xlim([0 1000*Pchirp])
+% xlim([0 1000*Pchirp])
 ylim([-1.1 1.1])
 
 
@@ -276,7 +277,7 @@ ylim([-1.1 1.1])
 %% surf of all T1-T2 Profiles
 
 figure
-surf(echoVec(:,1:end)*1000,RecoveryT(minind:maxind)*1000,T1T2data(:,1:end)); 
+surf(echoVec(:,1:end)*1000,t1,T1T2data(:,1:end)); 
 shading flat;
 colormap('jet');
 % shading interp;
@@ -291,11 +292,11 @@ close all
 
 %Prepare 2D data
 T1T2data2 = T1T2data(:,1:end);
-T1T2data2 = flipud(T1T2data2);
+% T1T2data2 = flipud(T1T2data2);
 
 % Prepare T1 and T2 axes
-vaxis = RecoveryT(minind:maxind); %s
-vaxis = rot90(vaxis,2);
+vaxis = t1*1e-3; %s
+% vaxis = rot90(vaxis,2);
 T2axis = echoVec'/1e6;   %s
 
 save(strcat(datadir,datafile, '.dat'), 'T1T2data2', '-ascii');
