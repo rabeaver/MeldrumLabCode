@@ -64,7 +64,7 @@ z = f/(gamma*G);                       % um, 280.47 Hz/um (for PM25)
 ChirpTRange = (range(z)/(1000*sliceheight)*Pchirp);
 ChirpTOverZ = ChirpTRange/range(z);
 ChirpT = (z+sliceheight*500-sliceoffset*1000)*ChirpTOverZ;
-RecoveryT = -(z-sliceheight*500-sliceoffset*1000)*ChirpTOverZ;
+
 
 %%
 % Import CHIRP data
@@ -80,7 +80,7 @@ end
 CHIRPdat = reshape(spec, nPts, nEchoes);
 CHIRPdat = CHIRPdat(1:(end-omitPts),omitEchoes+1:end);
 
-%% SNR calc (two sections)
+%% SNR calc 
 n1 = CHIRPdat(1:noisePoints,:);
 n2 = CHIRPdat(nPts-noisePoints-omitPts:end,:);
 n = cat(1,n1,n2);
@@ -97,7 +97,7 @@ N = rms(n);
 
 SNR = S/N
 SNR_perRtScans = SNR/sqrt(2*ap.ns)
-%%
+%% Filter, apodize, zero-fill, and FT
 pVec = 1:1:(nPts-omitEchoes);
 filt = exp(-(pVec-(nPts-omitEchoes)/2).^2/((nPts-omitEchoes)/apofac)^2);
 filt = repmat(filt',1,nEchoes);
@@ -110,6 +110,7 @@ CHIRPdat = padarray(CHIRPdat, size(CHIRPdat(:,1),1)/2*((2^zf)-1),0); % Pad with 
 
 T1T2profiles = fftshift(fft(CHIRPdat,NFFT)/L, 1); % Performs FFT algorithm
 
+%% Plot CHIRP-encoded data
 figure(1)
 subplot(1,2,1)
 hold on
@@ -176,21 +177,9 @@ title('Surface plot of T1T2 FFT Profiles')
 hold off
 
 
-%% Plot first T1T2 profile and coil profile
-
-close all
-
-figure(5)
-hold on
-plot(z,abs(CPprofiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','k')
-plot(z,abs(T1T2profiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','r')
-hold off
-
-xlabel('{\it z} (um)','fontsize',12)
-title('T1-T2 & coil profiles')
-set(gca,'Fontsize',12,'linewidth',2)
-
-%% Coil Sensitivity Correction
+%% Coil sensitivity correction and plot first T1T2 profile and coil profile
+ylims = [0 4];
+echoIndex = 1; 
 
 for k = 1:nEchoes-omitEchoes
     pcorr(:,k) = abs(CPprofiles(:,1));
@@ -198,19 +187,22 @@ end
 
 T1T2profcorr = T1T2profiles./pcorr;
 
-% figure(6)
-% pcolor(abs(T1T2profcorr)); 
-% colormap('jet');
-% shading interp;
-% colorbar('linewidth',2)
-% caxis([0 1])
-% title('Coil sensitivity corrected T1-T2 profiles')
+close all
+
+figure(5)
+hold on
+plot(z,abs(CPprofiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',1,'color','k')
+plot(z,abs(T1T2profiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',1,'color','r')
+plot(z,abs(T1T2profcorr(:,echoIndex)),'linewidth',1.3,'color','b')
+xlim([min(z), max(z)]);
+ylim(ylims)
+hold off
+
+xlabel('{\it z} (um)','fontsize',12)
+title('T1-T2 & coil profiles')
+set(gca,'Fontsize',12,'linewidth',2)
 
 %% Find Optimal data range with these figures
-close all
-ylims = [0 3];
-echoIndex = 1; 
-
 
 figure(8)
 plot(abs(T1T2profiles(:,echoIndex)))
@@ -225,7 +217,10 @@ xlim([0 NFFT])
 ylim(ylims)
 xlabel('index')
 subplot(3,1,2)
+hold on
 plot(z,abs(T1T2profcorr(:,echoIndex)))
+plot(z,abs(CPprofiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',0.5,'color','k')
+plot(z,abs(T1T2profiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',0.5,'color','r')
 line([-sliceheight*500+sliceoffset*1000 -sliceheight*500+sliceoffset*1000],ylims,'Color','k')
 line([ sliceheight*500+sliceoffset*1000  sliceheight*500+sliceoffset*1000],ylims,'Color','k')
 xlim([min(z), max(z)]);
@@ -233,21 +228,20 @@ ylim(ylims)
 % set(gca,'XDir','reverse')
 xlabel('position (\mum)')
 subplot(3,1,3)
-plot(RecoveryT,abs(T1T2profcorr(:,echoIndex)))
+plot(ChirpT,abs(T1T2profcorr(:,echoIndex)))
 line([0 0],ylims,'Color','k')
 line([Pchirp Pchirp],ylims,'Color','k')
-xlim([min(RecoveryT), max(RecoveryT)]);
+xlim([min(ChirpT), max(ChirpT)]);
 ylim(ylims)
-set(gca,'XDir','reverse')
+% set(gca,'XDir','reverse')
 xlabel('effective recovery time [s])')
 
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 229;
-firstinvertedind = 282;
+minind= 230;
+firstinvertedind = 280;
 maxind = 307;
-
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 
@@ -258,10 +252,9 @@ for ii = 1:nEchoes-omitEchoes;
     T1T2profiles2(firstinvertedind-minind+2:end,ii) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,ii)));
 end
 
-
 % T1T2data=T1T2profiles2;
 T1T2data=T1T2profiles2/max(max(abs(T1T2profiles2)));
-t1 = 1000*(linspace(RecoveryT(minind),RecoveryT(maxind),maxind-minind+1));
+t1 = 1000*(linspace(ChirpT(minind),ChirpT(maxind),maxind-minind+1));
 %plot first T1 column
 figure
 scatter(t1,T1T2data(:,1),'linewidth',2)
@@ -271,11 +264,9 @@ set(gca,'Fontsize',30,'linewidth',2)
 % xlim([0 1000*Pchirp])
 ylim([-1.1 1.1])
 
-
-% cftool(t1*1000,T1T2data(:,1))
+cftool(t1*1000,T1T2data(:,1))
 
 %% surf of all T1-T2 Profiles
-
 figure
 surf(echoVec(:,1:end)*1000,t1,T1T2data(:,1:end)); 
 shading flat;
@@ -285,7 +276,6 @@ colorbar
 ylabel('{\it t}_1 (ms)'); 
 xlabel('{\it t}_2 (ms)');
 title('T1-T2 data')
-
 
 %% Save data, display ILT Data params
 close all
@@ -308,5 +298,5 @@ save(strcat(datadir,datafile,'_vaxis.dat'),'vaxis','-ascii')
 % sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))
 
 fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
-fprintf(fileID,'%s: %f; %d %d %d; %.0f %.0f %.2f %.2f; %d %d\n',datafile, SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), RecoveryT(maxind)*1e3, RecoveryT(minind)*1e3, size(T1T2data,2), size(T1T2data,1));
+fprintf(fileID,'%s: %f; %d %d %d; %.0f %.0f %.2f %.2f; %d %d\n',datafile, SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), ChirpT(maxind)*1e3, ChirpT(minind)*1e3, size(T1T2data,2), size(T1T2data,1));
 fclose(fileID);
