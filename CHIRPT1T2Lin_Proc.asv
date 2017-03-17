@@ -11,16 +11,16 @@ close all
 spectrometer = 'Tecmag'; %'Tecmag'
 
 datadir = 'C:\CommonData\TKM\P250\';
-datafile = 'P250_CHIRP_5_T1IR_10Mar2017_result';
+datafile = 'P250_CHIRP_7_T1IR_9Mar2017_result';
 noCHIRPfile = 'P250_noCHIRP_2_T1IR_8Mar2017_result';
 filenameExt = '.tnt';
 
 
-Pchirp = 0.10; % CHIRP Pulse Length (s)
+Pchirp = 0.250; % CHIRP Pulse Length (s)
 
 
-sliceheight = 0.150; %mm
-sliceoffset = 0.00; %mm
+sliceheight = 0.100; %mm
+sliceoffset = -0.100; %mm
 PreCPMGdelay = 40e-6; %s
 
 
@@ -176,14 +176,25 @@ title('Surface plot of T1T2 FFT Profiles')
 hold off
 
 
-%% Plot first T1T2 profile and coil profile
+%% Coil sensitivity correction and plot first T1T2 profile and coil profile
+ylims = [0 4];
+echoIndex = 1; 
+
+for k = 1:nEchoes-omitEchoes
+    pcorr(:,k) = abs(CPprofiles(:,1));
+end
+
+T1T2profcorr = T1T2profiles./pcorr;
 
 close all
 
 figure(5)
 hold on
-plot(z,abs(CPprofiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','k')
-plot(z,abs(T1T2profiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','r')
+plot(z,abs(CPprofiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',1,'color','k')
+plot(z,abs(T1T2profiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',1,'color','r')
+plot(z,abs(T1T2profcorr(:,echoIndex)),'linewidth',1.3,'color','b')
+xlim([min(z), max(z)]);
+ylim(ylims)
 hold off
 
 xlabel('{\it z} (um)','fontsize',12)
@@ -192,11 +203,7 @@ set(gca,'Fontsize',12,'linewidth',2)
 
 %% Coil Sensitivity Correction
 
-for k = 1:nEchoes-omitEchoes
-    pcorr(:,k) = abs(CPprofiles(:,1));
-end
 
-T1T2profcorr = T1T2profiles./pcorr;
 
 % figure(6)
 % pcolor(abs(T1T2profcorr)); 
@@ -207,9 +214,8 @@ T1T2profcorr = T1T2profiles./pcorr;
 % title('Coil sensitivity corrected T1-T2 profiles')
 
 %% Find Optimal data range with these figures
-close all
-ylims = [0 0.2];
-echoIndex = 2; 
+% close all
+
 
 
 figure(8)
@@ -225,7 +231,10 @@ xlim([0 NFFT])
 ylim(ylims)
 xlabel('index')
 subplot(3,1,2)
+hold on
 plot(z,abs(T1T2profcorr(:,echoIndex)))
+plot(z,abs(CPprofiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',0.5,'color','k')
+plot(z,abs(T1T2profiles(:,1))/max(abs(CPprofiles(:,1))),'linewidth',0.5,'color','r')
 line([-sliceheight*500+sliceoffset*1000 -sliceheight*500+sliceoffset*1000],ylims,'Color','k')
 line([ sliceheight*500+sliceoffset*1000  sliceheight*500+sliceoffset*1000],ylims,'Color','k')
 xlim([min(z), max(z)]);
@@ -244,9 +253,9 @@ xlabel('effective recovery time [s])')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 242;
-firstinvertedind = 258;
-maxind = 277;
+minind= 240;
+firstinvertedind = 277;
+maxind = 305;
 
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
@@ -254,21 +263,21 @@ T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 for ii = 1:nEchoes-omitEchoes;
 %     [~,firstinvertedind] = min(abs(T1T2profcorr(minind:maxind,ii)));
 %     firstinvertedind = firstinvertedind+minind-1;
-    T1T2profiles2(1:firstinvertedind-minind+1,ii) = -(abs(T1T2profcorr(minind:firstinvertedind,ii)));
-    T1T2profiles2(firstinvertedind-minind+2:end,ii) = (abs(T1T2profcorr(firstinvertedind+1:maxind,ii)));
+    T1T2profiles2(1:firstinvertedind-minind+1,ii) = (abs(T1T2profcorr(minind:firstinvertedind,ii)));
+    T1T2profiles2(firstinvertedind-minind+2:end,ii) = -(abs(T1T2profcorr(firstinvertedind+1:maxind,ii)));
 end
 
 
 % T1T2data=T1T2profiles2;
 T1T2data=T1T2profiles2/max(max(abs(T1T2profiles2)));
-t1 = 1000*(linspace(RecoveryT(maxind),RecoveryT(minind),maxind-minind+1));
+t1 = 1000*(linspace(RecoveryT(minind),RecoveryT(maxind),maxind-minind+1));
 %plot first T1 column
 figure
 scatter(t1,T1T2data(:,1),'linewidth',2)
 xlabel('{\it t}_1 (ms)','fontsize',30)
 title('T1-T2, first T1 column')
 set(gca,'Fontsize',30,'linewidth',2)
-xlim([0 1000*Pchirp])
+% xlim([0 1000*Pchirp])
 ylim([-1.1 1.1])
 
 

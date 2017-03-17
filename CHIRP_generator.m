@@ -9,17 +9,19 @@ close all
 % tic
 
 
-dt = 200e-9;             % time per point in waveform (s) [Scout limit is 20ns]
+dt = 200e-7;             % time per point in waveform (s) [Scout limit is 20ns]
 tau = 250e-3;            % pulse length (s)
 sliceheight = 0.150;     % mm
 
 
 G = 6.59;               %T m-1, B0 field gradient [PM25 = 6.59]
                         %                         [PM5 = 23.87]
-offset = 0;             %mm, frequency offset (if applicable)
-amplitude = 2;         %pwr, for Tecmag
-% NOTE: positive offset moves to the left in the FT spectrum (negative
-% position)
+offset = -0.10;             %mm, frequency offset (if applicable)
+amplitude = 2;          %pwr, for Tecmag
+% Note: The offset is subtracted from the frequency so that a negative
+% offset increases the frequency, bringing the slice closer to the magnet.
+% This makes the spatial orientation consistent with the sign of the
+% offset--positive offset is up, negative offset is down.
 
 % frequency ramping for CHIRP
 LINramp = 1;
@@ -39,9 +41,9 @@ gamma = 42.576;                 %MHz T-1
 SW = sliceheight*G*gamma*1000;  %Hz
 % SW_s = SW*2*pi;               %rad s-1
 offsetHz = offset*1000*G*gamma; %Hz
-f0 = -SW/2;                     %initial frequency (Hz)
-% f0_s = -SW_s/2;               %initial frequency (s-1)
-    
+f0 = -SW/2 - offsetHz;          %initial frequency (Hz)
+fF = +SW/2 - offsetHz;          %final frequency (Hz)
+   
     
 % CALCULATION OF PHASE %
 
@@ -55,15 +57,7 @@ if LINramp == 1;
 %     phase_s = f0_s*t + SW_s/2/tau*t.^2;         %phase (rad)
 
 % numerical expressions
-    % WE FLIPPED F SHOULD BE LINSPACE(-SW/2,SW/2,N)!!!!!!!!!!!!!!!!!!!
-        % WE FLIPPED F SHOULD BE LINSPACE(-SW/2,SW/2,N)!!!!!!!!!!!!!!!!!!!
-            % WE FLIPPED F SHOULD BE LINSPACE(-SW/2,SW/2,N)!!!!!!!!!!!!!!!!!!!
-                % WE FLIPPED F SHOULD BE LINSPACE(-SW/2,SW/2,N)!!!!!!!!!!!!!!!!!!!
-    f = linspace(-SW/2,SW/2,N)-offsetHz;       % frequency (Hz, or cycles s-1)
-    % WE FLIPPED F SHOULD BE LINSPACE(-SW/2,SW/2,N)!!!!!!!!!!!!!!!!!!!
-        % WE FLIPPED F SHOULD BE LINSPACE(-SW/2,SW/2,N)!!!!!!!!!!!!!!!!!!!
-            % WE FLIPPED F SHOULD BE LINSPACE(-SW/2,SW/2,N)!!!!!!!!!!!!!!!!!!!
-                % WE FLIPPED F SHOULD BE LINSPACE(-SW/2,SW/2,N)!!!!!!!!!!!!!!!!!!!
+    f = linspace(f0,fF,N);            % frequency (Hz, or cycles s-1)
     f_s = f*360;                      % frequency (deg s-1)
     phase_s = cumsum(f_s)*dt;         % phase (deg) 
     phase_s360 = mod(phase_s,360);    % phase (deg, mod 360)

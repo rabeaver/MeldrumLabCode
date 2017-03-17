@@ -3,7 +3,7 @@ clc
 close all
 
 %%
-filename = 'P250_CPMG_3_8Mar2017.tnt'; %Input experiment file name
+filename = 'P250_CPMG_2_14Mar2017.tnt'; %Input experiment file name
 filedir = 'C:\CommonData\TKM\P250\'; %Copy file path
 fileloc = strcat(filedir,filename);
 
@@ -13,9 +13,9 @@ zf = 2; %zero filling... Don't touch
 
 tEcho = 250; %Echotime (us)
 nEchoes = 16; %Number of echoes
-nPts = 164; % Number of acquisition points
+nPts = 82; % Number of acquisition points
 nPtsBlank = 0; %Don't touch
-tD = 1e-6; %dwell time, (s)
+tD = 2e-6; %dwell time, (s)
 
 
 G = 6.59;                           % Gradient (T m-1)
