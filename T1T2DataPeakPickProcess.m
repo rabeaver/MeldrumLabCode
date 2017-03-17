@@ -4,9 +4,9 @@ close all
 
 %give file dir, file name (the *.out file from Prospa export2d), T2 and D limits (should be the same for Naproxed
 %stuff), and number of points in inverted data.
-datadir = 'C:\CommonData\JNK\Mortar\BrickInWater\UFT1T2\';
-datafile = 'BrickInWater_CHIRP_T1T2_22July2016.dat.out';
-T2lims = [1e-5 1e-1];
+datadir = '/Users/tyler/Dropbox/Data/WMO_2017/T1T2/M060.2015e/1/';
+datafile = '2DILT.out';
+T2lims = [1e-4 1e-2];
 T1lims = [1e-3 1e0];
 contourLevel = 0.50;
 
