@@ -3,20 +3,20 @@ clc
 close all
 
 %%
-datadir = 'C:\CommonData\ADF\Gouda\';
-datafile = 'TradGouda_CPMG_20Feb2017';
+datadir = 'C:\CommonData\Glycerol\';
+datafile = 'Glycerol_T2Dtrad_fromnoChirp_3_29Mar2017';
 
 
 nPts = 82;                          % # of acqu points
 omitPts = 0;                        % the number of points that are zeros from the spectrometer
-nEchoes = 1024;                      % Echoes
+nEchoes = 256;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
 tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
 tE = 250;                           % us
-deltaMin = 12e-6;                  % s
-deltaMax = 3500e-6;                 % s
-lin = 0;                            % 1 if delta is linearly spaced, 0 if log spaced
-DELTA = 3e-3;                      % s
+deltaMin = 0.1e-6;                  % s
+deltaMax = 3497e-6;                 % s
+lin = 1;                            % 1 if delta is linearly spaced, 0 if log spaced
+DELTA = 10e-3;                      % s
 noisePoints = 5;                   % number of points for measuring noise
 noiseNumber = 1;                    % scan number to use for determining SNR
 G = 6.59;                           % T m-1, B0 field gradient
@@ -50,7 +50,7 @@ echoVec = tE*(omitEchoes+1):tE:(nEchoes*tE);
 data = sum(real(T2Ddat),2);
 % data = max(real(T2Ddat),[],2);
 data = reshape(data,ap.td(2),(nEchoes-omitEchoes));
-data = abs(data);
+data = real(data);
 
 dataY = zeros(ap.td(2),nEchoes-omitEchoes);
 
@@ -82,7 +82,7 @@ SNR_perRtScans = SNR/sqrt(ap.td(2)*ap.ns)
 
 figure(2)
 hold on
-surf(echoVec/1000,vIndex',data)
+surf(echoVec/1000,deltaVec*1000,data./max(max(data)))
 shading flat
 xlabel('T2 [ms]')
 ylabel('delta [ms]')

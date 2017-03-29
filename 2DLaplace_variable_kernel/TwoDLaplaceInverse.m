@@ -601,7 +601,7 @@ if d2 == 1
     surf(timea, timeb, data)
     va = timea; 
     vb = timeb;
-    axis([va(1),va(sda),vb(1),vb(sdb)]);
+%     axis([min(va),max(va),min(vb),max(vb)]);
 	 shading flat;
     if nfig == 1
        colorbar;            
@@ -609,7 +609,7 @@ if d2 == 1
 end
 if d1 == 1
     plot(timea,data)
-    axis([timea(1),timea(sda),0,max(data)]); %modified
+    axis([timea(1),timea(sda),min(timeb),max(timeb)]); %modified
 end
 
 % --------------------------------------------------------------------
@@ -1019,7 +1019,7 @@ cd(pwd1);
 axes(handles.axes2);
 if d2 == 1
     surf(taulh,taulv,spectrum)
-	 if get(handles.checkbox9,'value')==0
+	 if get(handles.checkbox9,'value')==0 %[boolean colors]
 		 caxis('auto');
 	 else
 		 caxis([0 1]);
@@ -1027,6 +1027,22 @@ if d2 == 1
     shading interp;
 %     %set(gcf,'Renderer','zbuffer');
     axis([taulh(1),taulh(sta(2)),taulv(1),taulv(stb(2))]);
+    xmarks=(taulh(1):1:taulh(sta(2)));
+    ymarks=(taulv(1):1:taulv(stb(2)));
+
+    for aa = 0:range(xmarks)-2
+        line([xmarks(aa+2) xmarks(aa+2)],[min(ymarks) max(ymarks)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
+    end
+    
+    for aa = 0:range(ymarks)-2
+        line([min(xmarks) max(xmarks)],[ymarks(aa+2) ymarks(aa+2)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
+    end
+%     [~,I] = max(spectrum);
+%     [D,J] = max(I);
+%     hold on
+%     plot3((taulh(D)+taulh(D+1))/2,(taulv(J)+taulv(J+1))/2,max(max(spectrum)),'or','MarkerFaceColor','red');
+%     hold off
+%     
 elseif d1 == 1
     plot(taulh,spectrum)
     xlim([taulh(1),taulh(sta(2))]);
@@ -1132,8 +1148,9 @@ if nfig == 1 && d2 == 1
     fig=figure;
     axes('FontSize',12);
 %     %set(gcf,'Renderer','zbuffer');
-    set(fig,'DoubleBuffer','on');
+%     set(fig,'DoubleBuffer','on');
     set(gca,'NextPlot','replace','Visible','off')
+    set(gca,'TickLabelInterpreter', 'latex');
     surf(taulh,taulv',spectrum);
 	 if get(handles.checkbox9,'value')==0
 		 caxis('auto');
@@ -1142,24 +1159,42 @@ if nfig == 1 && d2 == 1
 	 end
     shading interp;
     axis([taulh(1),taulh(sta(2)),taulv(1),taulv(stb(2))]);
-    colorbar;
+    xmarks=(taulh(1):1:taulh(sta(2)));
+    ymarks=(taulv(1):1:taulv(stb(2)));
+
+    for aa = 0:range(xmarks)-2
+        line([xmarks(aa+2) xmarks(aa+2)],[min(ymarks) max(ymarks)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
+    end
+    
+    for aa = 0:range(ymarks)-2
+        line([min(xmarks) max(xmarks)],[ymarks(aa+2) ymarks(aa+2)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
+    end
+    
+%     [~,I] = max(spectrum);
+%     [D,J] = max(I);
+%     hold on
+%     plot3((taulh(J)+taulh(J+1))/2,(taulv(D)+taulv(D+1))/2,max(max(spectrum)),'or','MarkerFaceColor','red');
+%     hold off
+    
     if hr == 1
-        xlabel('Log_{10}(T) [s]','FontSize',14);
+        xlabel('$\log {\it{T}_2/\textrm{s}}$','FontSize',14,'interpreter','latex');
     elseif hd == 1
-        xlabel('Log_{10}(D) [10^{-9} m^2/s]','FontSize',14);
+        xlabel('$\log {\it{D}/   10^{-9} \textrm{m}^2 \textrm{s}^{-1}}$','FontSize',14,'interpreter','latex');
     end
     if vr == 1 
-        ylabel('Log_{10}(T) [s]','FontSize',14);
+        ylabel('$\log {\it{T}_2/ \textrm{s}}$','FontSize',14,'interpreter','latex');
     elseif vd == 1
-        ylabel('Log_{10}(D) [10^{-9} m^2/s]','FontSize',14);
+        ylabel('$\log {\it{D}/  10^{-9} \textrm{m}^2 \textrm{s}^{-1}}$','FontSize',14,'interpreter','latex');
     end
     if hd == 1 && vd == 1
         title('D-D correlation','FontSize',16);
     elseif hr == 1 && vr == 1
-        title('T-T correlation','FontSize',16);
+        title('$\it{T}_2-\it{T}_2$ correlation','FontSize',16,'interpreter','latex');
     else
-        title('D-T correlation','FontSize',16);
+        title('$\it{D}-\it{T}_2$ correlation','FontSize',16,'interpreter','latex');
     end
+pubgraph(fig,16,2,'w','mwa_cmr10')
+
 end
 
 if nfig == 1 && d1 == 1
