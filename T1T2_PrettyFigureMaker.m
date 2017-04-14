@@ -2,8 +2,8 @@ clear
 clc
 close all
 
-filedir = '/Users/tyler/Dropbox/Data/CHIRP/Dec2015/ConcentricSamples_01Dec2015/';
-filename = 'Double_CHIRP_1024_250PCD_08Dec2015_result';
+filedir = '/Users/tyler/Dropbox/Data/WMO_2017/T1T2/M060.2015e/1/';
+filename = '2DILT';
 data = load(strcat(filedir,'out files/ ',filename,'.out'));
 lowlim = 1e-4;
 hilim = 1e-1;
@@ -35,4 +35,4 @@ set(gcf,'PaperPosition',[0 0 5 5]);
 set(gcf,'PaperPositionMode','Manual');
 
 % print(gcf, '-depsc2',  strcat(filedir, 'figures/', filename,'.eps'));
-print(gcf, '-dtiff', '-r300', strcat(filedir, 'figures/', filename,'.tif'));
+% print(gcf, '-dtiff', '-r300', strcat(filedir, 'figures/', filename,'.tif'));
