@@ -3,15 +3,15 @@ clc
 close all
 
 %%
-filename = 'copperwaterecho200CPMG.tnt';
-filedir = 'C:\CommonData\MTR\';
+filename = 'Gouda_CPMG_2_05Apr2017';
+filedir = 'C:\CommonData\TKM\Gouda\';
 fileloc = strcat(filedir,filename);
 
-[ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
+[ap,spec,spec2,spec3,spec4] = readTecmag4d(strcat(fileloc,'.tnt'));
 
-tEcho = 200; %us
-nEchoes = 64;
-nPts = 54;
+tEcho = 250; %us
+nEchoes = 512;
+nPts = 78;
 nPtsBlank = 0;
 
 %% SNR calc
@@ -53,3 +53,16 @@ plot(echoVector,ypred,'-r');
 xlabel('time[s]');
 ylabel('intensity');
 set(gca, 'Fontsize',18,'linewidth',2);
+
+figure(3)
+plot(echoVector,log10(dataIntRe));
+xlabel('time[s]');
+ylabel('log intensity');
+set(gca, 'Fontsize',18,'linewidth',2);
+
+%% For ILT
+dataOut = dataIntRe';
+echoOut = echoVector';
+
+save(strcat(filedir,filename,'.dat'), 'dataOut', '-ascii')
+save(strcat(filedir,filename,'_T2axis.dat'),'echoOut','-ascii')

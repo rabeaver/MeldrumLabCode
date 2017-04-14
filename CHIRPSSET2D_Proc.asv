@@ -425,29 +425,14 @@ save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
 
 
 %%
-omitEchoesT2D = 16;
-omitDT2D = 5;
-hlims = [0.001 1];
-vlims = [0.001 1];
-hsteps = 20;
-vsteps = 20;
-alpha = 1e7;
-
-t2proc = t2axis(1+omitEchoesT2D:end)';
-vproc = vIndex(1+omitDT2D:end)';
-dataProc = T2Ddat(1+omitDT2D:end,1+omitEchoesT2D:end);
-
-[spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(dataProc,t2proc,vproc,hlims,hsteps,vlims,vsteps,alpha,-1,'b','exp(-h/T)','exp(-v*D)');
-
-taulh = log10(tauh);
-taulv = log10(tauv);
+[spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(T2Ddat,t2axis',vIndex',[min(t2axis) max(t2axis)],15,[min(vIndex) max(vIndex)],15,1e7,-1,'b','exp(-h/T)','exp(-v*D)');
 
 hh = figure(10);
-surf(taulh,taulv,spectrum)
+surf(log10(tauh),log10(tauv),spectrum)
 shading interp;
-axis([taulh(1),taulh(end),taulv(1),taulv(end)]);
-xmarks=(taulh(1):1:taulh(end));
-ymarks=(taulv(1):1:taulv(end));
+%     axis([log10(tauh,1),log10(taulh(sta(2)),taulv(1),taulv(stb(2))]);
+xmarks=(min(log10(tauh,1):1:max(log10(tauh)));
+ymarks=(log10(tauv,1):1:max(log10(tauv)));
 
 for aa = 0:range(xmarks)-2
     line([xmarks(aa+2) xmarks(aa+2)],[min(ymarks) max(ymarks)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
@@ -456,9 +441,3 @@ end
 for aa = 0:range(ymarks)-2
     line([min(xmarks) max(xmarks)],[ymarks(aa+2) ymarks(aa+2)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
 end
-
-
-xlabel('$\log {\it{T}_2/\textrm{s}}$','FontSize',14,'interpreter','latex');
-ylabel('$\log {\it{D}/  10^{-9} \textrm{m}^2 \textrm{s}^{-1}}$','FontSize',14,'interpreter','latex');
-title('$\it{D}-\it{T}_2$ correlation','FontSize',16,'interpreter','latex');
-pubgraph(hh,16,2,'w','mwa_cmr10')

@@ -1151,7 +1151,9 @@ if nfig == 1 && d2 == 1
 %     set(fig,'DoubleBuffer','on');
     set(gca,'NextPlot','replace','Visible','off')
     set(gca,'TickLabelInterpreter', 'latex');
-    surf(taulh,taulv',spectrum);
+    contourf(taulh,taulv',spectrum,12);
+    colormap(flipud(hot));
+%     grid on;
 	 if get(handles.checkbox9,'value')==0
 		 caxis('auto');
 	 else
@@ -1163,11 +1165,11 @@ if nfig == 1 && d2 == 1
     ymarks=(taulv(1):1:taulv(stb(2)));
 
     for aa = 0:range(xmarks)-2
-        line([xmarks(aa+2) xmarks(aa+2)],[min(ymarks) max(ymarks)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
+        line([xmarks(aa+2) xmarks(aa+2)],[min(ymarks) max(ymarks)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','r');
     end
     
     for aa = 0:range(ymarks)-2
-        line([min(xmarks) max(xmarks)],[ymarks(aa+2) ymarks(aa+2)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
+        line([min(xmarks) max(xmarks)],[ymarks(aa+2) ymarks(aa+2)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','r');
     end
     
 %     [~,I] = max(spectrum);

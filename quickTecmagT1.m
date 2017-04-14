@@ -4,16 +4,16 @@ close all
 
 %%
 
-filename = 'P250_BURP_T1IR_6Mar2017.tnt';
-filedir = 'C:\CommonData\TKM\';
+filename = 'Gouda_T1IR_BURP_1_05Apr2017.tnt';
+filedir = 'C:\CommonData\TKM\Gouda\';
 
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
 tEcho = 250; %us
 
-nEchoes = 16;
-nPts = 164;
+nEchoes = 512;
+nPts = 78;
 nPtsBlank = 0;
 nT1Pts = 15
 T1min = 0.05; %ms

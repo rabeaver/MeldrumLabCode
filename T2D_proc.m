@@ -3,21 +3,21 @@ clc
 close all
 
 %%
-datadir = 'C:\CommonData\Glycerol\';
-datafile = 'Glycerol_T2Dtrad_fromnoChirp_3_29Mar2017';
+datadir = 'C:\CommonData\TKM\Gouda\';
+datafile = 'Gouda_RCT2Dtrad_1_13Apr2017';
 
 
-nPts = 82;                          % # of acqu points
+nPts = 36;                          % # of acqu points
 omitPts = 0;                        % the number of points that are zeros from the spectrometer
-nEchoes = 256;                      % Echoes
+nEchoes = 512;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 2e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 250;                           % us
+tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 302;                           % us
 deltaMin = 0.1e-6;                  % s
-deltaMax = 3497e-6;                 % s
+deltaMax = 3448e-6;                 % s
 lin = 1;                            % 1 if delta is linearly spaced, 0 if log spaced
-DELTA = 10e-3;                      % s
-noisePoints = 5;                   % number of points for measuring noise
+DELTA = 1e-3;                      % s
+noisePoints = 2;                   % number of points for measuring noise
 noiseNumber = 1;                    % scan number to use for determining SNR
 G = 6.59;                           % T m-1, B0 field gradient
 
