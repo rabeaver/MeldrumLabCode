@@ -289,8 +289,8 @@ ylim(ylimits)
 xlabel('z (um)')
 %% Data Range and Inversion
 
-minind = 81; %min(ptIndex);
-maxind = 170; %max(ptIndex); 
+minind = 66; %min(ptIndex);
+maxind = 81; %max(ptIndex); 
 
 % Calculate other axes
 BigIndex = 1:NFFT;
@@ -354,7 +354,7 @@ t2axis = t2axis';
 vIndex = rot90(vIndex,2)';
 
 
-T2Ddat = flipud((T2Ddat));
+T2Ddat = ((T2Ddat));
 
 save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
 save(strcat(datadir,datafile, '_T2axis.dat'), 't2axis', '-ascii')
@@ -429,8 +429,8 @@ omitEchoesT2D = 16;
 omitDT2D = 5;
 hlims = [0.001 1];
 vlims = [0.001 1];
-hsteps = 20;
-vsteps = 20;
+hsteps = 15;
+vsteps = 15;
 alpha = 1e7;
 
 t2proc = t2axis(1+omitEchoesT2D:end)';
