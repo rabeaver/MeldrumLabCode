@@ -13,30 +13,30 @@ close all
 
 spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
 datadir = 'C:\CommonData\TKM\Gouda\';
-datafile = 'Gouda_CHIRP_2_13Apr2017_result'; %\1\data'; 
-noCHIRPfile = 'Gouda_noCHIRP_1_13Apr2017_result'; %\1\data'; 
+datafile = 'CHIRP_2_08May2017_result'; %\1\data'; 
+noCHIRPfile = 'noCHIRP_2_08May2017_result'; %\1\data'; 
 
 
-Pchirp = 1727e-6;                  % CHIRP Pulse Length (s)
+Pchirp = 977e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
 sliceheight = 0.300;                % mm
 
 rampPct = 0.0;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 36;                          % # of acqu points
+nPts = 72;                          % # of acqu points
 
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
-nEchoes = 512;                      % Echoes
+nEchoes = 256;                      % Echoes
 omitEchoes = 0;                     % number of echoes to remove from data
-echoChoice = 2;                     %the echo to use for display purposes
+echoChoice = 16;                     %the echo to use for display purposes
 
-tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 302-6;                           % us
+tD = 4e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 398-6;                           % us
 preCHIRPdelay = 20e-6;             % s
 noisePoints = 2;                    % number of points for measuring noise
 
-nScans = 32768;                     % Number of scans in the experiment
+nScans = 16384;                     % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
@@ -46,8 +46,8 @@ apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodizatio
 
 
-delta = 3.5e-3;                       % little delta time (s)
-DELTA = 1e-3;                       % Big delta time in s
+delta = 2e-3;                       % little delta time (s)
+DELTA = 20e-3;                       % Big delta time in s
 
 
 % ===================================
@@ -184,8 +184,8 @@ view([0 90])
 
 hh = figure(5);
 hold on
-plot(z,abs(CPprofiles(:,echoChoice))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','k')
-plot(z,abs(T2Dprofiles(:,echoChoice))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','r')
+plot(z,abs(CPprofiles(:,echoChoice))/max(abs(CPprofiles(:,echoChoice))),'linewidth',2,'color','k')
+plot(z,abs(T2Dprofiles(:,echoChoice))/max(abs(CPprofiles(:,echoChoice))),'linewidth',2,'color','r')
 line([-sliceheight*1e3/2 -sliceheight*1e3/2],[0 2])
 line([sliceheight*1e3/2 1e3*sliceheight/2],[0 2])
 ylim([0 1.2])
@@ -243,17 +243,22 @@ deltaFig = 2*Pchirp*(BWchirp/2-f)/BWchirp + deltaMin; % expression for delta(eff
 wurstAmp = 1-(cos(pi*(t1_fig7)/Pchirp)).^40;
 
 
-ylimits = [0 2];
+ylimits = [0 1];
 deltaEff = 2*t1_fig7 ;
 % deltaEff = delta - t1_fig7 - preCHIRPdelay;
 deltaEff = fliplr(deltaEff);
 
 figure(8)
 subplot(4,1,1)
-plot(abs(T2Dprofcorr(:,echoChoice)))
+hold on
+for iii = 1:2*echoChoice+8;
+    plot(abs(T2Dprofcorr(:,iii)),':k','LineWidth',0.25)
+end
+plot(abs(T2Dprofcorr(:,echoChoice)),'-r','LineWidth',2)
 xlim([0 NFFT])
 ylim(ylimits)
 xlabel('index')
+hold off
 % 
 subplot(4,1,2)
 hold on
@@ -289,8 +294,8 @@ ylim(ylimits)
 xlabel('z (um)')
 %% Data Range and Inversion
 
-minind = 66; %min(ptIndex);
-maxind = 81; %max(ptIndex); 
+minind = 205; %min(ptIndex);
+maxind = 325; %max(ptIndex); 
 
 % Calculate other axes
 BigIndex = 1:NFFT;
@@ -307,6 +312,7 @@ fIndex = zBigIndex(min(ptIndex):max(ptIndex)) * gamma*1e6 * G;
 deltaEffIndex = (1-(((BWchirp/2)-fIndex)/BWchirp))*2*Pchirp*1000;
 qIndex = 2*pi*gamma*1e6*G*deltaEffIndex/1000;
 vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
+vIndex_RC = (1/6)*(2*pi*gamma*1e6*G)^2.*(delta^3 - 3*delta^2*deltaEffIndex/2000 + 3*(deltaEffIndex/2000).^2*delta + 6*(deltaEffIndex/2000).^2*DELTA + 3*(deltaEffIndex/2000).^3)*1e-9;
 T2Ddat = abs(T2Dprofcorr(minind:maxind,:)); %crops data set according to above indices
 
 
@@ -334,7 +340,7 @@ D = p(1)*1e-9 ;        % *10-9 m^2 s^-1
 
 figure(10)
 % surf(echoVec/1000,deltaSteps*1e6,T2Ddat);
-surf(echoVec/1000,deltaEffIndex(1:end-5),T2Ddat(1:end-5,:));
+surf(echoVec/1000,deltaEffIndex,T2Ddat);
 shading flat
 colormap('jet');
 colorbar 
@@ -347,19 +353,20 @@ title('D-T2 data')
 
 t2axis = echoVec; %s
 % vaxis = gammaRad^2*G^2.*deltaSteps.^2.*((DELTA+delta) - (1/3)*deltaSteps); %s/m2
-t2axis = t2axis';
+t2axis = 1e-6*t2axis';
 
 % vaxis = [1.15, 1.39, 1.66, 1.94, 2.25, 2.58, 2.92, 3.29, 3.67, 4.08, 4.5, 4.93, 5.39, 5.86, 6.34]*1e7/1e9;
 
 vIndex = rot90(vIndex,2)';
+vIndex_RC = rot90(vIndex_RC,2)';
 
 
-T2Ddat = ((T2Ddat));
+T2Ddat = flipud(T2Ddat);
 
 save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
 save(strcat(datadir,datafile, '_T2axis.dat'), 't2axis', '-ascii')
 save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
-
+save(strcat(datadir,datafile, '_vaxisRC.dat'), 'vIndex_RC', '-ascii')
 % %%
 % 
 % 
@@ -425,40 +432,82 @@ save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
 
 
 %%
-omitEchoesT2D = 16;
-omitDT2D = 5;
-hlims = [0.001 1];
-vlims = [0.001 1];
-hsteps = 15;
-vsteps = 15;
-alpha = 1e7;
+% omitEchoesT2D = 16;
+% omitDT2D = 5;
+% hlims = [0.001 1];
+% vlims = [0.001 1];
+% hsteps = 15;
+% vsteps = 15;
+% alpha = 1e7;
+% 
+% t2proc = t2axis(1+omitEchoesT2D:end)';
+% vproc = vIndex(1+omitDT2D:end)';
+% dataProc = T2Ddat(1+omitDT2D:end,1+omitEchoesT2D:end);
+% 
+% [spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(dataProc,t2proc,vproc,hlims,hsteps,vlims,vsteps,alpha,-1,'b','exp(-h/T)','exp(-v*D)');
+% 
+% taulh = log10(tauh);
+% taulv = log10(tauv);
+% 
+% hh = figure(10);
+% surf(taulh,taulv,spectrum)
+% shading interp;
+% axis([taulh(1),taulh(end),taulv(1),taulv(end)]);
+% xmarks=(taulh(1):1:taulh(end));
+% ymarks=(taulv(1):1:taulv(end));
+% 
+% for aa = 0:range(xmarks)-2
+%     line([xmarks(aa+2) xmarks(aa+2)],[min(ymarks) max(ymarks)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
+% end
+% 
+% for aa = 0:range(ymarks)-2
+%     line([min(xmarks) max(xmarks)],[ymarks(aa+2) ymarks(aa+2)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
+% end
+% 
+% 
+% xlabel('$\log {\it{T}_2/\textrm{s}}$','FontSize',14,'interpreter','latex');
+% ylabel('$\log {\it{D}/  10^{-9} \textrm{m}^2 \textrm{s}^{-1}}$','FontSize',14,'interpreter','latex');
+% title('$\it{D}-\it{T}_2$ correlation','FontSize',16,'interpreter','latex');
+% pubgraph(hh,16,2,'w','mwa_cmr10')
 
-t2proc = t2axis(1+omitEchoesT2D:end)';
-vproc = vIndex(1+omitDT2D:end)';
-dataProc = T2Ddat(1+omitDT2D:end,1+omitEchoesT2D:end);
+%% Recreate the data for a two-component system
 
-[spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(dataProc,t2proc,vproc,hlims,hsteps,vlims,vsteps,alpha,-1,'b','exp(-h/T)','exp(-v*D)');
 
-taulh = log10(tauh);
-taulv = log10(tauv);
 
-hh = figure(10);
-surf(taulh,taulv,spectrum)
-shading interp;
-axis([taulh(1),taulh(end),taulv(1),taulv(end)]);
-xmarks=(taulh(1):1:taulh(end));
-ymarks=(taulv(1):1:taulv(end));
+D1 = 1.53411; %x10-9 m2/s
+T21 = 0.0852742; %s
+A1 = 0.97;
 
-for aa = 0:range(xmarks)-2
-    line([xmarks(aa+2) xmarks(aa+2)],[min(ymarks) max(ymarks)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
+D2 = 0.121306; %%x10-9 m2/s
+T22 = 0.0283681; %s
+
+
+dStart = exp((-A1*D1 + -(1-A1)*D2)*vIndex_RC);
+T2decay = exp(-(A1*t2axis/T21 + (1-A1)*t2axis/T22));
+for ii = 1:length(dStart)
+    SS(ii,:) = dStart(ii)*T2decay;
 end
-
-for aa = 0:range(ymarks)-2
-    line([min(xmarks) max(xmarks)],[ymarks(aa+2) ymarks(aa+2)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
-end
+SS = SS/max(max(SS));
 
 
-xlabel('$\log {\it{T}_2/\textrm{s}}$','FontSize',14,'interpreter','latex');
-ylabel('$\log {\it{D}/  10^{-9} \textrm{m}^2 \textrm{s}^{-1}}$','FontSize',14,'interpreter','latex');
-title('$\it{D}-\it{T}_2$ correlation','FontSize',16,'interpreter','latex');
-pubgraph(hh,16,2,'w','mwa_cmr10')
+zrange = [0 1];
+yrange = [min(vIndex_RC) max(vIndex_RC)];
+xrange = [min(t2axis) max(t2axis)];
+
+figure(11)
+ax1 = subplot(2,2,1);
+surf(t2axis,vIndex_RC,SS)
+xlim(xrange); ylim(yrange); zlim(zrange);
+shading flat
+ax2 = subplot(2,2,2);
+surf(t2axis,vIndex_RC,T2Ddat);
+xlim(xrange); ylim(yrange); zlim(zrange);
+shading flat
+ax3 = subplot(2,2,3);
+surf(t2axis,vIndex_RC,SS-T2Ddat);
+xlim(xrange); ylim(yrange); zlim([-1 1]);
+shading flat
+
+hlink = linkprop([ax1,ax2,ax3],{'CameraPosition','CameraUpVector'}); 
+rotate3d on
+

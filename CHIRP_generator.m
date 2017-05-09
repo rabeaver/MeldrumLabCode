@@ -10,14 +10,14 @@ close all
 
 
 dt = 200e-9;             % time per point in waveform (s) [Scout limit is 20ns]
-tau = 1.727e-3;            % pulse length (s)
+tau = 0.977e-3;            % pulse length (s)
 sliceheight = 0.300;     % mm
 
 
 G = 6.59;               %T m-1, B0 field gradient [PM25 = 6.59]
                         %                         [PM5 = 23.87]
 offset = 0;             %mm, frequency offset (if applicable)
-amplitude = 30;          %pwr, for Tecmag
+amplitude = 20;          %pwr, for Tecmag
 % Note: The offset is subtracted from the frequency so that a negative
 % offset increases the frequency, bringing the slice closer to the magnet.
 % This makes the spatial orientation consistent with the sign of the

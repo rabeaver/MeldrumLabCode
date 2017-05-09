@@ -4,19 +4,20 @@ close all
 
 %%
 datadir = 'C:\CommonData\TKM\Gouda\';
-datafile = 'Gouda_RCT2Dtrad_1_13Apr2017';
+datafile = 'RCT2Dtrad_1_08Apr2017';
 
 
-nPts = 36;                          % # of acqu points
+nPts = 72;                          % # of acqu points
 omitPts = 0;                        % the number of points that are zeros from the spectrometer
-nEchoes = 512;                      % Echoes
+nEchoes = 256;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 302;                           % us
+tD = 4e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 398;                           % us
 deltaMin = 0.1e-6;                  % s
-deltaMax = 3448e-6;                 % s
+deltaMax = 1988e-6;                 % s
 lin = 1;                            % 1 if delta is linearly spaced, 0 if log spaced
-DELTA = 1e-3;                      % s
+delta = 2e-3;                     % s
+DELTA = 20e-3;                      % s
 noisePoints = 2;                   % number of points for measuring noise
 noiseNumber = 1;                    % scan number to use for determining SNR
 G = 6.59;                           % T m-1, B0 field gradient
@@ -43,6 +44,8 @@ end
 BigDELTA = DELTA + deltaVec;
 qIndex = 2*pi*gamma*1e6*G*deltaVec;
 vIndex = (qIndex.^2.*(BigDELTA-deltaVec./3).*1e-9)';
+vIndex_RC = (1/6)*(gammaRad*G)^2.*(delta^3 - 3*delta^2*deltaVec/2 + 3*(deltaVec/2).^2*delta + 6*(deltaVec/2).^2*DELTA + 3*(deltaVec/2).^3)*1e-9;
+vIndex_RC = vIndex_RC';
 % xD = -gammaRad^2*G^2.*deltaVec.^2.*(DELTA+2*deltaVec/3)*1e-9;
 
 echoVec = tE*(omitEchoes+1):tE:(nEchoes*tE);
@@ -95,6 +98,7 @@ t2axis = echoVec'*1e-6; %s
 save(strcat(datadir,datafile, '.dat'), 'data', '-ascii')
 save(strcat(datadir,datafile, '_T2axis.dat'), 't2axis', '-ascii')
 save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
+save(strcat(datadir,datafile, '_vaxisRC.dat'), 'vIndex_RC', '-ascii')
 
 %UF Points [Min, Max; min(echoVec), max(echoVec), delta(eff)(min) [us], delta(eff)(max) [us], #echoes, #D points]
 % sprintf('%f; %d %d %d; %.0f %.0f %.0f %.0f; %d %d',SNR, minind, maxind, firstinvertedind,  min(echoVec), max(echoVec), 1e6*min(t1), 1e6*max(t1), size(T1T2data,2), size(T1T2data,1))

@@ -3,15 +3,15 @@ clc
 close all
 
 %%
-filename = 'Gouda_CPMG_2_05Apr2017';
-filedir = 'C:\CommonData\TKM\Gouda\';
+filename = 'CPMG_1_4May2017';
+filedir = 'C:\CommonData\TKM\Cream\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(strcat(fileloc,'.tnt'));
 
-tEcho = 250; %us
-nEchoes = 512;
-nPts = 78;
+tEcho = 302; %us
+nEchoes = 1024;
+nPts = 54;
 nPtsBlank = 0;
 
 %% SNR calc
