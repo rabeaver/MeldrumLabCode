@@ -3,14 +3,14 @@ clc
 close all
 
 %%
-filename = 'CPMG_1_4May2017';
-filedir = 'C:\CommonData\TKM\Cream\';
+filename = 'GlycerolLarge_CPMG_11Apr2016_1';
+filedir = 'C:\CommonData\Glycerol\';
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(strcat(fileloc,'.tnt'));
 
-tEcho = 302; %us
-nEchoes = 1024;
+tEcho = 400; %us
+nEchoes = 256;
 nPts = 54;
 nPtsBlank = 0;
 

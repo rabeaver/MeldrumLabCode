@@ -3,8 +3,8 @@ clc
 close all
 
 %%
-filename = 'P250_CPMG_2_14Mar2017.tnt'; %Input experiment file name
-filedir = 'C:\CommonData\TKM\P250\'; %Copy file path
+filename = 'Cheddar_CPMG_21JUN2017_result.tnt'; %Input experiment file name
+filedir = 'C:\CommonData\ADF\Cheddar\'; %Copy file path
 fileloc = strcat(filedir,filename);
 
 [ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
@@ -12,8 +12,8 @@ fileloc = strcat(filedir,filename);
 zf = 2; %zero filling... Don't touch
 
 tEcho = 250; %Echotime (us)
-nEchoes = 16; %Number of echoes
-nPts = 82; % Number of acquisition points
+nEchoes = 512; %Number of echoes
+nPts = 78; % Number of acquisition points
 nPtsBlank = 0; %Don't touch
 tD = 2e-6; %dwell time, (s)
 

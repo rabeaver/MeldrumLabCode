@@ -3,21 +3,21 @@ clc
 close all
 
 %%
-datadir = 'C:\CommonData\TKM\Gouda\';
-datafile = 'RCT2Dtrad_1_08Apr2017';
+datadir = 'C:\CommonDataTKM\pH2\MeOH\';
+datafile = 'CPMG_1_16June2017';
 
 
-nPts = 72;                          % # of acqu points
+nPts = 78;                          % # of acqu points
 omitPts = 0;                        % the number of points that are zeros from the spectrometer
-nEchoes = 256;                      % Echoes
+nEchoes = 512;                      % Echoes
 omitEchoes = 0;                     % numner of echoes to remove from data
-tD = 4e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 398;                           % us
-deltaMin = 0.1e-6;                  % s
-deltaMax = 1988e-6;                 % s
+tD = 1e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 250;                           % us
+deltaMin = 40e-6;                  % s
+deltaMax = 2659e-6;                 % s
 lin = 1;                            % 1 if delta is linearly spaced, 0 if log spaced
-delta = 2e-3;                     % s
-DELTA = 20e-3;                      % s
+delta = 4e-3;                     % s
+DELTA = 25e-3;                      % s
 noisePoints = 2;                   % number of points for measuring noise
 noiseNumber = 1;                    % scan number to use for determining SNR
 G = 6.59;                           % T m-1, B0 field gradient
@@ -89,6 +89,16 @@ surf(echoVec/1000,deltaVec*1000,data./max(max(data)))
 shading flat
 xlabel('T2 [ms]')
 ylabel('delta [ms]')
+if lin==0
+    set(gca,'YScale','log')
+end
+
+figure(3)
+hold on
+surf(echoVec/1000,vIndex_RC,data./max(max(data)))
+shading flat
+xlabel('T2 [ms]')
+ylabel('v [s m-2]')
 if lin==0
     set(gca,'YScale','log')
 end
