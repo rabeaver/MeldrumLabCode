@@ -12,31 +12,31 @@ close all
 
 
 spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
-datadir = 'C:\CommonData\TKM\Gouda\';
-datafile = 'CHIRP_2_08May2017_result'; %\1\data'; 
-noCHIRPfile = 'noCHIRP_2_08May2017_result'; %\1\data'; 
+datadir = '/Users/tyler/Desktop/UFT2DUpdate_6Dec2016/CuH2O/CHIRPexp/';
+datafile = 'Cu_H2O_CHIRPSSE_500usDELTA_500usdelta_24June2016'; %\1\data'; 
+noCHIRPfile = 'Cu_H2O_noCHIRPSSE_400usDELTA_24June2016'; %\1\data'; 
 
 
-Pchirp = 977e-6;                  % CHIRP Pulse Length (s)
+Pchirp = 246.8e-6;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
-sliceheight = 0.300;                % mm
+sliceheight = 0.200;                % mm
 
 rampPct = 0.0;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 72;                          % # of acqu points
+nPts = 54;                          % # of acqu points
 
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
-nEchoes = 256;                      % Echoes
+nEchoes = 64;                      % Echoes
 omitEchoes = 0;                     % number of echoes to remove from data
 echoChoice = 16;                     %the echo to use for display purposes
 
-tD = 4e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 398-6;                           % us
+tD = 6e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
+tE = 400-6;                           % us
 preCHIRPdelay = 20e-6;             % s
 noisePoints = 2;                    % number of points for measuring noise
 
-nScans = 16384;                     % Number of scans in the experiment
+nScans = 1024;                     % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
                                     %use only if nPts for CHIRP on and CHIRP off expts don't match
 
@@ -46,8 +46,8 @@ apodize = 0;                        % Gaussian apodization on (1) or off (0)?
 apofac = 5;                         % Amount of Apodizatio
 
 
-delta = 2e-3;                       % little delta time (s)
-DELTA = 20e-3;                       % Big delta time in s
+delta = 0.5e-3;                       % little delta time (s)
+DELTA = 0.5e-3;                       % Big delta time in s
 
 
 % ===================================
@@ -294,8 +294,8 @@ ylim(ylimits)
 xlabel('z (um)')
 %% Data Range and Inversion
 
-minind = 205; %min(ptIndex);
-maxind = 325; %max(ptIndex); 
+minind = 94; %min(ptIndex);
+maxind = 164; %max(ptIndex); 
 
 % Calculate other axes
 BigIndex = 1:NFFT;
