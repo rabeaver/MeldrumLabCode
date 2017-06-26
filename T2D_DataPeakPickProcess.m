@@ -7,12 +7,12 @@ close all
 %stuff), and number of points in inverted data.
 
 
-datadir = 'Z:\Data\JNK\UFT2DUpdate_6Dec2016\Glycerol\Tradexp\';
-datafile = 'Glycerol_STE_5Dec2016_LongerDELTA.dat.out';
-T2lims = [1e-4 1e0];
-Dlims = [1e-13 1e-9];
+datadir = 'C:\CommonData\TKM\Gouda\';
+datafile = 'CHIRP_4_10May2017_result.dat.out';
+T2lims = [1e-3 1e0];
+Dlims = [1e-11 1e-8];
 
-contourLevel = 0.50;
+contourLevel = 0.80;
 
 %load the data and remove 0 values (replace with NaN)
 data = load(strcat(datadir,datafile));
