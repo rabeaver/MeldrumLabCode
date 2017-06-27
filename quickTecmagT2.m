@@ -3,14 +3,14 @@ clc
 close all
 
 %%
-filename = 'copperwaterecho200CPMG.tnt';
-filedir = 'C:\CommonData\MTR\';
+filename = 'GlycerolLarge_CPMG_11Apr2016_1';
+filedir = 'C:\CommonData\Glycerol\';
 fileloc = strcat(filedir,filename);
 
-[ap,spec,spec2,spec3,spec4] = readTecmag4d(fileloc);
+[ap,spec,spec2,spec3,spec4] = readTecmag4d(strcat(fileloc,'.tnt'));
 
-tEcho = 200; %us
-nEchoes = 64;
+tEcho = 400; %us
+nEchoes = 256;
 nPts = 54;
 nPtsBlank = 0;
 
@@ -53,3 +53,16 @@ plot(echoVector,ypred,'-r');
 xlabel('time[s]');
 ylabel('intensity');
 set(gca, 'Fontsize',18,'linewidth',2);
+
+figure(3)
+plot(echoVector,log10(dataIntRe));
+xlabel('time[s]');
+ylabel('log intensity');
+set(gca, 'Fontsize',18,'linewidth',2);
+
+%% For ILT
+dataOut = dataIntRe';
+echoOut = echoVector';
+
+save(strcat(filedir,filename,'.dat'), 'dataOut', '-ascii')
+save(strcat(filedir,filename,'_T2axis.dat'),'echoOut','-ascii')

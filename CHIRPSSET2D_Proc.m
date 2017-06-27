@@ -1,4 +1,3 @@
-
 clear
 clc
 close all
@@ -12,31 +11,30 @@ close all
 
 
 spectrometer = 'Tecmag'; %'Tecmag' OR 'Kea'
+
 datadir = 'Z:\Backup\ADF\Tyler Data\EtGly\';
 datafile = 'CHIRP_1_15May2017_result'; %\1\data'; 
 noCHIRPfile = 'noCHIRP_1_15May2017_result'; %\1\data'; 
 
-
-Pchirp = 1496.8e-6;                  % CHIRP Pulse Length (s)
-
-
-Pchirp = 477e-6;                  % CHIRP Pulse Length (s)
+Pchirp = 2.477e-3;                  % CHIRP Pulse Length (s)
 pw     = 6e-6;                      % hard pulse length
-sliceheight = 0.20;                % mm
+sliceheight = 0.200;                % mm
 
-rampPct = 0.01;                     % percent for the CHIRP power ramp to reach pMax
+rampPct = 0.0;                     % percent for the CHIRP power ramp to reach pMax
 
-nPts = 152;                          % # of acqu points
+
+nPts = 78;                          % # of acqu points
 
 omitPtsBack = 0;                    % the number of points at the end of each echo window that are zeros from the spectrometer
 omitPtsFront = 0;                    % the number of points at the beginning of each echo window to zero
-nEchoes = 512;                      % Echoes
-omitEchoes = 0;                     % numner of echoes to remove from data
+nEchoes = 128;                      % Echoes
+omitEchoes = 0;                     % number of echoes to remove from dat0
+echoChoice = 2;                     %the echo to use for display purposes
 
 tD = 4e-6;                          % dwell time (Tecmag shows correct dwell time for a complex point, no need to multiply by 2)
-tE = 700e-6;                           % us
-preCHIRPdelay = 0.2e-6;             % s
-noisePoints = 5;                    % number of points for measuring noise
+tE = 700-6;                           % us
+preCHIRPdelay = 20e-6;             % s
+noisePoints = 2;                    % number of points for measuring noise
 
 nScans = 4096;                     % Number of scans in the experiment
 cutRefPts = 0;                     %if necessary, can cut the data from the reference scan by half this value on each end of the acq window
@@ -49,8 +47,9 @@ apofac = 5;                         % Amount of Apodizatio
 
 
 
-delta = 1e-3;                       % little delta time (s)
-DELTA = 10e-3;                       % Big delta time in s
+
+delta = 5e-3;                       % little delta time (s)
+DELTA = 30e-3;                       % Big delta time in s
 
 
 % ===================================
@@ -127,11 +126,11 @@ T2Dprofiles = (fftshift(fft(CHIRPdat,NFFT)/L, 1)); % Performs FFT algorithm
 %% Plot CHIRP results
 figure(1)
 subplot(1,2,1)
-plot(t*1e6,real(CHIRPdat(:,2)));
+plot(t*1e6,real(CHIRPdat(:,echoChoice)));
 xlabel('time [us]')
 subplot(1,2,2)
 % figure(5)
-plot(z,2*abs(T2Dprofiles(:,2)),'LineWidth',1.5);
+plot(z,2*abs(T2Dprofiles(:,echoChoice)),'LineWidth',1.5);
 xlabel('real space [um]')
 title('Plot of first T2-D FFT Profile and Echo')
 
@@ -169,11 +168,11 @@ figure(3)
 subplot(1,2,1)
 hold on
 % plot(t*1e6,abs(noCHIRPdat(:,4)));
-plot(t*1e6,real(noCHIRPdat(:,4)));
-plot(t*1e6,imag(noCHIRPdat(:,4)));
+plot(t*1e6,real(noCHIRPdat(:,echoChoice)));
+plot(t*1e6,imag(noCHIRPdat(:,echoChoice)));
 xlabel('time [us]')
 subplot(1,2,2)
-plot(z,2*abs(CPprofiles(:,2)),'LineWidth',1.5);
+plot(z,2*abs(CPprofiles(:,echoChoice)),'LineWidth',1.5);
 xlabel('real space [um]')
 title('Plot of first reference FFT Profile and Echo')
 
@@ -185,22 +184,24 @@ xlabel('T2 [ms]')
 ylabel('z [um]')
 view([0 90])
 
-figure(5)
+hh = figure(5);
 hold on
-plot(z,abs(CPprofiles(:,2))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','k')
-plot(z,abs(T2Dprofiles(:,2))/max(abs(CPprofiles(:,1))),'linewidth',2,'color','r')
-% ylim([0 0.1])
+plot(z,abs(CPprofiles(:,echoChoice))/max(abs(CPprofiles(:,echoChoice))),'linewidth',2,'color','k')
+plot(z,abs(T2Dprofiles(:,echoChoice))/max(abs(CPprofiles(:,echoChoice))),'linewidth',2,'color','r')
+line([-sliceheight*1e3/2 -sliceheight*1e3/2],[0 2])
+line([sliceheight*1e3/2 1e3*sliceheight/2],[0 2])
+ylim([0 1.2])
 hold off
 xlabel('z [um]','fontsize',12)
 title('T2-D and coil reference profiles')
 set(gca,'Fontsize',12,'linewidth',2)
 legend('ref','exp')
-
+pubgraph(hh,14,2,'w','Arial')
 
 %% Coil Sensitivity Correction
 
 for k = 1:nEchoes-omitEchoes
-    pcorr(:,k) = abs(CPprofiles(:,1));
+    pcorr(:,k) = abs(CPprofiles(:,echoChoice));
 end
 
 T2Dprofcorr = T2Dprofiles./pcorr;
@@ -236,25 +237,42 @@ T2Dprofcorr = T2Dprofiles./pcorr;
 
 close all 
 figure(7)
-plot(abs(T2Dprofiles(:,1)))
+plot(abs(T2Dprofiles(:,echoChoice)))
 
 t1_fig7=Pchirp*(BWchirp/2-f)/BWchirp;
 deltaFig = 2*Pchirp*(BWchirp/2-f)/BWchirp + deltaMin; % expression for delta(effective), maybe
 
-ylimits = [0 1.5];
+wurstAmp = 1-(cos(pi*(t1_fig7)/Pchirp)).^40;
+
+
+ylimits = [0 0.8];
 deltaEff = 2*t1_fig7 ;
 % deltaEff = delta - t1_fig7 - preCHIRPdelay;
 deltaEff = fliplr(deltaEff);
 
+qIndex1 = 2*pi*gamma*1e6*G*deltaEff;
+vIndex1 = qIndex1.^2.*(DELTA + delta -deltaEff./3).*1e-9;
+
+vIndex_RC1 = (1/6)*(2*pi*gamma*1e6*G)^2.*(delta^3 - 3*delta^2*deltaEff/2 + 3*(deltaEff/2).^2*delta + 6*(deltaEff/2).^2*DELTA + 3*(deltaEff/2).^3)*1e-9;
+
 figure(8)
-subplot(2,1,1)
-plot(abs(T2Dprofcorr(:,1)))
+subplot(4,1,1)
+hold on
+for iii = 1:2*echoChoice+8;
+    plot(abs(T2Dprofcorr(:,iii)),':k','LineWidth',0.25)
+end
+plot(abs(T2Dprofcorr(:,echoChoice)),'-r','LineWidth',2)
 xlim([0 NFFT])
 ylim(ylimits)
 xlabel('index')
+hold off
 % 
-subplot(2,1,2)
-plot(1e6*t1_fig7,abs(T2Dprofcorr(:,1)))
+subplot(4,1,2)
+hold on
+plot(1e6*t1_fig7,abs(T2Dprofcorr(:,echoChoice)))
+plot(1e6*t1_fig7,wurstAmp,'--k');
+plot(1e6*t1_fig7,ylimits(2)*vIndex_RC1./max(vIndex_RC1),'--b')
+plot(1e6*t1_fig7,ylimits(2)*vIndex1./max(vIndex_RC1),'--g')
 line(1e6*[0 0],[0 ylimits(2)])
 line(1e6*[Pchirp Pchirp],[0 ylimits(2)])
 line(1e6*[0+CHIRPtimeDelay 0+CHIRPtimeDelay],[0 ylimits(2)],'Color','r','LineStyle','--')
@@ -265,7 +283,7 @@ set(gca,'XDir','reverse')
 xlabel('CHIRP time (us)')
 
 subplot(4,1,3)
-plot(1e6*deltaEff,abs(T2Dprofcorr(:,1)))
+plot(1e6*deltaEff,abs(T2Dprofcorr(:,echoChoice)))
 line(1e6*[0 0],[0 ylimits(2)])
 line(1e6*[delta delta],[0 ylimits(2)])
 line(1e6*[2*CHIRPtimeDelay 2*CHIRPtimeDelay],[0 ylimits(2)],'Color','r','LineStyle','--')
@@ -276,7 +294,7 @@ ylim(ylimits)
 xlabel('effective delta (us)')
 
 subplot(4,1,4)
-plot(z,abs(T2Dprofcorr(:,1)))
+plot(z,abs(T2Dprofcorr(:,echoChoice)))
 line([-sliceheight*1e3/2 -sliceheight*1e3/2],[0 ylimits(2)])
 line([sliceheight*1e3/2 1e3*sliceheight/2],[0 ylimits(2)])
 xlim([min(z), max(z)]);
@@ -285,8 +303,10 @@ ylim(ylimits)
 xlabel('z (um)')
 %% Data Range and Inversion
 
-minind = 388; %min(ptIndex);
-maxind = 591; %max(ptIndex); 
+minind = 198; %min(ptIndex);
+maxind = 322; %max(ptIndex); 
+
+
 
 % Calculate other axes
 BigIndex = 1:NFFT;
@@ -303,6 +323,7 @@ fIndex = zBigIndex(min(ptIndex):max(ptIndex)) * gamma*1e6 * G;
 deltaEffIndex = (1-(((BWchirp/2)-fIndex)/BWchirp))*2*Pchirp*1000;
 qIndex = 2*pi*gamma*1e6*G*deltaEffIndex/1000;
 vIndex = qIndex.^2.*(BigDELTA-deltaEffIndex./3000).*1e-9;
+vIndex_RC = (1/6)*(2*pi*gamma*1e6*G)^2.*(delta^3 - 3*delta^2*deltaEffIndex/2000 + 3*(deltaEffIndex/2000).^2*delta + 6*(deltaEffIndex/2000).^2*DELTA + 3*(deltaEffIndex/2000).^3)*1e-9;
 T2Ddat = abs(T2Dprofcorr(minind:maxind,:)); %crops data set according to above indices
 
 
@@ -317,25 +338,32 @@ yD = log(T2Ddat./max(max((T2Ddat))))';
 T2Dsize = size(T2Ddat,1); % cuts down delta points to math those selected for the indices,assuming that the 
 
 % fit to STE diffusion equation
-p = polyfit(-vIndex, yD(1,:),1); %T2Dsize),(yD(1,:)),1);
+p = polyfit(-vIndex_RC, yD(1,:),1); %T2Dsize),(yD(1,:)),1);
 
 figure(9)
+subplot(2,1,1)
 hold on
-scatter(-vIndex(1:T2Dsize),(yD(1,:)));
-plot(-vIndex(1:T2Dsize),polyval(p,-vIndex(1:T2Dsize)));
+scatter(-vIndex_RC(1:T2Dsize),(yD(1,:)));
+plot(-vIndex_RC(1:T2Dsize),polyval(p,-vIndex_RC(1:T2Dsize)));
+xlabel('vIndex_RC')
+xlim([min(-vIndex_RC(1:T2Dsize)) max(-vIndex_RC(1:T2Dsize))]);
+subplot(2,1,2)
+scatter(minind:1:maxind,yD(1,:));
+xlim([minind maxind]);
+xlabel('index')
 
-D = p(1)*1e-9         % *10-9 m^2 s^-1
+D = p(1)*1e-9 ;        % *10-9 m^2 s^-1
 
 %% surf of all T2-D Profiles
 
 figure(10)
 % surf(echoVec/1000,deltaSteps*1e6,T2Ddat);
-surf(echoVec/1000,deltaEffIndex(1:end-5),T2Ddat(1:end-5,:));
+surf(echoVec/1000,vIndex_RC,T2Ddat);
 shading flat
 colormap('jet');
 colorbar 
 xlabel('T2 [ms]'); 
-ylabel('delta [us]');
+ylabel('v [s m-2]');
 title('D-T2 data')
 
 %% Save data, display ILT Data params
@@ -348,15 +376,15 @@ t2axis = t2axis';
 % vaxis = [1.15, 1.39, 1.66, 1.94, 2.25, 2.58, 2.92, 3.29, 3.67, 4.08, 4.5, 4.93, 5.39, 5.86, 6.34]*1e7/1e9;
 
 vIndex = rot90(vIndex,2)';
+vIndex_RC = rot90(vIndex_RC,2)';
 
 
-T2Ddat = flipud(flipud(T2Ddat));
-
+T2Ddat = flipud(T2Ddat)-rms(rms(T2Ddat));
 
 save(strcat(datadir,datafile, '.dat'), 'T2Ddat', '-ascii')
 save(strcat(datadir,datafile, '_T2axis.dat'), 't2axis', '-ascii')
 save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
-
+save(strcat(datadir,datafile, '_vaxisRC.dat'), 'vIndex_RC', '-ascii')
 % %%
 % 
 % 
@@ -419,3 +447,85 @@ save(strcat(datadir,datafile, '_vaxis.dat'), 'vIndex', '-ascii')
 % fileID = fopen(strcat(datadir,'DataNotesAuto.txt'),'a');
 % fprintf(fileID,'%s %s: %f; %d %d; %.0f %.0f %.2f %.2f; %d %d\n',dt,datafile, SNR, minind, maxind, min(echoVec), max(echoVec), 1e6*min(deltaSteps), 1e6*max(deltaSteps), size(T2Ddat,2), size(T2Ddat,1));
 % fclose(fileID);
+
+
+%%
+% omitEchoesT2D = 16;
+% omitDT2D = 5;
+% hlims = [0.001 1];
+% vlims = [0.001 1];
+% hsteps = 15;
+% vsteps = 15;
+% alpha = 1e7;
+% 
+% t2proc = t2axis(1+omitEchoesT2D:end)';
+% vproc = vIndex(1+omitDT2D:end)';
+% dataProc = T2Ddat(1+omitDT2D:end,1+omitEchoesT2D:end);
+% 
+% [spectrum,tauh,tauv,chisq,compte]=upnnlsmooth3Dsvdfin(dataProc,t2proc,vproc,hlims,hsteps,vlims,vsteps,alpha,-1,'b','exp(-h/T)','exp(-v*D)');
+% 
+% taulh = log10(tauh);
+% taulv = log10(tauv);
+% 
+% hh = figure(10);
+% surf(taulh,taulv,spectrum)
+% shading interp;
+% axis([taulh(1),taulh(end),taulv(1),taulv(end)]);
+% xmarks=(taulh(1):1:taulh(end));
+% ymarks=(taulv(1):1:taulv(end));
+% 
+% for aa = 0:range(xmarks)-2
+%     line([xmarks(aa+2) xmarks(aa+2)],[min(ymarks) max(ymarks)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
+% end
+% 
+% for aa = 0:range(ymarks)-2
+%     line([min(xmarks) max(xmarks)],[ymarks(aa+2) ymarks(aa+2)],[max(max(spectrum)) max(max(spectrum))],'LineStyle','--','LineWidth',2,'Color','w');
+% end
+% 
+% 
+% xlabel('$\log {\it{T}_2/\textrm{s}}$','FontSize',14,'interpreter','latex');
+% ylabel('$\log {\it{D}/  10^{-9} \textrm{m}^2 \textrm{s}^{-1}}$','FontSize',14,'interpreter','latex');
+% title('$\it{D}-\it{T}_2$ correlation','FontSize',16,'interpreter','latex');
+% pubgraph(hh,16,2,'w','mwa_cmr10')
+
+%% Recreate the data for a two-component system
+
+
+
+% D1 = 1.53411; %x10-9 m2/s
+% T21 = 0.0852742; %s
+% A1 = 0.97;
+% 
+% D2 = 0.121306; %%x10-9 m2/s
+% T22 = 0.0283681; %s
+% 
+% 
+% dStart = exp((-A1*D1 + -(1-A1)*D2)*vIndex_RC);
+% T2decay = exp(-(A1*t2axis/T21 + (1-A1)*t2axis/T22));
+% for ii = 1:length(dStart)
+%     SS(ii,:) = dStart(ii)*T2decay;
+% end
+% SS = SS/max(max(SS));
+% 
+% 
+% zrange = [0 1];
+% yrange = [min(vIndex_RC) max(vIndex_RC)];
+% xrange = [min(t2axis) max(t2axis)];
+% 
+% figure(11)
+% ax1 = subplot(2,2,1);
+% surf(t2axis,vIndex_RC,SS)
+% xlim(xrange); ylim(yrange); zlim(zrange);
+% shading flat
+% ax2 = subplot(2,2,2);
+% surf(t2axis,vIndex_RC,T2Ddat);
+% xlim(xrange); ylim(yrange); zlim(zrange);
+% shading flat
+% ax3 = subplot(2,2,3);
+% surf(t2axis,vIndex_RC,SS-T2Ddat);
+% xlim(xrange); ylim(yrange); zlim([-1 1]);
+% shading flat
+% 
+% hlink = linkprop([ax1,ax2,ax3],{'CameraPosition','CameraUpVector'}); 
+% rotate3d on
+

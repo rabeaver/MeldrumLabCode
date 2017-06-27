@@ -8,16 +8,15 @@ close all
 %%%%%%% User-defined parameters %%%%%%%
 % tic
 
-
-dt = 200e-7;             % time per point in waveform (s) [Scout limit is 20ns]
-tau = 250e-3;            % pulse length (s)
-sliceheight = 0.150;     % mm
+dt = 200e-9;             % time per point in waveform (s) [Scout limit is 20ns]
+tau = 1.477e-3;            % pulse length (s)
+sliceheight = 0.300;     % mm
 
 
 G = 6.59;               %T m-1, B0 field gradient [PM25 = 6.59]
                         %                         [PM5 = 23.87]
-offset = -0.10;             %mm, frequency offset (if applicable)
-amplitude = 2;          %pwr, for Tecmag
+offset = 0;             %mm, frequency offset (if applicable)
+amplitude = 15;          %pwr, for Tecmag
 % Note: The offset is subtracted from the frequency so that a negative
 % offset increases the frequency, bringing the slice closer to the magnet.
 % This makes the spatial orientation consistent with the sign of the
@@ -28,8 +27,8 @@ LINramp = 1;
 EXPramp = 0; 
 
 % shape for edges of amplitude profile
-WURSTshape = 0;
-LINEARshape = 1;
+WURSTshape = 1;
+LINEARshape = 0;
 linearPct = 0.01;       % percent of the front end and back end of the pulse
                         % that will be linearly ramped
 

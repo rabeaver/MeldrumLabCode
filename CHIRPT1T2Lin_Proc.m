@@ -11,12 +11,12 @@ close all
 spectrometer = 'Tecmag'; %'Tecmag'
 
 datadir = 'C:\CommonData\TKM\P250\';
-datafile = 'P250_CHIRP_1_T1IR_11Mar2017_result';
+datafile = 'P250_CHIRP_6_T1IR_10Mar2017_result';
 noCHIRPfile = 'P250_noCHIRP_2_T1IR_8Mar2017_result';
 filenameExt = '.tnt';
 
 
-Pchirp = 0.250; % CHIRP Pulse Length (s)
+Pchirp = 0.100; % CHIRP Pulse Length (s)
 
 
 sliceheight = 0.150; %mm
@@ -58,7 +58,14 @@ NFFT = 2^nextpow2(L);               % Next power of 2 from length of y
 
 echoVec = (omitEchoes+1)*tE:tE:(nEchoes*tE);
 t = (-(L-1)/2:L/2)*T;               % Time vector
-f = linspace(-Fs/2,Fs/2,NFFT);      % Hz
+f = -linspace(-Fs/2,Fs/2,NFFT);      % Hz
+
+%/ I added a minus sign to the expression for f above, TKM, 14 March 2017.
+%I'm still not sure what should happen with his with regards to making sure
+%indices increase in parallel with real space (up is +z) because the
+%gradient points down on the single-sided magnets. I think this correction
+%makes things more consistent, but I need to think about it. /%
+
 z = f/(gamma*G);                       % um, 280.47 Hz/um (for PM25)
 
 ChirpTRange = (range(z)/(1000*sliceheight)*Pchirp);
@@ -216,6 +223,7 @@ line([Pchirp Pchirp],ylims,'Color','k')
 xlim([0 NFFT])
 ylim(ylims)
 xlabel('index')
+set(gca,'XDir','reverse')
 subplot(3,1,2)
 hold on
 plot(z,abs(T1T2profcorr(:,echoIndex)))
@@ -239,9 +247,9 @@ xlabel('effective recovery time [s])')
 %% Data Range and Inversion
 
 % manually select indices for data range and inversion (zero point)
-minind= 230;
-firstinvertedind = 280;
-maxind = 307;
+minind= 229;
+firstinvertedind = 277;
+maxind = 305;
 
 T1T2profiles2=zeros((maxind-minind+1),nEchoes-omitEchoes);
 
@@ -264,7 +272,7 @@ set(gca,'Fontsize',30,'linewidth',2)
 % xlim([0 1000*Pchirp])
 ylim([-1.1 1.1])
 
-cftool(t1*1000,T1T2data(:,1))
+% cftool(t1,T1T2data(:,1))
 
 %% surf of all T1-T2 Profiles
 figure

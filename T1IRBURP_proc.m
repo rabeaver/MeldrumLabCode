@@ -7,8 +7,8 @@ close all
 % Input filename, - .tnt
 
 
-filename = 'Gouda2_T1IR_BURP_27Sep2016';
-filedir = 'C:\CommonData\JNK\UFT2D\Food\Gouda\';
+filename = 'Gouda_T1IR_BURP_1_05Apr2017';
+filedir = 'C:\CommonData\TKM\Gouda\';
 
 
 fileloc = strcat(filedir,filename,'.tnt');
@@ -20,12 +20,12 @@ fileloc = strcat(filedir,filename,'.tnt');
 
 tEcho = 250; %us
 nEchoes = 512;
-nPts = 82;
+nPts = 78;
 nPtsBlank = 0;
 omitEchoes = 0;
-nT1Pts = 21;
-T1min = 0.1; %ms
-T1max = 1250; %ms
+nT1Pts = 15;
+T1min = 0.05; %ms
+T1max = 500; %ms
 noisePoints = 6; %number of points to use for noise at beginning and end of each acqu period
 noiseNumber = nT1Pts; %T1 point to use for SNR calc
 
